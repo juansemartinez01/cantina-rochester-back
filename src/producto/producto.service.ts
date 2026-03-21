@@ -5,6 +5,7 @@ import { Producto } from './producto.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { BuscarProductoDto } from './dto/buscar-producto.dto';
+import { BuscarProductoFastDto } from './dto/buscar-producto-fast.dto';
 import { StockActual } from 'src/stock-actual/stock-actual.entity';
 import { Unidad } from 'src/unidad/unidad.entity';
 
@@ -12,8 +13,12 @@ import { Unidad } from 'src/unidad/unidad.entity';
 import { In } from 'typeorm';
 import { ProductoPrecioAlmacen } from 'src/producto-precio-almacen/producto-precio-almacen.entity';
 import { UpdateProductoCargaRapidaDto } from './dto/update-producto-carga-rapida.dto';
+import { Usuario } from 'src/usuario/usuario.entity';
+import { PrecioHistorialTipo, ProductoPrecioHistorial } from 'src/producto-precio-historial/producto-precio-historial.entity';
 
 const QUICK_BARCODE = '000000000000';
+
+type AuthUser = { id?: number };
 
 @Injectable()
 export class ProductoService {
@@ -23,7 +28,55 @@ export class ProductoService {
     @InjectRepository(Unidad) private readonly unidadRepo: Repository<Unidad>,
     @InjectRepository(ProductoPrecioAlmacen)
     private readonly ppaRepo: Repository<ProductoPrecioAlmacen>,
+
+    @InjectRepository(ProductoPrecioHistorial)
+    private readonly precioHistRepo: Repository<ProductoPrecioHistorial>,
+
+    @InjectRepository(Usuario)
+    private readonly usuarioRepo: Repository<Usuario>,
   ) {}
+
+  private async resolveUserForAudit(user?: AuthUser) {
+    const userId = user?.id;
+    if (!userId) {
+      return { usuario_id: null, usuario_nombre: null };
+    }
+
+    const u = await this.usuarioRepo.findOne({
+      where: { id: userId },
+      select: ['id', 'nombre', 'usuario'],
+    });
+
+    return {
+      usuario_id: String(userId),
+      usuario_nombre: u?.nombre ?? u?.usuario ?? String(userId),
+    };
+  }
+
+  private async auditPrecio(params: {
+    producto_id: number;
+    almacen_id?: number | null;
+    tipo: PrecioHistorialTipo;
+    precio_anterior?: number | null;
+    precio_nuevo?: number | null;
+    origen: string;
+    user?: AuthUser;
+  }) {
+    const who = await this.resolveUserForAudit(params.user);
+
+    await this.precioHistRepo.insert({
+      producto_id: params.producto_id,
+      almacen_id: params.almacen_id ?? null,
+      tipo: params.tipo,
+      precio_anterior:
+        params.precio_anterior == null ? null : String(params.precio_anterior),
+      precio_nuevo:
+        params.precio_nuevo == null ? null : String(params.precio_nuevo),
+      usuario_id: who.usuario_id,
+      usuario_nombre: who.usuario_nombre,
+      origen: params.origen,
+    });
+  }
 
   private isQuickProducto(p?: Producto | null) {
     return !!p && p.barcode === QUICK_BARCODE;
@@ -50,9 +103,20 @@ export class ProductoService {
       const override = await this.ppaRepo.findOne({
         where: { producto_id: productoId, almacen_id: almacenId },
       });
-      if (override?.precio != null) return Number(override.precio);
+      if (override?.precio != null) {
+        return this.getPrecioOverrideEfectivo(override);
+      }
     }
     return Number(prod.precioBase ?? 0);
+  }
+
+  private getPrecioOverrideEfectivo(override: ProductoPrecioAlmacen): number {
+    const inOferta = override.inOferta === true;
+    const precioOfertaNum = Number(override.precioOferta ?? 0);
+    if (inOferta && Number.isFinite(precioOfertaNum) && precioOfertaNum > 0) {
+      return precioOfertaNum;
+    }
+    return Number(override.precio ?? 0);
   }
 
   private esGramos(u: Unidad | null | undefined) {
@@ -84,6 +148,7 @@ export class ProductoService {
           'producto.barcode',
           'producto.precioBase',
           'producto.activo',
+          'producto.inOferta',
           'producto.precio_updated_at',
           // ya lo tenías, lo dejamos
           'producto.es_por_gramos',
@@ -156,6 +221,7 @@ export class ProductoService {
           existingBarcode.sku = dto.sku;
           existingBarcode.precioBase = dto.precioBase;
           existingBarcode.activo = true;
+          existingBarcode.inOferta = dto.inOferta ?? false;
           existingBarcode.updated_at = new Date();
           existingBarcode.proveedorNombre = dto.proveedorNombre ?? undefined;
 
@@ -174,6 +240,7 @@ export class ProductoService {
       unidad,
       categoria_id: dto.categoria_id,
       proveedorNombre: dto.proveedorNombre ?? undefined,
+      inOferta: dto.inOferta ?? false,
       es_por_gramos: this.esGramos(unidad),
       ...(dto.precioBase != null ? { precio_updated_at: new Date() } : {}),
     });
@@ -201,10 +268,15 @@ export class ProductoService {
     defaultProducto.nombre = 'Producto no encontrado';
     defaultProducto.sku = 'N/A';
     defaultProducto.barcode = 'N/A';
+    defaultProducto.inOferta = false;
     return defaultProducto;
   }
 
-  async update(id: number, dto: UpdateProductoDto): Promise<Producto> {
+  async update(
+    id: number,
+    dto: UpdateProductoDto,
+    user?: { id?: number },
+  ): Promise<Producto> {
     const productoActual = await this.repo.findOne({ where: { id } });
     if (!productoActual)
       throw new NotFoundException(`Producto ${id} no encontrado`);
@@ -241,6 +313,28 @@ export class ProductoService {
       ? { precio_updated_at: new Date() }
       : {};
 
+    const cambiaPrecioBase = Object.prototype.hasOwnProperty.call(
+      dto,
+      'precioBase',
+    );
+
+    if (cambiaPrecioBase) {
+      const oldVal = Number(productoActual.precioBase ?? 0);
+      const newVal = Number((dto as any).precioBase ?? 0);
+
+      if (oldVal !== newVal) {
+        await this.auditPrecio({
+          producto_id: id,
+          almacen_id: null,
+          tipo: PrecioHistorialTipo.BASE,
+          precio_anterior: oldVal,
+          precio_nuevo: newVal,
+          origen: 'PUT /productos/:id',
+          user,
+        });
+      }
+    }
+
     await this.repo.update({ id }, {
       ...dto,
       ...(unidad ? { unidad } : {}),
@@ -274,8 +368,20 @@ export class ProductoService {
   }
 
   async buscarConFiltros(filtros: BuscarProductoDto): Promise<Producto[]> {
-    const { nombre, sku, barcode, categoriaId, unidadId, conStock, almacenId } =
-      filtros;
+    const {
+      nombre,
+      sku,
+      barcode,
+      categoriaId,
+      unidadId,
+      conStock,
+      almacenId,
+      precioUpdatedDesde,
+      precioUpdatedHasta,
+      q,
+      page,
+      limit,
+    } = filtros;
 
     const query = this.repo
       .createQueryBuilder('producto')
@@ -321,10 +427,40 @@ export class ProductoService {
       });
     }
 
+    if (precioUpdatedDesde) {
+      query.andWhere('producto.precio_updated_at >= :precioUpdatedDesde', {
+        precioUpdatedDesde,
+      });
+    }
+
+    if (precioUpdatedHasta) {
+      query.andWhere('producto.precio_updated_at <= :precioUpdatedHasta', {
+        precioUpdatedHasta,
+      });
+    }
+
+    if (q) {
+      query.andWhere(
+        '(producto.nombre ILIKE :q OR producto.sku ILIKE :q OR producto.barcode ILIKE :q)',
+        { q: `%${q}%` },
+      );
+    }
+
     // 👇 tu filtro original (lo dejamos tal cual)
     const conStockBool = conStock === 'true';
     if (conStockBool) {
       query.andWhere('stock.cantidad > 0');
+    }
+
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    if (
+      Number.isInteger(pageNum) &&
+      Number.isInteger(limitNum) &&
+      pageNum > 0 &&
+      limitNum > 0
+    ) {
+      query.skip((pageNum - 1) * limitNum).take(Math.min(limitNum, 10000));
     }
 
     const productos = await query.getMany();
@@ -341,7 +477,7 @@ export class ProductoService {
 
       const mapOverride = new Map<number, number>();
       overrides.forEach((o) =>
-        mapOverride.set(o.producto_id, Number(o.precio)),
+        mapOverride.set(o.producto_id, this.getPrecioOverrideEfectivo(o)),
       );
 
       for (const p of productos) {
@@ -357,6 +493,105 @@ export class ProductoService {
     return productos;
   }
 
+  async buscarConFiltrosFast(
+    filtros: BuscarProductoFastDto,
+  ): Promise<Producto[]> {
+    const {
+      nombre,
+      sku,
+      barcode,
+      categoriaId,
+      unidadId,
+      conStock,
+      almacenId,
+      q,
+      limit,
+    } = filtros;
+
+    const almacenIdNum = Number(almacenId);
+    if (!almacenId || !Number.isInteger(almacenIdNum) || almacenIdNum <= 0) {
+      return this.buscarConFiltros(filtros);
+    }
+
+    const query = this.repo
+      .createQueryBuilder('producto')
+      .leftJoinAndSelect('producto.unidad', 'unidad')
+      .leftJoinAndSelect('producto.categoria', 'categoria')
+      .innerJoinAndSelect(
+        'producto.stock',
+        'stock',
+        'stock.almacen_id = :almacenId',
+        { almacenId: almacenIdNum },
+      )
+      .leftJoinAndMapOne('stock.almacen', 'stock.almacen', 'almacen')
+      .addSelect('producto.precio_updated_at')
+      .where('producto.activo = true')
+      .addSelect('producto.es_por_gramos')
+      .addSelect('producto.proveedorNombre');
+
+    if (nombre) {
+      query.andWhere('producto.nombre ILIKE :nombre', {
+        nombre: `%${nombre}%`,
+      });
+    }
+
+    if (sku) {
+      query.andWhere('producto.sku = :sku', { sku });
+    }
+
+    if (barcode) {
+      query.andWhere('producto.barcode = :barcode', { barcode });
+    }
+
+    if (q) {
+      query.andWhere(
+        '(producto.nombre ILIKE :q OR producto.sku ILIKE :q OR producto.barcode ILIKE :q)',
+        { q: `%${q}%` },
+      );
+    }
+
+    if (categoriaId !== undefined && !isNaN(parseInt(categoriaId))) {
+      query.andWhere('producto.categoria_id = :categoriaId', {
+        categoriaId: parseInt(categoriaId),
+      });
+    }
+
+    if (unidadId !== undefined && !isNaN(parseInt(unidadId))) {
+      query.andWhere('producto.unidad_id = :unidadId', {
+        unidadId: parseInt(unidadId),
+      });
+    }
+
+    const conStockBool = conStock === 'true';
+    if (conStockBool) {
+      query.andWhere('stock.cantidad > 0');
+    }
+
+    const limitNum = Number(limit);
+    if (Number.isInteger(limitNum) && limitNum > 0) {
+      query.take(Math.min(limitNum, 10000));
+    }
+
+    const productos = await query.getMany();
+    if (productos.length === 0) return productos;
+
+    const ids = productos.map((p) => p.id);
+    const overrides = await this.ppaRepo.find({
+      where: { producto_id: In(ids), almacen_id: almacenIdNum },
+    });
+
+    const mapOverride = new Map<number, number>();
+    overrides.forEach((o) =>
+      mapOverride.set(o.producto_id, this.getPrecioOverrideEfectivo(o)),
+    );
+
+    for (const p of productos) {
+      (p as any).precioFinal = mapOverride.get(p.id) ?? Number(p.precioBase ?? 0);
+    }
+
+    return productos;
+  }
+
   async borrarLogicamente(id: number): Promise<Producto> {
     const producto = await this.repo.findOne({ where: { id } });
     if (!producto) throw new NotFoundException(`Producto ${id} no encontrado`);
@@ -366,14 +601,29 @@ export class ProductoService {
   }
 
   /** Upsert del precio por almacén */
-  async upsertPrecioAlmacen(input: {
-    producto_id: number;
-    almacen_id: number;
-    precio: number;
-    moneda?: string;
-  }) {
-    const { producto_id, almacen_id, precio, moneda } = input;
+  async upsertPrecioAlmacen(
+    input: {
+      producto_id: number;
+      almacen_id: number;
+      precio: number;
+      moneda?: string;
+      inOferta?: boolean;
+      precioOferta?: number;
+    },
+    user?: { id?: number },
+  ) {
+    const { producto_id, almacen_id, precio, moneda, inOferta, precioOferta } =
+      input;
     if (precio <= 0) throw new BadRequestException('El precio debe ser > 0');
+
+    const ofertaActiva = inOferta === true;
+    if (ofertaActiva) {
+      if (precioOferta == null || Number(precioOferta) <= 0) {
+        throw new BadRequestException(
+          'Si inOferta es true, debe enviarse precioOferta > 0',
+        );
+      }
+    }
 
     // aseguramos que el producto exista (útil para 404 claras)
     const prod = await this.repo.findOne({ where: { id: producto_id } });
@@ -385,7 +635,25 @@ export class ProductoService {
     });
 
     if (current) {
+      const oldVal = Number(current.precio ?? 0);
+      const newVal = Number(precio);
+
+      if (oldVal !== newVal) {
+        await this.auditPrecio({
+          producto_id,
+          almacen_id,
+          tipo: PrecioHistorialTipo.OVERRIDE,
+          precio_anterior: oldVal,
+          precio_nuevo: newVal,
+          origen: 'POST /productos/precio-override',
+          user,
+        });
+      }
+
+
       current.precio = String(precio);
+      current.inOferta = ofertaActiva;
+      current.precioOferta = ofertaActiva ? String(precioOferta) : null;
       if (moneda) current.moneda = moneda;
       await this.repo.update(producto_id, { precio_updated_at: new Date() });
       return this.ppaRepo.save(current);
@@ -394,8 +662,21 @@ export class ProductoService {
         producto_id,
         almacen_id,
         precio: String(precio),
+        inOferta: ofertaActiva,
+        precioOferta: ofertaActiva ? String(precioOferta) : null,
         moneda: moneda ?? 'ARS',
       });
+
+      await this.auditPrecio({
+        producto_id,
+        almacen_id,
+        tipo: PrecioHistorialTipo.OVERRIDE,
+        precio_anterior: null,
+        precio_nuevo: Number(precio),
+        origen: 'POST /productos/precio-override',
+        user,
+      });
+
       await this.repo.update(producto_id, { precio_updated_at: new Date() });
       return this.ppaRepo.save(nuevo);
     }
@@ -422,6 +703,9 @@ export class ProductoService {
     producto.nombre = dto.nombre;
     producto.descripcion = dto.descripcion;
     producto.precioBase = dto.precioBase;
+    if (dto.inOferta !== undefined) {
+      producto.inOferta = dto.inOferta;
+    }
     producto.precio_updated_at = new Date();
 
     return this.repo.save(producto);

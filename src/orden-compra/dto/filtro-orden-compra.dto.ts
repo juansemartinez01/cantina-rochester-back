@@ -1,4 +1,4 @@
-import { IsOptional, IsNumberString, IsString } from 'class-validator';
+import { IsDateString, IsOptional, IsNumberString, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class FiltroOrdenCompraDto {
@@ -13,6 +13,14 @@ export class FiltroOrdenCompraDto {
   @IsOptional()
   @IsString()
   proveedorId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  fechaVencimientoDesde?: string;
+
+  @IsOptional()
+  @IsDateString()
+  fechaVencimientoHasta?: string;
 
   @IsOptional()
   @Type(() => Number)

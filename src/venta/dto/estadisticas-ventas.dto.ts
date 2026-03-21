@@ -9,4 +9,8 @@ export class EstadisticasVentasDto {
   @IsOptional()
   @IsString()
   fechaHasta?: string;
+
+  @IsOptional()
+  @IsString()
+  almacenId?: string;
 }

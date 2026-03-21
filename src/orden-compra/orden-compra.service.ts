@@ -42,6 +42,7 @@ export class OrdenCompraService {
         cantidad_gramos?: number;
         precioUnitario: number;
         subtotal: number;
+        fechaVencimiento?: string;
       }> = [];
 
       for (const i of items) {
@@ -91,6 +92,7 @@ export class OrdenCompraService {
           cantidad_gramos,
           precioUnitario,
           subtotal,
+          fechaVencimiento: i.fechaVencimiento,
         });
       }
 
@@ -115,6 +117,7 @@ export class OrdenCompraService {
           cantidad_gramos: it.esPorGramos ? (Number(it.cantidad_gramos!.toFixed(3)).toString()) : null, // guardamos como string para NUMERIC
           precioUnitario: it.precioUnitario,
           subtotal: it.subtotal,
+          fechaVencimiento: it.fechaVencimiento ?? null,
         });
         await manager.save(ordenItem);
 
@@ -149,12 +152,13 @@ export class OrdenCompraService {
         if (stock) {
           if (it.esPorGramos) {
             const actual = stock.cantidad_gramos ? Number(stock.cantidad_gramos) : 0;
-            const nuevo = actual + it.cantidad_gramos!;
+            const nuevo = actual < 0 ? it.cantidad_gramos! : actual + it.cantidad_gramos!;
             stock.cantidad_gramos = nuevo.toFixed(3);
             // aseguramos piezas en 0 si es por gramos
             if (stock.cantidad == null) stock.cantidad = 0;
           } else {
-            stock.cantidad = (stock.cantidad ?? 0) + it.cantidad!;
+            const actual = stock.cantidad ?? 0;
+            stock.cantidad = actual < 0 ? it.cantidad! : actual + it.cantidad!;
             // aseguramos gramos nulo/0 si es por piezas (opcional)
             if (!stock.cantidad_gramos) stock.cantidad_gramos = null;
           }
@@ -216,6 +220,7 @@ async obtenerTodasConFiltros(filtros: FiltroOrdenCompraDto) {
       'items.cantidad_gramos',
       'items.precioUnitario',
       'items.subtotal',
+      'items.fechaVencimiento',
       'producto.id',
       'producto.nombre',
       'unidad.id',
@@ -234,6 +239,18 @@ async obtenerTodasConFiltros(filtros: FiltroOrdenCompraDto) {
 
   if (filtros.proveedorId) {
     query.andWhere('proveedor.id = :proveedorId', { proveedorId: filtros.proveedorId });
+  }
+
+  if (filtros.fechaVencimientoDesde) {
+    query.andWhere('items.fecha_vencimiento >= :fechaVencimientoDesde', {
+      fechaVencimientoDesde: filtros.fechaVencimientoDesde,
+    });
+  }
+
+  if (filtros.fechaVencimientoHasta) {
+    query.andWhere('items.fecha_vencimiento <= :fechaVencimientoHasta', {
+      fechaVencimientoHasta: filtros.fechaVencimientoHasta,
+    });
   }
 
   const [data, total] = await query
@@ -256,6 +273,7 @@ async obtenerTodasConFiltros(filtros: FiltroOrdenCompraDto) {
       cantidad_gramos: item['cantidad_gramos'] ?? null,
       precioUnitario: item.precioUnitario,
       subtotal: item.subtotal,
+      fechaVencimiento: item.fechaVencimiento ?? null,
       producto: {
         id: item.producto.id,
         nombre: item.producto.nombre,

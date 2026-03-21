@@ -34,6 +34,10 @@ export class CreateProductoDto {
   @IsOptional()
   es_por_gramos?: boolean; // en la entidad default=false
 
+  @IsBoolean()
+  @IsOptional()
+  inOferta?: boolean; // en la entidad default=false
+
   // ⬇️ NUEVO CAMPO
   @IsString()
   @IsOptional()

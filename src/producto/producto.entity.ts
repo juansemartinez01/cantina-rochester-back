@@ -57,6 +57,9 @@ export class Producto {
   @Column({ type: 'boolean', name: 'es_por_gramos', default: false })
   es_por_gramos: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  inOferta: boolean;
+
   @Column({ type: 'timestamptz', nullable: true })
   precio_updated_at: Date;
 

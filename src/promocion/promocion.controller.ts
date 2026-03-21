@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, Put, Query } from '@nestjs/common';
 import { PromocionService } from './promocion.service';
 import { CreatePromocionDto } from './dto/create-promocion.dto';
 import { UpdatePromocionDto } from './dto/update-promocion.dto';
+import { QueryProductosPromocionActivaDto } from './dto/query-productos-promocion-activa.dto';
 
 @Controller('promociones')
 export class PromocionController {
@@ -15,6 +16,13 @@ export class PromocionController {
   @Get('activas')
   getActivas() {
     return this.service.findActivas();
+  }
+
+  @Get('activas/productos')
+  getProductosEnPromocionesActivas(
+    @Query() query: QueryProductosPromocionActivaDto,
+  ) {
+    return this.service.findProductosEnPromocionesActivas(query);
   }
 
   @Get('codigo/:codigo')

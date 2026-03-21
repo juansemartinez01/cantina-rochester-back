@@ -199,12 +199,12 @@ export class VentaService {
   async obtenerTodasConFiltros(filtros: {
     fechaDesde?: string;
     fechaHasta?: string;
-    horaDesde?: string; // ⬅️ nuevo
-    horaHasta?: string; // ⬅️ nuevo
+    horaDesde?: string;
+    horaHasta?: string;
     usuarioId?: string;
     estado?: string;
     almacenId?: string;
-    tipo?: 'EFECTIVO' | 'BANCARIZADO'; // ✅ nuevo
+    tipo?: 'EFECTIVO' | 'BANCARIZADO';
     page?: number;
     limit?: number;
     ordenCampo?: string;
@@ -218,17 +218,28 @@ export class VentaService {
     const {
       fechaDesde,
       fechaHasta,
-      horaDesde, // ⬅️
-      horaHasta, // ⬅️
+      horaDesde,
+      horaHasta,
       usuarioId,
       almacenId,
       estado,
-      tipo, // ✅ nuevo
+      tipo,
       page = 1,
       limit = 50,
       ordenCampo = 'fecha',
       ordenDireccion = 'DESC',
     } = filtros;
+
+    console.log('FILTROS VENTAS >>>', {
+      fechaDesde,
+      fechaHasta,
+      horaDesde,
+      horaHasta,
+      usuarioId,
+      almacenId,
+      estado,
+      tipo,
+    });
 
     const query = this.repo
       .createQueryBuilder('venta')
@@ -238,7 +249,7 @@ export class VentaService {
       .leftJoin('producto.unidad', 'unidad')
       .leftJoin('producto.categoria', 'categoria')
       .leftJoin('venta.almacen', 'almacen')
-      .leftJoin('venta.ingresos', 'ingreso') // 👈 importante para acceder a tipo
+      .leftJoin('venta.ingresos', 'ingreso')
       .select([
         'venta.id',
         'venta.fecha',
@@ -266,77 +277,28 @@ export class VentaService {
         'almacen.id',
         'almacen.nombre',
 
-        'ingreso.tipo', // opcional si querés verlo
+        'ingreso.tipo',
         'ingreso.monto',
       ])
       .skip((page - 1) * limit)
       .take(limit);
 
-      const tz = 'America/Argentina/Buenos_Aires';
-
-      // ⬇️ fechaDesde + horaDesde
-      if (fechaDesde) {
-        const mInicio = moment.tz(fechaDesde, tz);
-
-        if (horaDesde) {
-          const [h, m] = horaDesde.split(':').map(Number);
-          mInicio
-            .hour(h || 0)
-            .minute(m || 0)
-            .second(0)
-            .millisecond(0);
-        } else {
-          // si no viene horaDesde, uso comienzo del día
-          mInicio.startOf('day');
-        }
-
-        const fechaDesdeUtc = mInicio.utc().toDate();
-        query.andWhere('venta.fecha >= :fechaDesde', {
-          fechaDesde: fechaDesdeUtc,
-        });
-      }
-
-      // ⬇️ fechaHasta + horaHasta
-      if (fechaHasta) {
-        const mFin = moment.tz(fechaHasta, tz);
-
-        if (horaHasta) {
-          const [h, m] = horaHasta.split(':').map(Number);
-          mFin
-            .hour(h || 23)
-            .minute(m || 59)
-            .second(59)
-            .millisecond(999);
-        } else {
-          // si no viene horaHasta, uso fin del día
-          mFin.endOf('day');
-        }
-
-        const fechaHastaUtc = mFin.utc().toDate();
-        query.andWhere('venta.fecha <= :fechaHasta', {
-          fechaHasta: fechaHastaUtc,
-        });
-      }
-
+    // 🔹 Filtro fecha + hora (SIN moment, SIN UTC)
     if (fechaDesde) {
-      const fechaDesdeUtc = moment
-        .tz(fechaDesde, 'America/Argentina/Buenos_Aires')
-        .startOf('day')
-        .utc()
-        .toDate();
+      const horaIni = horaDesde ?? '00:00';
+      const fechaHoraDesde = `${fechaDesde} ${horaIni}:00`;
+
       query.andWhere('venta.fecha >= :fechaDesde', {
-        fechaDesde: fechaDesdeUtc,
+        fechaDesde: fechaHoraDesde,
       });
     }
 
     if (fechaHasta) {
-      const fechaHastaUtc = moment
-        .tz(fechaHasta, 'America/Argentina/Buenos_Aires')
-        .endOf('day')
-        .utc()
-        .toDate();
+      const horaFin = horaHasta ?? '23:59';
+      const fechaHoraHasta = `${fechaHasta} ${horaFin}:59`;
+
       query.andWhere('venta.fecha <= :fechaHasta', {
-        fechaHasta: fechaHastaUtc,
+        fechaHasta: fechaHoraHasta,
       });
     }
 
@@ -361,7 +323,6 @@ export class VentaService {
       }
     }
 
-    // ✅ Filtro por tipo de ingreso
     if (tipo) {
       query.andWhere('ingreso.tipo = :tipo', { tipo });
     }
@@ -405,98 +366,136 @@ export class VentaService {
   }
 
   async obtenerEstadisticasVentas(filtros: EstadisticasVentasDto) {
-    const { fechaDesde, fechaHasta } = filtros;
-    const condiciones = [];
-    const fechaDesdeUtc = fechaDesde
-      ? moment
-          .tz(fechaDesde, 'America/Argentina/Buenos_Aires')
-          .startOf('day')
-          .utc()
-          .format('YYYY-MM-DD HH:mm:ss')
-      : null;
-    const fechaHastaUtc = fechaHasta
-      ? moment
-          .tz(fechaHasta, 'America/Argentina/Buenos_Aires')
-          .endOf('day')
-          .utc()
-          .format('YYYY-MM-DD HH:mm:ss')
-      : null;
+    const { fechaDesde, fechaHasta, almacenId } = filtros;
 
-    if (fechaDesdeUtc) condiciones.push(`v.fecha >= '${fechaDesdeUtc}'`);
-    if (fechaHastaUtc) condiciones.push(`v.fecha <= '${fechaHastaUtc}'`);
-    const whereClause = condiciones.length
-      ? `WHERE ${condiciones.join(' AND ')}`
-      : '';
+    const desde = fechaDesde ? `${fechaDesde} 00:00:00` : null;
+    const hasta = fechaHasta ? `${fechaHasta} 23:59:59` : null;
 
-    // Ingresos totales y total ventas
-    const resumen = await this.dataSource.query(`
-      SELECT 
-        COALESCE(SUM(v.total), 0)::FLOAT AS "ingresosTotales",
-        COUNT(*) AS "totalVentas"
-      FROM venta v
-      ${whereClause};
-    `);
+    const almacenIdNum = almacenId ? parseInt(almacenId, 10) : NaN;
+    const almacenParam = !isNaN(almacenIdNum) ? almacenIdNum : null;
 
-    const { ingresosTotales, totalVentas } = resumen[0];
+    const where = `
+    WHERE ($1::timestamp IS NULL OR v.fecha >= $1::timestamp)
+      AND ($2::timestamp IS NULL OR v.fecha <= $2::timestamp)
+      AND ($3::int IS NULL OR v.almacen_id = $3::int)
+  `;
 
-    // Productos agregados
-    const productos = await this.dataSource.query(`
-      SELECT 
-        p.id,
-        p.descripcion AS nombre,
-        p.sku,
-        SUM(COALESCE(vi.cantidad, 0))::INTEGER      AS "cantidadVendidaPiezas",
-        SUM(COALESCE(vi.cantidad_gramos, 0))::FLOAT AS "gramosVendidos",
-        SUM(vi.subtotal)::FLOAT                     AS ingresos
-      FROM venta_item vi
-      JOIN producto p ON p.id = vi.producto_id
-      JOIN venta v ON v.id = vi.venta_id
-      ${whereClause}
-      GROUP BY p.id;
-    `);
-
-    const productoMasVendido = productos.reduce(
-      (max: { cantidadVendida: number }, p: { cantidadVendida: number }) =>
-        p.cantidadVendida > max.cantidadVendida ? p : max,
-      productos[0] || null,
+    // ✅ Resumen total (con filtro opcional de almacen)
+    const resumen = await this.dataSource.query(
+      `
+    SELECT
+      COALESCE(SUM(v.total), 0)::FLOAT AS "ingresosTotales",
+      COUNT(*)::TEXT AS "totalVentas"
+    FROM venta v
+    ${where};
+    `,
+      [desde, hasta, almacenParam],
     );
 
-    const productoMasIngresos = productos.reduce(
-      (max: { ingresos: number }, p: { ingresos: number }) =>
-        p.ingresos > max.ingresos ? p : max,
-      productos[0] || null,
+    const ingresosTotales = Number(resumen[0]?.ingresosTotales ?? 0);
+    const totalVentas = resumen[0]?.totalVentas ?? '0';
+
+    // ✅ Resumen por almacén (para comparar / agrupar)
+    // (si viene almacenId, te va a devolver 1 fila; si no, todas)
+    const resumenPorAlmacen = await this.dataSource.query(
+      `
+    SELECT
+      a.id::int AS "almacenId",
+      a.nombre  AS "almacenNombre",
+      COALESCE(SUM(v.total), 0)::FLOAT AS "ingresosTotales",
+      COUNT(*)::int AS "totalVentas"
+    FROM venta v
+    JOIN almacen a ON a.id = v.almacen_id
+    ${where}
+    GROUP BY a.id, a.nombre
+    ORDER BY "ingresosTotales" DESC;
+    `,
+      [desde, hasta, almacenParam],
     );
+
+    // ✅ Productos agregados (con filtro opcional de almacen)
+    const productos = await this.dataSource.query(
+      `
+    SELECT 
+      p.id,
+      COALESCE(
+        NULLIF(TRIM(p.nombre), ''),
+        NULLIF(TRIM(p.descripcion), ''),
+        NULLIF(TRIM(p.sku), ''),
+        'SIN NOMBRE'
+      ) AS nombre,
+      p.sku,
+      SUM(COALESCE(vi.cantidad, 0))::INTEGER       AS "cantidadVendidaPiezas",
+      SUM(COALESCE(vi.cantidad_gramos, 0))::FLOAT  AS "gramosVendidos",
+      COALESCE(SUM(vi.subtotal), 0)::FLOAT         AS ingresos
+    FROM venta_item vi
+    JOIN producto p ON p.id = vi.producto_id
+    JOIN venta v ON v.id = vi.venta_id
+    ${where}
+    GROUP BY p.id, p.nombre, p.descripcion, p.sku;
+    `,
+      [desde, hasta, almacenParam],
+    );
+
+    // ✅ Ranking normalizado: piezas vs kg (gramos/1000)
+    const scoreCantidad = (p: any) => {
+      const piezas = Number(p.cantidadVendidaPiezas ?? 0);
+      if (piezas > 0) return piezas;
+      const gramos = Number(p.gramosVendidos ?? 0);
+      return gramos / 1000;
+    };
+
+    const productoMasVendido =
+      productos.length > 0
+        ? [...productos].sort((a, b) => scoreCantidad(b) - scoreCantidad(a))[0]
+        : null;
+
+    const productoMasIngresos =
+      productos.length > 0
+        ? [...productos].sort(
+            (a, b) => Number(b.ingresos) - Number(a.ingresos),
+          )[0]
+        : null;
 
     const topProductosCantidad = [...productos]
-      .sort((a, b) => b.cantidadVendida - a.cantidadVendida)
+      .sort((a, b) => scoreCantidad(b) - scoreCantidad(a))
       .slice(0, 5);
 
     const topProductosIngresos = [...productos]
-      .sort((a, b) => b.ingresos - a.ingresos)
+      .sort((a, b) => Number(b.ingresos) - Number(a.ingresos))
       .slice(0, 5);
 
-    const ventasPorDia = await this.dataSource.query(`
-      SELECT 
-        TO_CHAR(v.fecha, 'YYYY-MM-DD') AS fecha,
-        COUNT(*)::INTEGER AS cantidad,
-        SUM(v.total)::FLOAT AS ingresos
-      FROM venta v
-      ${whereClause}
-      GROUP BY 1
-      ORDER BY 1;
-    `);
+    // ✅ Ventas por día (con filtro opcional de almacen)
+    const ventasPorDia = await this.dataSource.query(
+      `
+    SELECT 
+      TO_CHAR(v.fecha, 'YYYY-MM-DD') AS fecha,
+      COUNT(*)::INTEGER                AS cantidad,
+      COALESCE(SUM(v.total), 0)::FLOAT AS ingresos
+    FROM venta v
+    ${where}
+    GROUP BY 1
+    ORDER BY 1;
+    `,
+      [desde, hasta, almacenParam],
+    );
 
-    const promedioVenta = totalVentas > 0 ? ingresosTotales / totalVentas : 0;
+    const totalVentasNum = Number(totalVentas);
+    const promedioVenta =
+      totalVentasNum > 0 ? ingresosTotales / totalVentasNum : 0;
 
     return {
       ingresosTotales,
-      totalVentas,
+      totalVentas, // string como ya lo tenías
       promedioVenta,
       productoMasVendido,
       productoMasIngresos,
       topProductosCantidad,
       topProductosIngresos,
       ventasPorDia,
+
+      // ✅ NUEVO (no rompe lo existente, suma funcionalidad)
+      resumenPorAlmacen,
     };
   }
 
@@ -516,31 +515,54 @@ export class VentaService {
     return this.repo.save(venta);
   }
 
-  // estadisticas.service.ts
-  async obtenerTotalPorCategoria(fechaDesde?: string, fechaHasta?: string) {
-    const query = this.dataSource.createQueryRunner();
-    await query.connect();
+  async obtenerTotalPorCategoria(
+    fechaDesde?: string,
+    fechaHasta?: string,
+    almacenId?: string,
+  ) {
+    const desde = fechaDesde ? `${fechaDesde} 00:00:00` : null;
+    const hasta = fechaHasta ? `${fechaHasta} 23:59:59` : null;
 
-    const resultados = await query.query(
+    const almacenIdNum = almacenId ? parseInt(almacenId, 10) : NaN;
+    const almacenParam = !isNaN(almacenIdNum) ? almacenIdNum : null;
+
+    return this.dataSource.query(
       `
-    SELECT
-      c.id AS "categoriaId",
-      c.nombre AS "categoriaNombre",
-      SUM(vi.subtotal) AS "totalGenerado"
-    FROM venta_item vi
-    JOIN producto p ON p.id = vi.producto_id
-    JOIN categoria c ON c.id = p.categoria_id
-    JOIN venta v ON v.id = vi.venta_id
-    WHERE ($1::timestamp IS NULL OR v.fecha >= $1)
-      AND ($2::timestamp IS NULL OR v.fecha <= $2)
-    GROUP BY c.id, c.nombre
+    WITH por_categoria AS (
+      SELECT
+        c.id AS "categoriaId",
+        c.nombre AS "categoriaNombre",
+        COALESCE(SUM(vi.subtotal), 0)::float8 AS "totalGenerado"
+      FROM venta_item vi
+      JOIN producto p ON p.id = vi.producto_id
+      JOIN categoria c ON c.id = p.categoria_id
+      JOIN venta v ON v.id = vi.venta_id
+      WHERE ($1::timestamp IS NULL OR v.fecha >= $1::timestamp)
+        AND ($2::timestamp IS NULL OR v.fecha <= $2::timestamp)
+        AND ($3::int IS NULL OR v.almacen_id = $3::int)
+      GROUP BY c.id, c.nombre
+    ),
+    promos AS (
+      SELECT
+        0 AS "categoriaId",
+        'PROMOCIONES' AS "categoriaNombre",
+        COALESCE(SUM(vi.subtotal), 0)::float8 AS "totalGenerado"
+      FROM venta_item vi
+      JOIN venta v ON v.id = vi.venta_id
+      WHERE ($1::timestamp IS NULL OR v.fecha >= $1::timestamp)
+        AND ($2::timestamp IS NULL OR v.fecha <= $2::timestamp)
+        AND ($3::int IS NULL OR v.almacen_id = $3::int)
+        AND vi.producto_id IS NULL
+        AND COALESCE(vi.subtotal, 0) > 0
+    )
+    SELECT * FROM por_categoria
+    UNION ALL
+    SELECT * FROM promos
+    WHERE "totalGenerado" > 0
     ORDER BY "totalGenerado" DESC;
     `,
-      [fechaDesde || null, fechaHasta || null],
+      [desde, hasta, almacenParam],
     );
-
-    await query.release();
-    return resultados;
   }
 
   async crearVentaMixta(dto: CreateVentaMixtaDto & { usuario: Usuario }) {

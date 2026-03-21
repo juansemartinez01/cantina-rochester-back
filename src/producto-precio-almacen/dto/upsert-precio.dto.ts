@@ -1,4 +1,4 @@
-import { IsInt, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 
 export class UpsertPrecioDto {
   @IsInt() producto_id: number;
@@ -12,4 +12,14 @@ export class UpsertPrecioDto {
   @IsOptional()
   @IsString()
   moneda?: string; // default 'ARS'
+
+  @IsOptional()
+  @IsBoolean()
+  inOferta?: boolean;
+
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
+  @Min(0.01)
+  precioOferta?: number;
 }

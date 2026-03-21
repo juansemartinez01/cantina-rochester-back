@@ -31,6 +31,13 @@ private toNumber(n: any): number {
   return Number.isFinite(v) ? v : 0;
 }
 
+private getPrecioOverrideEfectivo(override: ProductoPrecioAlmacen): number {
+  const inOferta = override.inOferta === true;
+  const precioOfertaNum = this.toNumber(override.precioOferta);
+  if (inOferta && precioOfertaNum > 0) return precioOfertaNum;
+  return this.toNumber(override.precio);
+}
+
 // Resuelve precio final: override (si existe) o precioBase
 private resolvePrecioFinal(
   productoId: number,
@@ -57,7 +64,10 @@ private resolvePrecioFinal(
   });
   const ovMap = new Map<string, number>();
   for (const o of overridesArr) {
-    ovMap.set(`${o.producto_id}:${o.almacen_id}`, this.toNumber(o.precio));
+    ovMap.set(
+      `${o.producto_id}:${o.almacen_id}`,
+      this.getPrecioOverrideEfectivo(o),
+    );
   }
 
   // Enriquecer cada fila con precioFinal y valorFila
@@ -229,7 +239,7 @@ async getStockByAlmacen(almacenId: number) {
   // Map de override por productoId (en este almacén)
   const overridePorProducto = new Map<number, number>();
   for (const o of overridesArr) {
-    overridePorProducto.set(o.producto_id, toNumber(o.precio));
+    overridePorProducto.set(o.producto_id, this.getPrecioOverrideEfectivo(o));
   }
 
   // Map rápido de producto por id desde las filas detalladas

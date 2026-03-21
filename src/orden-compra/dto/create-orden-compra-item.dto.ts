@@ -1,5 +1,5 @@
 // src/orden-compra/dto/create-orden-compra-item.dto.ts
-import { IsInt, IsNumber, IsOptional, ValidateIf } from 'class-validator';
+import { IsDateString, IsInt, IsNumber, IsOptional, ValidateIf } from 'class-validator';
 
 export class CreateOrdenCompraItemDto {
   @IsInt()
@@ -19,4 +19,8 @@ export class CreateOrdenCompraItemDto {
 
   @IsNumber()
   precioUnitario: number;
+
+  @IsOptional()
+  @IsDateString()
+  fechaVencimiento?: string;
 }

@@ -33,4 +33,7 @@ export class OrdenCompraItem {
 
   @Column('numeric')
   subtotal: number;
+
+  @Column({ name: 'fecha_vencimiento', type: 'date', nullable: true })
+  fechaVencimiento: string | null;
 }

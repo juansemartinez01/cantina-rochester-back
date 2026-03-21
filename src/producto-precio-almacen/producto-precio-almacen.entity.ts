@@ -21,6 +21,12 @@ export class ProductoPrecioAlmacen {
   @Column({ type: 'numeric', precision: 12, scale: 2 })
   precio: string;
 
+  @Column({ type: 'boolean', default: false })
+  inOferta: boolean;
+
+  @Column({ name: 'precio_oferta', type: 'numeric', precision: 12, scale: 2, nullable: true })
+  precioOferta: string | null;
+
   @Column({ type: 'varchar', length: 10, default: 'ARS' })
   moneda: string;
 

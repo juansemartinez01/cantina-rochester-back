@@ -6,6 +6,7 @@ import { CreatePromocionDto } from './dto/create-promocion.dto';
 import { PromocionProducto } from './promocion-producto.entity';
 import { UpdatePromocionDto } from './dto/update-promocion.dto';
 import { Producto } from 'src/producto/producto.entity';
+import { QueryProductosPromocionActivaDto } from './dto/query-productos-promocion-activa.dto';
 
 @Injectable()
 export class PromocionService {
@@ -168,6 +169,31 @@ async findActivas(): Promise<Promocion[]> {
     where: { activo: true },
     relations: ['productos', 'productos.producto'],
   });
+}
+
+async findProductosEnPromocionesActivas(query: QueryProductosPromocionActivaDto) {
+  const page = Number(query.page ?? 1);
+  const limit = Math.min(Number(query.limit ?? 50), 200);
+  const skip = (page - 1) * limit;
+
+  const qb = this.promoProdRepo
+    .createQueryBuilder('pp')
+    .innerJoinAndSelect('pp.promocion', 'promocion', 'promocion.activo = :activo', {
+      activo: true,
+    })
+    .innerJoinAndSelect('pp.producto', 'producto')
+    .orderBy('promocion.id', 'DESC')
+    .addOrderBy('pp.id', 'DESC');
+
+  const [items, total] = await qb.skip(skip).take(limit).getManyAndCount();
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    data: items,
+  };
 }
 
 async borrarLogicamente(id: number): Promise<{ message: string }> {

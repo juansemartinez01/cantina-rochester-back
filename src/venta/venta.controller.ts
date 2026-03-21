@@ -57,17 +57,24 @@ export class VentaController {
     });
   }
 
+  // ✅ /ventas/estadisticas?fechaDesde=...&fechaHasta=...&almacenId=1
   @Get('estadisticas')
   obtenerEstadisticas(@Query() filtros: EstadisticasVentasDto) {
     return this.service.obtenerEstadisticasVentas(filtros);
   }
 
+  // ✅ /ventas/ingresos-por-categoria?fechaDesde=...&fechaHasta=...&almacenId=1
   @Get('ingresos-por-categoria')
   obtenerTotalPorCategoria(
     @Query('fechaDesde') fechaDesde?: string,
     @Query('fechaHasta') fechaHasta?: string,
+    @Query('almacenId') almacenId?: string,
   ) {
-    return this.service.obtenerTotalPorCategoria(fechaDesde, fechaHasta);
+    return this.service.obtenerTotalPorCategoria(
+      fechaDesde,
+      fechaHasta,
+      almacenId, // ✅ nuevo
+    );
   }
 
   @Get(':id')
