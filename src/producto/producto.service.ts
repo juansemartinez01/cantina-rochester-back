@@ -119,6 +119,52 @@ export class ProductoService {
     return Number(override.precio ?? 0);
   }
 
+  private buildPrecioOverrideMap(overrides: ProductoPrecioAlmacen[]) {
+    const map = new Map<
+      number,
+      {
+        inOferta: boolean;
+        precioOriginal: number;
+        precioOferta: number | null;
+        precioFinal: number;
+      }
+    >();
+
+    for (const o of overrides) {
+      map.set(o.producto_id, {
+        inOferta: o.inOferta === true,
+        precioOriginal: Number(o.precio ?? 0),
+        precioOferta:
+          o.precioOferta == null ? null : Number(o.precioOferta),
+        precioFinal: this.getPrecioOverrideEfectivo(o),
+      });
+    }
+
+    return map;
+  }
+
+  private applyPrecioRespuesta(
+    productos: Producto[],
+    mapOverride?: Map<
+      number,
+      {
+        inOferta: boolean;
+        precioOriginal: number;
+        precioOferta: number | null;
+        precioFinal: number;
+      }
+    >,
+  ) {
+    for (const p of productos) {
+      const ov = mapOverride?.get(p.id);
+      (p as any).precioFinal = ov?.precioFinal ?? Number(p.precioBase ?? 0);
+      (p as any).precioOriginal = ov?.precioOriginal ?? null;
+      (p as any).precioOferta = ov?.precioOferta ?? null;
+      // Debe salir el inOferta por almacén (no el del producto)
+      (p as any).inOferta = ov?.inOferta ?? false;
+    }
+  }
+
   private esGramos(u: Unidad | null | undefined) {
     const abbr = u?.abreviatura?.toLowerCase()?.trim();
     const name = u?.nombre?.toLowerCase()?.trim();
@@ -474,20 +520,10 @@ export class ProductoService {
       const overrides = await this.ppaRepo.find({
         where: { producto_id: In(ids), almacen_id: Number(almacenId) },
       });
-
-      const mapOverride = new Map<number, number>();
-      overrides.forEach((o) =>
-        mapOverride.set(o.producto_id, this.getPrecioOverrideEfectivo(o)),
-      );
-
-      for (const p of productos) {
-        (p as any).precioFinal =
-          mapOverride.get(p.id) ?? Number(p.precioBase ?? 0);
-      }
+      const mapOverride = this.buildPrecioOverrideMap(overrides);
+      this.applyPrecioRespuesta(productos, mapOverride);
     } else {
-      for (const p of productos) {
-        (p as any).precioFinal = Number(p.precioBase ?? 0);
-      }
+      this.applyPrecioRespuesta(productos);
     }
 
     return productos;
@@ -579,15 +615,8 @@ export class ProductoService {
     const overrides = await this.ppaRepo.find({
       where: { producto_id: In(ids), almacen_id: almacenIdNum },
     });
-
-    const mapOverride = new Map<number, number>();
-    overrides.forEach((o) =>
-      mapOverride.set(o.producto_id, this.getPrecioOverrideEfectivo(o)),
-    );
-
-    for (const p of productos) {
-      (p as any).precioFinal = mapOverride.get(p.id) ?? Number(p.precioBase ?? 0);
-    }
+    const mapOverride = this.buildPrecioOverrideMap(overrides);
+    this.applyPrecioRespuesta(productos, mapOverride);
 
     return productos;
   }
