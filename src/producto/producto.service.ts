@@ -422,12 +422,24 @@ export class ProductoService {
       unidadId,
       conStock,
       almacenId,
+      inOferta,
       precioUpdatedDesde,
       precioUpdatedHasta,
       q,
       page,
       limit,
     } = filtros;
+
+    const almacenIdNum =
+      almacenId !== undefined && !isNaN(parseInt(almacenId))
+        ? parseInt(almacenId)
+        : undefined;
+
+    if (inOferta !== undefined && almacenIdNum === undefined) {
+      throw new BadRequestException(
+        'Para filtrar por inOferta es obligatorio enviar almacenId',
+      );
+    }
 
     const query = this.repo
       .createQueryBuilder('producto')
@@ -467,10 +479,34 @@ export class ProductoService {
       });
     }
 
-    if (almacenId !== undefined && !isNaN(parseInt(almacenId))) {
+    if (almacenIdNum !== undefined) {
       query.andWhere('stock.almacen_id = :almacenId', {
-        almacenId: parseInt(almacenId),
+        almacenId: almacenIdNum,
       });
+    }
+
+    if (inOferta === 'true') {
+      query.andWhere(
+        `EXISTS (
+          SELECT 1
+          FROM producto_precio_almacen ppa
+          WHERE ppa.producto_id = producto.id
+            AND ppa.almacen_id = :almacenIdFiltro
+            AND ppa."inOferta" = true
+        )`,
+        { almacenIdFiltro: almacenIdNum },
+      );
+    } else if (inOferta === 'false') {
+      query.andWhere(
+        `NOT EXISTS (
+          SELECT 1
+          FROM producto_precio_almacen ppa
+          WHERE ppa.producto_id = producto.id
+            AND ppa.almacen_id = :almacenIdFiltro
+            AND ppa."inOferta" = true
+        )`,
+        { almacenIdFiltro: almacenIdNum },
+      );
     }
 
     if (precioUpdatedDesde) {
@@ -515,10 +551,10 @@ export class ProductoService {
     if (productos.length === 0) return productos;
 
     // Si viene almacenId, buscamos overrides; si no, usamos precioBase como precioFinal
-    if (almacenId !== undefined && !isNaN(parseInt(almacenId))) {
+    if (almacenIdNum !== undefined) {
       const ids = productos.map((p) => p.id);
       const overrides = await this.ppaRepo.find({
-        where: { producto_id: In(ids), almacen_id: Number(almacenId) },
+        where: { producto_id: In(ids), almacen_id: almacenIdNum },
       });
       const mapOverride = this.buildPrecioOverrideMap(overrides);
       this.applyPrecioRespuesta(productos, mapOverride);

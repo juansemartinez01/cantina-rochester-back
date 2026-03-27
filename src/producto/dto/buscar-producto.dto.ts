@@ -1,5 +1,5 @@
 // src/producto/dto/buscar-producto.dto.ts
-import { IsOptional, IsString, IsNumberString, IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsNumberString, IsDateString, IsBooleanString } from 'class-validator';
 
 export class BuscarProductoDto {
   @IsOptional()
@@ -49,4 +49,8 @@ export class BuscarProductoDto {
   @IsOptional()
   @IsNumberString()
   limit?: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  inOferta?: string;
 }
