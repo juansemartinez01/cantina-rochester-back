@@ -15,6 +15,10 @@ export class FiltroOrdenCompraDto {
   proveedorId?: string;
 
   @IsOptional()
+  @IsNumberString()
+  almacenId?: string;
+
+  @IsOptional()
   @IsDateString()
   fechaVencimientoDesde?: string;
 

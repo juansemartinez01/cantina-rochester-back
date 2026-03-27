@@ -22,6 +22,9 @@ export class OrdenCompra {
   @Column({ type: 'timestamp' })
   fecha: Date;
 
+  @Column({ name: 'almacen_id', type: 'int', nullable: true, default: null })
+  almacen_id: number | null;
+
   @Column({ type: 'numeric', nullable: true })
   total?: number;
 

@@ -102,6 +102,7 @@ export class OrdenCompraService {
       // 1) Crear orden
       const orden = manager.create(OrdenCompra, {
         proveedor: { id: proveedorId },
+        almacen_id: almacenId,
         fecha: new Date(),
         total: totalOrden,
       });
@@ -239,6 +240,10 @@ async obtenerTodasConFiltros(filtros: FiltroOrdenCompraDto) {
 
   if (filtros.proveedorId) {
     query.andWhere('proveedor.id = :proveedorId', { proveedorId: filtros.proveedorId });
+  }
+
+  if (filtros.almacenId) {
+    query.andWhere('orden.almacen_id = :almacenId', { almacenId: filtros.almacenId });
   }
 
   if (filtros.fechaVencimientoDesde) {
