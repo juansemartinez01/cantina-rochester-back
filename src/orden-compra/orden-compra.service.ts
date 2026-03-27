@@ -213,6 +213,7 @@ async obtenerTodasConFiltros(filtros: FiltroOrdenCompraDto) {
     .select([
       'orden.id',
       'orden.fecha',
+      'orden.almacen_id',
       'orden.total',
       'proveedor.id',
       'proveedor.nombre',
@@ -267,6 +268,7 @@ async obtenerTodasConFiltros(filtros: FiltroOrdenCompraDto) {
   const resultado = data.map((orden) => ({
     id: orden.id,
     fecha: orden.fecha,
+    almacen_id: (orden as any).almacen_id ?? null,
     total: orden.total,
     proveedor: {
       id: orden.proveedor.id,
