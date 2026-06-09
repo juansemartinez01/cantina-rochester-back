@@ -1,5 +1,12 @@
 // src/producto/dto/buscar-producto.dto.ts
-import { IsOptional, IsString, IsNumberString, IsDateString, IsBooleanString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumberString,
+  IsDateString,
+  IsBooleanString,
+  IsIn,
+} from 'class-validator';
 
 export class BuscarProductoDto {
   @IsOptional()
@@ -39,6 +46,10 @@ export class BuscarProductoDto {
   precioUpdatedHasta?: string;
 
   @IsOptional()
+  @IsBooleanString()
+  sinFechaPrecio?: string;
+
+  @IsOptional()
   @IsString()
   q?: string;
 
@@ -53,4 +64,12 @@ export class BuscarProductoDto {
   @IsOptional()
   @IsBooleanString()
   inOferta?: string;
+
+  @IsOptional()
+  @IsIn(['precioFinal'])
+  sortBy?: 'precioFinal';
+
+  @IsOptional()
+  @IsIn(['asc', 'desc', 'ASC', 'DESC'])
+  sortDir?: 'asc' | 'desc' | 'ASC' | 'DESC';
 }

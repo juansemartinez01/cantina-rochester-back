@@ -425,15 +425,40 @@ export class ProductoService {
       inOferta,
       precioUpdatedDesde,
       precioUpdatedHasta,
+      sinFechaPrecio,
       q,
       page,
       limit,
+      sortBy,
+      sortDir,
     } = filtros;
 
     const almacenIdNum =
       almacenId !== undefined && !isNaN(parseInt(almacenId))
         ? parseInt(almacenId)
         : undefined;
+
+    if (sortBy !== undefined && sortBy !== 'precioFinal') {
+      throw new BadRequestException(
+        'sortBy invalido. Valores permitidos: precioFinal',
+      );
+    }
+
+    if (
+      sortDir !== undefined &&
+      !['asc', 'desc'].includes(sortDir.toLowerCase())
+    ) {
+      throw new BadRequestException(
+        'sortDir invalido. Valores permitidos: asc, desc',
+      );
+    }
+
+    const ordenaPorPrecioFinal = sortBy === 'precioFinal';
+    if (ordenaPorPrecioFinal && almacenIdNum === undefined) {
+      throw new BadRequestException(
+        'Para ordenar por precioFinal es obligatorio enviar almacenId',
+      );
+    }
 
     if (inOferta !== undefined && almacenIdNum === undefined) {
       throw new BadRequestException(
@@ -509,13 +534,15 @@ export class ProductoService {
       );
     }
 
-    if (precioUpdatedDesde) {
+    if (sinFechaPrecio === 'true') {
+      query.andWhere('producto.precio_updated_at IS NULL');
+    } else if (precioUpdatedDesde) {
       query.andWhere('producto.precio_updated_at >= :precioUpdatedDesde', {
         precioUpdatedDesde,
       });
     }
 
-    if (precioUpdatedHasta) {
+    if (sinFechaPrecio !== 'true' && precioUpdatedHasta) {
       query.andWhere('producto.precio_updated_at <= :precioUpdatedHasta', {
         precioUpdatedHasta,
       });
@@ -532,6 +559,33 @@ export class ProductoService {
     const conStockBool = conStock === 'true';
     if (conStockBool) {
       query.andWhere('stock.cantidad > 0');
+    }
+
+    if (ordenaPorPrecioFinal) {
+      query.leftJoin(
+        ProductoPrecioAlmacen,
+        'precio_orden',
+        'precio_orden.producto_id = producto.id AND precio_orden.almacen_id = :almacenIdOrden',
+        { almacenIdOrden: almacenIdNum },
+      );
+
+      const precioFinalOrdenSql = `COALESCE(
+        CASE
+          WHEN precio_orden."inOferta" = true
+            AND precio_orden.precio_oferta > 0
+          THEN precio_orden.precio_oferta
+          ELSE precio_orden.precio
+        END,
+        producto."precioBase"
+      )`;
+
+      query
+        .addSelect(precioFinalOrdenSql, 'precio_final_orden')
+        .orderBy(
+          'precio_final_orden',
+          sortDir?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
+        )
+        .addOrderBy('producto.id', 'ASC');
     }
 
     const pageNum = Number(page);
