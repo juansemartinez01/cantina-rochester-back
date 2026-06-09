@@ -37,7 +37,8 @@ import { GastosModule } from './gastos/gastos.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
+      migrationsRun: false,
       ssl:
         process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
