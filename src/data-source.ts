@@ -3,7 +3,11 @@ import 'reflect-metadata';
 
 // 2) Después: carga tu .env
 import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+dotenv.config();
+dotenv.config({
+  path: process.env.TYPEORM_ENV_FILE || process.env.ENV_FILE || '.env.local',
+  override: true,
+});
 
 // 3) Finalmente: TypeORM DataSource
 import { DataSource } from 'typeorm';
