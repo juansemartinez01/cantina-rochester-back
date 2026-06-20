@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Param, Query, BadRequestException, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  BadRequestException,
+  Put,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { VentaService } from './venta.service';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { Venta } from './venta.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { EstadisticasVentasDto } from './dto/estadisticas-ventas.dto';
 import { UpdateEstadoVentaDto } from './dto/update-estado-venta.dto';
-import { CreateVentaMixtaDto } from './dto/create-venta-mixta.dto';
 
 @Controller('ventas')
 export class VentaController {
@@ -15,15 +25,16 @@ export class VentaController {
   ) {}
 
   @Post()
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
   async create(@Body() dto: CreateVentaDto) {
     const usuario = await this.usuarioService.findOne(dto.usuarioId);
     return this.service.create({ ...dto, usuario });
-  }
-
-  @Post('mixta')
-  async createMixta(@Body() dto: CreateVentaMixtaDto) {
-    const usuario = await this.usuarioService.findOne(dto.usuarioId);
-    return this.service.crearVentaMixta({ ...dto, usuario });
   }
 
   @Get()

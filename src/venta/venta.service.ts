@@ -1,187 +1,92 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Venta } from './venta.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
+import {
+  MedioPagoVenta,
+  normalizarMedioPago,
+} from './dto/create-venta-pago.dto';
 import { VentaItem } from './venta-item.entity';
 import { ProductoService } from '../producto/producto.service';
 
-import { StockActualService } from '../stock-actual/stock-actual.service';
-import { MovimientoStockService } from '../movimiento-stock/movimiento-stock.service';
 import { Usuario } from '../usuario/usuario.entity';
-import { Promocion } from 'src/promocion/promocion.entity';
 import { PromocionService } from 'src/promocion/promocion.service';
 import { IngresoVenta } from '../ingreso/ingreso-venta.entity'; // Import the entity (adjust path if needed)
 import { EstadisticasVentasDto } from './dto/estadisticas-ventas.dto';
 import { Almacen } from 'src/almacen/almacen.entity';
 import { UpdateEstadoVentaDto } from './dto/update-estado-venta.dto';
-import { CreateVentaMixtaDto } from './dto/create-venta-mixta.dto';
+import { Producto } from 'src/producto/producto.entity';
+import { StockActual } from 'src/stock-actual/stock-actual.entity';
+import { MovimientoStock } from 'src/movimiento-stock/movimiento-stock.entity';
 import moment from 'moment-timezone';
-
-
-
-
-
 
 @Injectable()
 export class VentaService {
   constructor(
     @InjectRepository(Venta)
     private readonly repo: Repository<Venta>,
-    @InjectRepository(IngresoVenta)
-    private readonly ingresoVentaRepo: Repository<IngresoVenta>,
     private readonly productoService: ProductoService,
-    private readonly stockService: StockActualService,
-    private readonly movService: MovimientoStockService,
     private readonly promoService: PromocionService,
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   async create(dto: CreateVentaDto & { usuario: Usuario }) {
-    const items: VentaItem[] = [];
-    let total = 0;
-
-    // 1) Armar items
-    for (const it of dto.items) {
-      const producto = await this.productoService.findOne(it.productoId);
-      if (!producto)
-        throw new NotFoundException(`Producto ${it.productoId} no encontrado`);
-
-      const granel = this.isGranel(producto);
-
-      // validar XOR según el tipo
-      if (granel) {
-        if (it.cantidad_gramos === undefined) {
-          throw new Error(
-            `Producto ${producto.id} se vende por gramos: enviar "cantidad_gramos"`,
-          );
-        }
-      } else {
-        if (it.cantidad === undefined) {
-          throw new Error(
-            `Producto ${producto.id} se vende por piezas: enviar "cantidad"`,
-          );
-        }
+    const savedId = await this.dataSource.transaction(async (manager) => {
+      const almacen = await manager
+        .getRepository(Almacen)
+        .findOneBy({ id: dto.almacenId });
+      if (!almacen) {
+        throw new NotFoundException(`Almacen ${dto.almacenId} no encontrado`);
       }
 
-      // calcular subtotal
-      const cantidadKg = granel ? Number(it.cantidad_gramos) / 1000 : 0;
-      const cantidadPzas = granel ? 0 : Number(it.cantidad);
-      const unidadesFacturadas = granel ? cantidadKg : cantidadPzas; // kg ó unidades
-      const subtotal = this.to2(unidadesFacturadas * Number(it.precioUnitario));
-      total += subtotal;
-
-      // crear item
-      const vi = new VentaItem();
-      vi.producto = producto;
-      vi.cantidad = granel ? null : cantidadPzas;
-      vi.cantidad_gramos = granel
-        ? this.to3(Number(it.cantidad_gramos)).toFixed(3)
-        : null;
-      vi.precioUnitario = Number(it.precioUnitario);
-      vi.subtotal = subtotal;
-
-      items.push(vi);
-    }
-
-    // 2) Promociones (mismo concepto, setear piezas/gramos según producto)
-    if (dto.promociones) {
-      for (const promoItem of dto.promociones) {
-        const promo = await this.promoService.getPromocionById(
-          promoItem.promocionId,
+      const { items, total } = await this.armarItemsVenta(dto, manager);
+      if (items.length === 0) {
+        throw new BadRequestException(
+          'La venta debe incluir al menos un item o una promocion',
         );
-        if (!promo)
-          throw new NotFoundException(
-            `Promoción ${promoItem.promocionId} no encontrada`,
-          );
-
-        // item "promo" como renglón de cobro
-        const subtotalPromo = this.to2(promo.precioPromo * promoItem.cantidad);
-        total += subtotalPromo;
-
-        const promoVentaItem = new VentaItem();
-        promoVentaItem.producto = null;
-        promoVentaItem.cantidad = promoItem.cantidad;
-        promoVentaItem.cantidad_gramos = null;
-        promoVentaItem.precioUnitario = promo.precioPromo;
-        promoVentaItem.subtotal = subtotalPromo;
-        items.push(promoVentaItem);
-
-        // detallar los productos de la promo (sin precio)
-        for (const p of promo.productos) {
-          const granel = this.isGranel(p.producto);
-          const vi = new VentaItem();
-          vi.producto = p.producto;
-          vi.precioUnitario = 0;
-          vi.subtotal = 0;
-
-          if (granel) {
-            // si tu pivot de promo tiene gramos, usar p.gramos; de lo contrario, definilo
-            const gramosTot = Number(
-              Number(p.cantidad_gramos ?? 0) * promoItem.cantidad,
-            );
-            vi.cantidad = null;
-            vi.cantidad_gramos = this.to3(gramosTot).toFixed(3);
-          } else {
-            vi.cantidad = (p.cantidad ?? 0) * promoItem.cantidad;
-            vi.cantidad_gramos = null;
-          }
-          items.push(vi);
-        }
       }
-    }
 
-    // 3) Venta + ingreso
-    const almacen = await this.dataSource
-      .getRepository(Almacen)
-      .findOneBy({ id: dto.almacenId });
-    if (!almacen)
-      throw new NotFoundException(`Almacén ${dto.almacenId} no encontrado`);
+      const pagos = this.normalizarPagos(dto.pagos);
+      this.validarTotalPagos(pagos, total);
 
-    const venta = this.repo.create({
-      usuario: dto.usuario,
-      almacen,
-      items,
-      total: this.to2(total),
-      estado: 'CONFIRMADA',
-      fecha: moment().tz('America/Argentina/Buenos_Aires').toDate(),
-    });
-    const saved = await this.repo.save(venta);
-
-    await this.ingresoVentaRepo.save({
-      venta: saved,
-      tipo: dto.tipoIngreso, // 'EFECTIVO' | 'BANCARIZADO'
-      monto: saved.total,
-    });
-
-    // 4) Stock + movimientos (piezas/gramos)
-    for (const it of items) {
-      if (!it.producto) continue; // el renglón de promo no descuenta
-
-      const piezas = it.cantidad ?? 0;
-      const gramos = Number(it.cantidad_gramos ?? 0);
-
-      await this.stockService.changeStock(it.producto.id, dto.almacenId, {
-        deltaPiezas: piezas ? -piezas : 0,
-        deltaGramos: gramos ? -gramos : 0,
+      const ventaRepo = manager.getRepository(Venta);
+      const venta = ventaRepo.create({
+        usuario: dto.usuario,
+        almacen,
+        items,
+        total,
+        estado: 'CONFIRMADA',
+        fecha: moment().tz('America/Argentina/Buenos_Aires').toDate(),
       });
+      const saved = await ventaRepo.save(venta);
 
-      await this.movService.create({
-        producto_id: it.producto.id,
-        origen_almacen: dto.almacenId,
-        destino_almacen: undefined,
-        cantidad: piezas || undefined,
-        cantidad_gramos:
-          typeof gramos === 'number' && gramos > 0
-            ? Number(gramos.toFixed(3)) // number (no string)
-            : undefined,
+      await manager.getRepository(IngresoVenta).save(
+        pagos.map((pago) => ({
+          venta: saved,
+          tipo: pago.medio,
+          monto: pago.monto,
+        })),
+      );
 
-        tipo: 'salida',
-        motivo: `Venta #${saved.id}`,
-      });
-    }
+      for (const item of items) {
+        if (!item.producto) continue;
+        await this.descontarStockYRegistrarMovimientoTx(
+          manager,
+          item,
+          dto.almacenId,
+          saved.id,
+        );
+      }
 
-    return saved;
+      return saved.id;
+    });
+
+    return this.getVentaCompleta(savedId);
   }
 
   findAll(): Promise<Venta[]> {
@@ -565,156 +470,249 @@ export class VentaService {
     );
   }
 
-  async crearVentaMixta(dto: CreateVentaMixtaDto & { usuario: Usuario }) {
+  private async armarItemsVenta(
+    dto: CreateVentaDto,
+    manager: EntityManager,
+  ): Promise<{ items: VentaItem[]; total: number }> {
     const items: VentaItem[] = [];
     let total = 0;
 
-    // helpers locales
-    const isGranel = (prod: any) =>
-      prod?.es_por_gramos === true || prod?.unidad?.codigo === 'g';
-    const to2 = (n: number) => Number(n.toFixed(2));
-    const to3 = (n: number) => Number(n.toFixed(3));
+    for (const itemDto of dto.items ?? []) {
+      const producto = await manager.getRepository(Producto).findOne({
+        where: { id: itemDto.productoId },
+        relations: ['unidad', 'categoria'],
+      });
 
-    // 1) Ítems sueltos (no promo)
-    for (const it of dto.items) {
-      const producto = await this.productoService.findOne(it.productoId);
-      if (!producto)
-        throw new NotFoundException(`Producto ${it.productoId} no encontrado`);
-
-      const granel = isGranel(producto);
-
-      // Validación XOR según tipo
-      if (granel && it.cantidad_gramos === undefined) {
-        throw new Error(
-          `Producto ${producto.id} se vende por gramos: enviar "cantidad_gramos"`,
-        );
-      }
-      if (!granel && it.cantidad === undefined) {
-        throw new Error(
-          `Producto ${producto.id} se vende por piezas: enviar "cantidad"`,
+      if (!producto) {
+        throw new NotFoundException(
+          `Producto ${itemDto.productoId} no encontrado`,
         );
       }
 
-      // Calcular subtotal
+      const granel = this.isGranel(producto);
+      this.validarCantidadSegunProducto(producto, itemDto);
+
+      const cantidadPiezas = granel ? 0 : Number(itemDto.cantidad);
+      const cantidadGramos = granel ? Number(itemDto.cantidad_gramos) : 0;
       const unidadesFacturadas = granel
-        ? Number(it.cantidad_gramos) / 1000 // kg
-        : Number(it.cantidad); // unidades
-      const subtotal = to2(unidadesFacturadas * Number(it.precioUnitario));
-      total += subtotal;
+        ? cantidadGramos / 1000
+        : cantidadPiezas;
+      const precioUnitario = await this.productoService.getPrecioFinal(
+        producto.id,
+        dto.almacenId,
+      );
+      const subtotal = this.to2(unidadesFacturadas * precioUnitario);
 
-      // Armar item
       const ventaItem = new VentaItem();
       ventaItem.producto = producto;
-      ventaItem.cantidad = granel ? null : Number(it.cantidad);
+      ventaItem.cantidad = granel ? null : cantidadPiezas;
       ventaItem.cantidad_gramos = granel
-        ? to3(Number(it.cantidad_gramos)).toFixed(3)
+        ? this.to3(cantidadGramos).toFixed(3)
         : null;
-      ventaItem.precioUnitario = Number(it.precioUnitario); // kg o unidad, según corresponda
+      ventaItem.precioUnitario = precioUnitario;
       ventaItem.subtotal = subtotal;
 
       items.push(ventaItem);
+      total += subtotal;
     }
 
-    // 2) Promociones (ítem de cobro + detalle de productos incluidos sin precio)
-    if (dto.promociones) {
-      for (const promoItem of dto.promociones) {
-        const promo = await this.promoService.getPromocionById(
-          promoItem.promocionId,
+    for (const promoItem of dto.promociones ?? []) {
+      const promo = await this.promoService.getPromocionById(
+        promoItem.promocionId,
+      );
+      if (!promo.activo) {
+        throw new BadRequestException(
+          `Promocion ${promoItem.promocionId} no esta activa`,
         );
-        if (!promo)
-          throw new NotFoundException(
-            `Promoción ${promoItem.promocionId} no encontrada`,
-          );
+      }
+      if (!promo.productos?.length) {
+        throw new BadRequestException(
+          `Promocion ${promoItem.promocionId} no tiene productos`,
+        );
+      }
 
-        // Renglón de cobro de la promo
-        const subtotalPromo = to2(promo.precioPromo * promoItem.cantidad);
-        total += subtotalPromo;
+      const cantidadPromo = Number(promoItem.cantidad);
+      if (!Number.isFinite(cantidadPromo) || cantidadPromo < 1) {
+        throw new BadRequestException(
+          'La cantidad de la promocion debe ser mayor a 0',
+        );
+      }
 
-        const promoVentaItem = new VentaItem();
-        promoVentaItem.producto = null; // ítem "abstracto" de la promo
-        promoVentaItem.cantidad = promoItem.cantidad; // cantidad de combos
-        promoVentaItem.cantidad_gramos = null;
-        promoVentaItem.precioUnitario = promo.precioPromo;
-        promoVentaItem.subtotal = subtotalPromo;
-        items.push(promoVentaItem);
+      const subtotalPromo = this.to2(Number(promo.precioPromo) * cantidadPromo);
+      const promoVentaItem = new VentaItem();
+      promoVentaItem.producto = null;
+      promoVentaItem.cantidad = cantidadPromo;
+      promoVentaItem.cantidad_gramos = null;
+      promoVentaItem.precioUnitario = Number(promo.precioPromo);
+      promoVentaItem.subtotal = subtotalPromo;
+      items.push(promoVentaItem);
+      total += subtotalPromo;
 
-        // Desglose de productos reales incluidos (sin precio)
-        for (const p of promo.productos) {
-          const prod = p.producto;
-          const granel = isGranel(prod);
+      for (const promoProducto of promo.productos) {
+        const producto = promoProducto.producto;
+        const granel = this.isGranel(producto);
+        const ventaItem = new VentaItem();
+        ventaItem.producto = producto;
+        ventaItem.precioUnitario = 0;
+        ventaItem.subtotal = 0;
 
-          const productoItem = new VentaItem();
-          productoItem.producto = prod;
-          productoItem.precioUnitario = 0;
-          productoItem.subtotal = 0;
-
-          if (granel) {
-            // si tu pivot de promo tiene 'gramos', úsalo; si no, cae en 0
-            const gramosTot =
-              Number(p.cantidad_gramos ?? 0) * promoItem.cantidad;
-            productoItem.cantidad = null;
-            productoItem.cantidad_gramos = to3(gramosTot).toFixed(3);
-          } else {
-            productoItem.cantidad = (p.cantidad ?? 0) * promoItem.cantidad;
-            productoItem.cantidad_gramos = null;
+        if (granel) {
+          const gramosTotales =
+            Number(promoProducto.cantidad_gramos ?? 0) * cantidadPromo;
+          if (!Number.isFinite(gramosTotales) || gramosTotales <= 0) {
+            throw new BadRequestException(
+              `La promocion ${promo.id} tiene gramos invalidos para producto ${producto.id}`,
+            );
           }
-
-          items.push(productoItem);
+          ventaItem.cantidad = null;
+          ventaItem.cantidad_gramos = this.to3(gramosTotales).toFixed(3);
+        } else {
+          const piezasTotales =
+            Number(promoProducto.cantidad ?? 0) * cantidadPromo;
+          if (!Number.isFinite(piezasTotales) || piezasTotales <= 0) {
+            throw new BadRequestException(
+              `La promocion ${promo.id} tiene cantidad invalida para producto ${producto.id}`,
+            );
+          }
+          ventaItem.cantidad = piezasTotales;
+          ventaItem.cantidad_gramos = null;
         }
+
+        items.push(ventaItem);
       }
     }
 
-    // 3) Venta + ingresos (mixta)
-    const almacen = await this.dataSource
-      .getRepository(Almacen)
-      .findOneBy({ id: dto.almacenId });
-    if (!almacen)
-      throw new NotFoundException(`Almacén ${dto.almacenId} no encontrado`);
-
-    const venta = this.repo.create({
-      usuario: dto.usuario,
-      almacen,
-      items,
-      total: to2(total),
-      estado: 'CONFIRMADA',
-      fecha: moment().tz('America/Argentina/Buenos_Aires').toDate(),
-    });
-    const saved = await this.repo.save(venta);
-
-    await this.ingresoVentaRepo.save([
-      { venta: saved, tipo: 'EFECTIVO', monto: dto.montoEfectivo },
-      { venta: saved, tipo: 'BANCARIZADO', monto: dto.montoBancarizado },
-    ]);
-
-    // 4) Bajar stock + movimientos (piezas/gramos)
-    for (const it of items) {
-      if (!it.producto) continue; // el renglón de cobro de la promo no descuenta
-
-      const piezas = it.cantidad ?? 0;
-      const gramos = Number(it.cantidad_gramos ?? 0);
-
-      await this.stockService.changeStock(it.producto.id, dto.almacenId, {
-        deltaPiezas: piezas ? -piezas : 0,
-        deltaGramos: gramos ? -gramos : 0,
-      });
-
-      await this.movService.create({
-        producto_id: it.producto.id,
-        origen_almacen: dto.almacenId,
-        destino_almacen: undefined,
-        cantidad: piezas || undefined, // solo si hubo piezas
-        cantidad_gramos:
-          typeof gramos === 'number' && gramos > 0
-            ? Number(gramos.toFixed(3)) // number (no string)
-            : undefined,
-        tipo: 'salida',
-        motivo: `Venta #${saved.id}`,
-      });
-    }
-
-    return saved;
+    return { items, total: this.to2(total) };
   }
 
+  private validarCantidadSegunProducto(producto: Producto, item: any) {
+    const granel = this.isGranel(producto);
+    const tienePiezas = item.cantidad !== undefined && item.cantidad !== null;
+    const tieneGramos =
+      item.cantidad_gramos !== undefined && item.cantidad_gramos !== null;
+
+    if (granel) {
+      if (!tieneGramos || tienePiezas) {
+        throw new BadRequestException(
+          `Producto ${producto.id} se vende por gramos: enviar solo cantidad_gramos`,
+        );
+      }
+      return;
+    }
+
+    if (!tienePiezas || tieneGramos) {
+      throw new BadRequestException(
+        `Producto ${producto.id} se vende por piezas: enviar solo cantidad`,
+      );
+    }
+  }
+
+  private normalizarPagos(
+    pagos: CreateVentaDto['pagos'],
+  ): Array<{ medio: MedioPagoVenta; monto: number }> {
+    const acumulados = new Map<MedioPagoVenta, number>();
+
+    for (const pago of pagos ?? []) {
+      const medio = normalizarMedioPago(pago.medio);
+      if (medio !== 'EFECTIVO' && medio !== 'BANCARIZADO') {
+        throw new BadRequestException(
+          'medio debe ser EFECTIVO, BANCARIZADO o un alias bancarizado valido',
+        );
+      }
+
+      const monto = Number(pago.monto);
+      if (!Number.isFinite(monto) || monto <= 0) {
+        throw new BadRequestException(
+          'Cada pago debe tener un monto mayor a 0',
+        );
+      }
+
+      acumulados.set(medio, this.to2((acumulados.get(medio) ?? 0) + monto));
+    }
+
+    if (acumulados.size === 0) {
+      throw new BadRequestException('La venta debe incluir al menos un pago');
+    }
+
+    return [...acumulados.entries()].map(([medio, monto]) => ({
+      medio,
+      monto: this.to2(monto),
+    }));
+  }
+
+  private validarTotalPagos(
+    pagos: Array<{ medio: MedioPagoVenta; monto: number }>,
+    total: number,
+  ) {
+    const totalPagos = this.to2(
+      pagos.reduce((acc, pago) => acc + Number(pago.monto), 0),
+    );
+
+    if (Math.abs(totalPagos - total) > 0.01) {
+      throw new BadRequestException(
+        `La suma de pagos (${totalPagos}) debe coincidir con el total de la venta (${total})`,
+      );
+    }
+  }
+
+  private async descontarStockYRegistrarMovimientoTx(
+    manager: EntityManager,
+    item: VentaItem,
+    almacenId: number,
+    ventaId: number,
+  ) {
+    const producto = item.producto;
+    if (!producto) return;
+
+    const piezas = Number(item.cantidad ?? 0);
+    const gramos = Number(item.cantidad_gramos ?? 0);
+    if (piezas <= 0 && gramos <= 0) return;
+
+    await manager.query(
+      `INSERT INTO stock_actual (producto_id, almacen_id, cantidad, cantidad_gramos)
+       VALUES ($1,$2,0,NULL)
+       ON CONFLICT (producto_id, almacen_id) DO NOTHING`,
+      [producto.id, almacenId],
+    );
+
+    const stockRepo = manager.getRepository(StockActual);
+    const stock = await stockRepo
+      .createQueryBuilder('stock')
+      .where(
+        'stock.producto_id = :productoId AND stock.almacen_id = :almacenId',
+        { productoId: producto.id, almacenId },
+      )
+      .setLock('pessimistic_write')
+      .getOne();
+
+    if (!stock) {
+      throw new NotFoundException(
+        `No existe stock para producto ${producto.id} en almacen ${almacenId}`,
+      );
+    }
+
+    if (this.isGranel(producto)) {
+      stock.cantidad = 0;
+      stock.cantidad_gramos = this.to3(
+        Number(stock.cantidad_gramos ?? 0) - gramos,
+      ).toFixed(3);
+    } else {
+      stock.cantidad = Number(stock.cantidad ?? 0) - piezas;
+      stock.cantidad_gramos = null;
+    }
+
+    await stockRepo.save(stock);
+
+    await manager.getRepository(MovimientoStock).save({
+      producto_id: producto.id,
+      origen_almacen: almacenId,
+      destino_almacen: undefined,
+      cantidad: piezas > 0 ? piezas : undefined,
+      cantidad_gramos: gramos > 0 ? this.to3(gramos).toFixed(3) : undefined,
+      tipo: 'salida',
+      motivo: `Venta #${ventaId}`,
+    });
+  }
   private isGranel(prod: any): boolean {
     return prod?.es_por_gramos === true || prod?.unidad?.codigo === 'g';
   }
