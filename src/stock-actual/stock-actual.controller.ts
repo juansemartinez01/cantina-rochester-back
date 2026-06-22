@@ -6,7 +6,9 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   ParseIntPipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import { StockActualService } from './stock-actual.service';
 import { CreateStockActualDto } from './dto/create-stock-actual.dto';
@@ -14,6 +16,7 @@ import { UpdateStockActualDto } from './dto/update-stock-actual.dto';
 import { StockActual } from './stock-actual.entity';
 import { RegistrarInsumoDto } from './dto/registrar-insumo.dto';
 import { CancelarInsumoDto } from './dto/cancelar-insumo.dto';
+import { QueryStockActualDto } from './dto/query-stock-actual.dto';
 
 @Controller('stock-actual')
 export class StockActualController {
@@ -22,8 +25,17 @@ export class StockActualController {
   // 🔹 GETs
 
   @Get()
-  getAll(): Promise<StockActual[]> {
-    return this.service.findAll();
+  getAll(
+    @Query(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    )
+    query: QueryStockActualDto,
+  ) {
+    return this.service.findAll(query);
   }
 
   @Get('almacen/:almacenId')

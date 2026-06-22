@@ -9,6 +9,7 @@ import { Usuario } from 'src/usuario/usuario.entity';
 import { ProductoPrecioHistorial } from 'src/producto-precio-historial/producto-precio-historial.entity';
 import { ProductoPrecioHistorialService } from 'src/producto-precio-historial/producto-precio-historial.service';
 import { ProductoPrecioHistorialModule } from 'src/producto-precio-historial/producto-precio-historial.module';
+import { StockActual } from 'src/stock-actual/stock-actual.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ProductoPrecioHistorialModule } from 'src/producto-precio-historial/pro
       Unidad,
       ProductoPrecioAlmacen,
       Usuario,
+      StockActual,
     ]),
     ProductoPrecioHistorialModule,
   ],

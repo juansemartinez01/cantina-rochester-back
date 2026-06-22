@@ -11,6 +11,21 @@ import { Producto } from 'src/producto/producto.entity';
 // arriba, junto con los existentes
 import { In } from 'typeorm';
 import { ProductoPrecioAlmacen } from 'src/producto-precio-almacen/producto-precio-almacen.entity';
+import { QueryStockActualDto } from './dto/query-stock-actual.dto';
+
+type StockActualListMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+type StockActualListResponse = StockActual[] | {
+  data: StockActual[];
+  meta: StockActualListMeta;
+};
 
 
 @Injectable()
@@ -49,44 +64,143 @@ private resolvePrecioFinal(
   if (overrides.has(k)) return this.toNumber(overrides.get(k));
   return this.toNumber(precioBase ?? 0);
 }
-  async findAll(): Promise<StockActual[]> {
-  // Traigo stock con relaciones (necesitamos producto.precioBase y producto.es_por_gramos)
-  const rows = await this.repo.find({ relations: ['producto', 'almacen'] });
-  if (!rows.length) return rows;
 
-  // IDs únicos para buscar overrides en lote
-  const productoIds = Array.from(new Set(rows.map(r => r.producto_id)));
-  const almacenIds  = Array.from(new Set(rows.map(r => r.almacen_id)));
-
-  // Overrides por (producto, almacén)
-  const overridesArr = await this.ppaRepo.find({
-    where: { producto_id: In(productoIds), almacen_id: In(almacenIds) },
-  });
-  const ovMap = new Map<string, number>();
-  for (const o of overridesArr) {
-    ovMap.set(
-      `${o.producto_id}:${o.almacen_id}`,
-      this.getPrecioOverrideEfectivo(o),
-    );
+  private normalizePositiveInt(
+    value: number | undefined,
+    fallback: number,
+    max?: number,
+  ): number {
+    const normalized =
+      Number.isInteger(value) && value > 0 ? value : fallback;
+    return max ? Math.min(normalized, max) : normalized;
   }
 
-  // Enriquecer cada fila con precioFinal y valorFila
-  for (const r of rows) {
-    const prod: any = r.producto;
-    const precioFinal = this.resolvePrecioFinal(r.producto_id, r.almacen_id, prod?.precioBase, ovMap);
-    (r as any).precioFinal = precioFinal;
-
-    const esGr = prod?.es_por_gramos === true;
-    const qtyNormalizada = esGr
-      ? this.toNumber(r.cantidad_gramos) / 1000 // gramos → kg
-      : this.toNumber(r.cantidad);              // piezas
-
-    (r as any).valorFila = this.toNumber(precioFinal) * qtyNormalizada;
+  private wantsMetadata(value?: boolean): boolean {
+    return value === true;
   }
 
-  return rows;
-}
+  private hasListQuery(query?: QueryStockActualDto): boolean {
+    if (!query) return false;
+    return Object.values(query).some((value) => value !== undefined);
+  }
 
+  private enrichStockRows(rows: StockActual[], overrides: Map<string, number>) {
+    for (const r of rows) {
+      const prod: any = r.producto;
+      const precioFinal = this.resolvePrecioFinal(
+        r.producto_id,
+        r.almacen_id,
+        prod?.precioBase,
+        overrides,
+      );
+      (r as any).precioFinal = precioFinal;
+
+      const esGr = prod?.es_por_gramos === true;
+      const qtyNormalizada = esGr
+        ? this.toNumber(r.cantidad_gramos) / 1000
+        : this.toNumber(r.cantidad);
+
+      (r as any).valorFila = this.toNumber(precioFinal) * qtyNormalizada;
+    }
+  }
+
+  private async buildOverrideMap(rows: StockActual[]) {
+    if (!rows.length) return new Map<string, number>();
+
+    const productoIds = Array.from(new Set(rows.map((r) => r.producto_id)));
+    const almacenIds = Array.from(new Set(rows.map((r) => r.almacen_id)));
+
+    const overridesArr = await this.ppaRepo.find({
+      where: { producto_id: In(productoIds), almacen_id: In(almacenIds) },
+    });
+
+    const ovMap = new Map<string, number>();
+    for (const o of overridesArr) {
+      ovMap.set(
+        `${o.producto_id}:${o.almacen_id}`,
+        this.getPrecioOverrideEfectivo(o),
+      );
+    }
+
+    return ovMap;
+  }
+
+  async findAll(
+    query: QueryStockActualDto = {},
+  ): Promise<StockActualListResponse> {
+    const shouldReturnMetadata = this.wantsMetadata(query.metadata);
+
+    if (!this.hasListQuery(query)) {
+      const rows = await this.repo.find({ relations: ['producto', 'almacen'] });
+      this.enrichStockRows(rows, await this.buildOverrideMap(rows));
+      return rows;
+    }
+
+    const qb = this.repo
+      .createQueryBuilder('stock')
+      .leftJoinAndSelect('stock.producto', 'producto')
+      .leftJoinAndSelect('stock.almacen', 'almacen')
+      .orderBy('stock.almacen_id', 'ASC')
+      .addOrderBy('stock.producto_id', 'ASC');
+
+    if (query.almacenId !== undefined) {
+      qb.andWhere('stock.almacen_id = :almacenId', {
+        almacenId: query.almacenId,
+      });
+    }
+
+    if (query.productoId !== undefined) {
+      qb.andWhere('stock.producto_id = :productoId', {
+        productoId: query.productoId,
+      });
+    }
+
+    if (query.producto?.trim()) {
+      const producto = `%${query.producto.trim()}%`;
+      qb.andWhere(
+        '(producto.nombre ILIKE :producto OR producto.sku ILIKE :producto OR producto.barcode ILIKE :producto)',
+        { producto },
+      );
+    }
+
+    if (query.proveedorNombre?.trim()) {
+      qb.andWhere('producto."proveedorNombre" ILIKE :proveedorNombre', {
+        proveedorNombre: `%${query.proveedorNombre.trim()}%`,
+      });
+    }
+
+    const shouldPaginate =
+      shouldReturnMetadata ||
+      query.page !== undefined ||
+      query.limit !== undefined;
+    const page = this.normalizePositiveInt(query.page, 1);
+    const limit = this.normalizePositiveInt(query.limit, 50, 500);
+
+    if (shouldPaginate) {
+      qb.skip((page - 1) * limit).take(limit);
+    }
+
+    const [rows, total] = shouldReturnMetadata
+      ? await qb.getManyAndCount()
+      : ([await qb.getMany(), 0] as [StockActual[], number]);
+
+    this.enrichStockRows(rows, await this.buildOverrideMap(rows));
+
+    if (!shouldReturnMetadata) return rows;
+
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+    return {
+      data: rows,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1 && totalPages > 0,
+      },
+    };
+  }
 
   async registrarEntrada(dto: CreateStockActualDto): Promise<StockActual> {
   return this.repo.manager.transaction(async (m) => {

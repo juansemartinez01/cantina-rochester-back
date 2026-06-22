@@ -20,6 +20,20 @@ const QUICK_BARCODE = '000000000000';
 
 type AuthUser = { id?: number };
 
+type ProductoSearchMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+type ProductoSearchResponse = {
+  data: Producto[];
+  meta: ProductoSearchMeta;
+};
+
 @Injectable()
 export class ProductoService {
   constructor(
@@ -34,6 +48,9 @@ export class ProductoService {
 
     @InjectRepository(Usuario)
     private readonly usuarioRepo: Repository<Usuario>,
+
+    @InjectRepository(StockActual)
+    private readonly stockRepo: Repository<StockActual>,
   ) {}
 
   private async resolveUserForAudit(user?: AuthUser) {
@@ -413,7 +430,9 @@ export class ProductoService {
     return p;
   }
 
-  async buscarConFiltros(filtros: BuscarProductoDto): Promise<Producto[]> {
+  async buscarConFiltros(
+    filtros: BuscarProductoDto,
+  ): Promise<ProductoSearchResponse> {
     const {
       nombre,
       sku,
@@ -588,35 +607,44 @@ export class ProductoService {
         .addOrderBy('producto.id', 'ASC');
     }
 
-    const pageNum = Number(page);
-    const limitNum = Number(limit);
-    if (
-      Number.isInteger(pageNum) &&
-      Number.isInteger(limitNum) &&
-      pageNum > 0 &&
-      limitNum > 0
-    ) {
-      query.skip((pageNum - 1) * limitNum).take(Math.min(limitNum, 10000));
+    const pageNum = page === undefined ? 1 : Number(page);
+    const limitNum = limit === undefined ? 50 : Number(limit);
+    if (!Number.isInteger(pageNum) || pageNum <= 0) {
+      throw new BadRequestException('page debe ser un entero mayor a 0');
+    }
+    if (!Number.isInteger(limitNum) || limitNum <= 0) {
+      throw new BadRequestException('limit debe ser un entero mayor a 0');
     }
 
-    const productos = await query.getMany();
+    const limitFinal = Math.min(limitNum, 500);
+    query.skip((pageNum - 1) * limitFinal).take(limitFinal);
 
-    // === NUEVO: anexar precioFinal sin cambiar el schema ===
-    if (productos.length === 0) return productos;
+    const [productos, total] = await query.getManyAndCount();
 
     // Si viene almacenId, buscamos overrides; si no, usamos precioBase como precioFinal
-    if (almacenIdNum !== undefined) {
+    if (productos.length && almacenIdNum !== undefined) {
       const ids = productos.map((p) => p.id);
       const overrides = await this.ppaRepo.find({
         where: { producto_id: In(ids), almacen_id: almacenIdNum },
       });
       const mapOverride = this.buildPrecioOverrideMap(overrides);
       this.applyPrecioRespuesta(productos, mapOverride);
-    } else {
+    } else if (productos.length) {
       this.applyPrecioRespuesta(productos);
     }
 
-    return productos;
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limitFinal);
+    return {
+      data: productos,
+      meta: {
+        page: pageNum,
+        limit: limitFinal,
+        total,
+        totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPreviousPage: pageNum > 1 && totalPages > 0,
+      },
+    };
   }
 
   async buscarConFiltrosFast(
@@ -636,7 +664,8 @@ export class ProductoService {
 
     const almacenIdNum = Number(almacenId);
     if (!almacenId || !Number.isInteger(almacenIdNum) || almacenIdNum <= 0) {
-      return this.buscarConFiltros(filtros);
+      const result = await this.buscarConFiltros(filtros);
+      return result.data;
     }
 
     const query = this.repo
@@ -715,6 +744,21 @@ export class ProductoService {
     const producto = await this.repo.findOne({ where: { id } });
     if (!producto) throw new NotFoundException(`Producto ${id} no encontrado`);
     this.assertNotQuickProducto(producto, 'borrado');
+
+    const stockConExistencia = await this.stockRepo
+      .createQueryBuilder('stock')
+      .where('stock.producto_id = :id', { id })
+      .andWhere(
+        '(COALESCE(stock.cantidad, 0) <> 0 OR COALESCE(stock.cantidad_gramos, 0) <> 0)',
+      )
+      .getOne();
+
+    if (stockConExistencia) {
+      throw new BadRequestException(
+        'No se puede borrar el producto porque tiene stock en uno o mas almacenes.',
+      );
+    }
+
     producto.activo = false;
     return this.repo.save(producto);
   }
