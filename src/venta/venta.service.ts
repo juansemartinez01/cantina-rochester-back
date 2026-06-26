@@ -4,7 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { Venta } from './venta.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import {
@@ -119,6 +124,11 @@ export class VentaService {
     total: number;
     page: number;
     limit: number;
+    totalesFiltrados: {
+      totalAcumulado: number;
+      efectivo: number;
+      bancarizado: number;
+    };
   }> {
     const {
       fechaDesde,
@@ -239,13 +249,148 @@ export class VentaService {
 
     query.orderBy(`venta.${campoOrdenFinal}`, ordenDireccion);
 
-    const [ventas, total] = await query.getManyAndCount();
+    const [[ventas, total], totalesFiltrados] = await Promise.all([
+      query.getManyAndCount(),
+      this.obtenerTotalesFiltrados(filtros),
+    ]);
 
     return {
       data: ventas,
       total,
       page,
       limit,
+      totalesFiltrados,
+    };
+  }
+
+  private aplicarFiltrosBaseVentas(
+    query: SelectQueryBuilder<Venta>,
+    filtros: {
+      fechaDesde?: string;
+      fechaHasta?: string;
+      horaDesde?: string;
+      horaHasta?: string;
+      usuarioId?: string;
+      estado?: string;
+      almacenId?: string;
+      tipo?: 'EFECTIVO' | 'BANCARIZADO';
+    },
+    tipoMode: 'joined' | 'exists' | 'none' = 'joined',
+  ) {
+    const {
+      fechaDesde,
+      fechaHasta,
+      horaDesde,
+      horaHasta,
+      usuarioId,
+      almacenId,
+      estado,
+      tipo,
+    } = filtros;
+
+    if (fechaDesde) {
+      const horaIni = horaDesde ?? '00:00';
+      const fechaHoraDesde = `${fechaDesde} ${horaIni}:00`;
+
+      query.andWhere('venta.fecha >= :fechaDesde', {
+        fechaDesde: fechaHoraDesde,
+      });
+    }
+
+    if (fechaHasta) {
+      const horaFin = horaHasta ?? '23:59';
+      const fechaHoraHasta = `${fechaHasta} ${horaFin}:59`;
+
+      query.andWhere('venta.fecha <= :fechaHasta', {
+        fechaHasta: fechaHoraHasta,
+      });
+    }
+
+    if (usuarioId) {
+      query.andWhere('usuario.id = :usuarioId', { usuarioId });
+    }
+
+    if (estado) {
+      const estados = estado
+        .split(',')
+        .map((e) => e.trim())
+        .filter(Boolean);
+      if (estados.length > 0) {
+        query.andWhere('venta.estado IN (:...estados)', { estados });
+      }
+    }
+
+    if (almacenId) {
+      const almacenIdNum = parseInt(almacenId, 10);
+      if (!isNaN(almacenIdNum)) {
+        query.andWhere('almacen.id = :almacenId', { almacenId: almacenIdNum });
+      }
+    }
+
+    if (tipo && tipoMode === 'joined') {
+      query.andWhere('ingreso.tipo = :tipo', { tipo });
+    }
+
+    if (tipo && tipoMode === 'exists') {
+      query.andWhere(
+        `EXISTS (
+          SELECT 1
+          FROM ingreso_venta ingreso_filtro
+          WHERE ingreso_filtro.venta_id = venta.id
+            AND ingreso_filtro.tipo = :tipo
+        )`,
+        { tipo },
+      );
+    }
+  }
+
+  private async obtenerTotalesFiltrados(filtros: {
+    fechaDesde?: string;
+    fechaHasta?: string;
+    horaDesde?: string;
+    horaHasta?: string;
+    usuarioId?: string;
+    estado?: string;
+    almacenId?: string;
+    tipo?: 'EFECTIVO' | 'BANCARIZADO';
+  }) {
+    const totalQuery = this.repo
+      .createQueryBuilder('venta')
+      .leftJoin('venta.usuario', 'usuario')
+      .leftJoin('venta.almacen', 'almacen')
+      .select('COALESCE(SUM(venta.total), 0)', 'totalAcumulado');
+
+    this.aplicarFiltrosBaseVentas(totalQuery, filtros, 'exists');
+
+    const ingresosQuery = this.repo
+      .createQueryBuilder('venta')
+      .innerJoin('venta.ingresos', 'ingreso')
+      .leftJoin('venta.usuario', 'usuario')
+      .leftJoin('venta.almacen', 'almacen')
+      .select(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'EFECTIVO' THEN ingreso.monto ELSE 0 END), 0)`,
+        'efectivo',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'BANCARIZADO' THEN ingreso.monto ELSE 0 END), 0)`,
+        'bancarizado',
+      );
+
+    this.aplicarFiltrosBaseVentas(ingresosQuery, filtros, 'none');
+
+    if (filtros.tipo) {
+      ingresosQuery.andWhere('ingreso.tipo = :tipo', { tipo: filtros.tipo });
+    }
+
+    const [totalRaw, ingresosRaw] = await Promise.all([
+      totalQuery.getRawOne(),
+      ingresosQuery.getRawOne(),
+    ]);
+
+    return {
+      totalAcumulado: this.to2(Number(totalRaw?.totalAcumulado ?? 0)),
+      efectivo: this.to2(Number(ingresosRaw?.efectivo ?? 0)),
+      bancarizado: this.to2(Number(ingresosRaw?.bancarizado ?? 0)),
     };
   }
 

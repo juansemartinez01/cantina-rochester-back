@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, Put, Query, Patch } from '@nestjs/common';
 import { PromocionService } from './promocion.service';
 import { CreatePromocionDto } from './dto/create-promocion.dto';
 import { UpdatePromocionDto } from './dto/update-promocion.dto';
@@ -52,9 +52,19 @@ export class PromocionController {
     return this.service.update(+id, dto);
   }
 
+  @Patch(':id/activar')
+  activar(@Param('id') id: string) {
+    return this.service.activar(+id);
+  }
+
+  @Patch(':id/desactivar')
+  desactivar(@Param('id') id: string) {
+    return this.service.desactivar(+id);
+  }
+
   @Delete(':id/logico')
   async borrarLogico(@Param('id') id: string) {
-    return this.service.borrarLogicamente(+id);
+    return this.service.desactivar(+id);
   }
 
 

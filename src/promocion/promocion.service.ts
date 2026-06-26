@@ -196,15 +196,32 @@ async findProductosEnPromocionesActivas(query: QueryProductosPromocionActivaDto)
   };
 }
 
-async borrarLogicamente(id: number): Promise<{ message: string }> {
+private async setActivo(id: number, activo: boolean): Promise<{ message: string }> {
   const promocion = await this.promoRepo.findOne({ where: { id } });
   if (!promocion) {
     throw new NotFoundException(`No se encontró ninguna promoción con id ${id}`);
   }
 
-  promocion.activo = false;
+  promocion.activo = activo;
   await this.promoRepo.save(promocion);
-  return { message: `Promoción con id ${id} desactivada correctamente` };
+
+  return {
+    message: activo
+      ? `Promoción con id ${id} activada correctamente`
+      : `Promoción con id ${id} desactivada correctamente`,
+  };
+}
+
+async activar(id: number): Promise<{ message: string }> {
+  return this.setActivo(id, true);
+}
+
+async desactivar(id: number): Promise<{ message: string }> {
+  return this.setActivo(id, false);
+}
+
+async borrarLogicamente(id: number): Promise<{ message: string }> {
+  return this.desactivar(id);
 }
 
 

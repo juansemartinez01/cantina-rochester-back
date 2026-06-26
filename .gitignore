@@ -3,3 +3,4 @@
 *.log
 .env*
 !.env.production
+.claude/settings.local.json

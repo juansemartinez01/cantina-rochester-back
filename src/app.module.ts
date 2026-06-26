@@ -25,6 +25,7 @@ import { IngresoVentaModule } from './ingreso/ingreso-venta.module';
 import { ExtraccionIngresoModule } from './extraccion/extraccion-ingreso.module';
 import { FacturaModule } from './factura/factura.module';
 import { GastosModule } from './gastos/gastos.module';
+import { CajaModule } from './caja/caja.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { GastosModule } from './gastos/gastos.module';
     ExtraccionIngresoModule,
     FacturaModule,
     GastosModule,
+    CajaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
