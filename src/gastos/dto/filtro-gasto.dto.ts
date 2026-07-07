@@ -18,6 +18,20 @@ export class FiltroGastoDto {
   search?: string;
 
   @IsOptional()
+  @IsString()
+  q?: string;
+
+  @IsOptional()
+  @IsString()
+  categoria?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : value))
+  @IsInt()
+  @Min(1)
+  categoriaId?: number;
+
+  @IsOptional()
   @IsIn(Object.values(GastoOrigen))
   origen?: GastoOrigen;
 
@@ -56,8 +70,8 @@ export class FiltroGastoDto {
 
   // Orden
   @IsOptional()
-  @IsIn(['fecha', 'monto', 'createdAt'])
-  orderBy?: 'fecha' | 'monto' | 'createdAt' = 'fecha';
+  @IsIn(['fecha', 'monto', 'createdAt', 'categoria'])
+  orderBy?: 'fecha' | 'monto' | 'createdAt' | 'categoria' = 'fecha';
 
   @IsOptional()
   @IsIn(['ASC', 'DESC'])

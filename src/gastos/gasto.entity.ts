@@ -10,6 +10,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { OrdenCompra } from 'src/orden-compra/orden-compra.entity';
+import { GastoCategoria } from './gasto-categoria.entity';
 
 export enum GastoOrigen {
   MANUAL = 'MANUAL',
@@ -19,6 +20,7 @@ export enum GastoOrigen {
 @Entity('gasto')
 @Index('idx_gasto_fecha', ['fecha'])
 @Index('idx_gasto_monto', ['monto'])
+@Index('idx_gasto_categoria', ['categoriaId'])
 export class Gasto {
   @PrimaryGeneratedColumn()
   id: number;
@@ -38,6 +40,16 @@ export class Gasto {
   // Campo opcional para notas largas
   @Column({ type: 'text', nullable: true })
   notas?: string | null;
+
+  @Column({ name: 'categoria_id', type: 'int', nullable: true })
+  categoriaId: number | null;
+
+  @ManyToOne(() => GastoCategoria, categoria => categoria.gastos, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'categoria_id' })
+  categoria: GastoCategoria | null;
 
   @Column({ type: 'enum', enum: GastoOrigen, default: GastoOrigen.MANUAL })
   origen: GastoOrigen;

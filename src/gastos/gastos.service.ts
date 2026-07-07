@@ -1,34 +1,48 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, FindOptionsWhere, ILike, IsNull, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository, SelectQueryBuilder } from 'typeorm';
 import { Gasto, GastoOrigen } from './gasto.entity';
+import { GastoCategoria } from './gasto-categoria.entity';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { FiltroGastoDto } from './dto/filtro-gasto.dto';
+import { CreateGastoCategoriaDto } from './dto/create-gasto-categoria.dto';
+import { UpdateGastoCategoriaDto } from './dto/update-gasto-categoria.dto';
 
 @Injectable()
 export class GastosService {
   constructor(
     @InjectRepository(Gasto)
     private readonly repo: Repository<Gasto>,
+    @InjectRepository(GastoCategoria)
+    private readonly categoriaRepo: Repository<GastoCategoria>,
   ) {}
 
   async crear(dto: CreateGastoDto): Promise<Gasto> {
-    // Normalizamos el monto a 2 decimales
+    const categoria = dto.categoriaId
+      ? await this.obtenerCategoriaActiva(dto.categoriaId)
+      : null;
     const montoFix2 = Number(dto.monto.toFixed(2));
     const entity = this.repo.create({
       fecha: dto.fecha,
-      monto: montoFix2.toFixed(2), // guardar como string por numeric
-      descripcion: dto.descripcion.trim(),
-      notas: dto.notas?.trim() ?? null,
+      monto: montoFix2.toFixed(2),
+      descripcion: this.cleanRequired(dto.descripcion, 'descripcion'),
+      notas: this.clean(dto.notas) ?? null,
+      categoriaId: categoria?.id ?? null,
+      categoria,
       origen: GastoOrigen.MANUAL,
       ordenCompraId: null,
     });
-    return await this.repo.save(entity);
+
+    const guardado = await this.repo.save(entity);
+    return this.obtenerPorId(guardado.id);
   }
 
   async actualizar(id: number, dto: UpdateGastoDto): Promise<Gasto> {
-    const gasto = await this.repo.findOne({ where: { id } });
+    const gasto = await this.repo.findOne({
+      where: { id },
+      relations: ['categoria'],
+    });
     if (!gasto) throw new NotFoundException('Gasto no encontrado');
 
     if (dto.monto !== undefined) {
@@ -36,29 +50,33 @@ export class GastosService {
       gasto.monto = Number(dto.monto.toFixed(2)).toFixed(2);
     }
     if (dto.fecha !== undefined) gasto.fecha = dto.fecha;
-    if (dto.descripcion !== undefined) gasto.descripcion = dto.descripcion.trim();
-    if (dto.notas !== undefined) gasto.notas = dto.notas?.trim() ?? null;
+    if (dto.descripcion !== undefined) {
+      gasto.descripcion = this.cleanRequired(dto.descripcion, 'descripcion');
+    }
+    if (dto.notas !== undefined) gasto.notas = this.clean(dto.notas) ?? null;
+    if (dto.categoriaId !== undefined) {
+      const categoria = dto.categoriaId
+        ? await this.obtenerCategoriaActiva(dto.categoriaId)
+        : null;
+      gasto.categoriaId = categoria?.id ?? null;
+      gasto.categoria = categoria;
+    }
 
-    return await this.repo.save(gasto);
+    await this.repo.save(gasto);
+    return this.obtenerPorId(id);
   }
 
   async obtenerPorId(id: number, incluirEliminados = false): Promise<Gasto> {
     const where: FindOptionsWhere<Gasto> = { id };
     const gasto = await this.repo.findOne({
       where,
+      relations: ['categoria'],
       withDeleted: incluirEliminados,
     });
     if (!gasto) throw new NotFoundException('Gasto no encontrado');
     return gasto;
   }
 
-  /**
-   * Lista con filtros + paginado + suma total filtrada.
-   * Devuelve:
-   *  - data: Gasto[]
-   *  - page, limit, totalItems, totalPages
-   *  - totalMontoFiltrado: string (numeric)
-   */
   async listar(f: FiltroGastoDto): Promise<{
     data: Gasto[];
     page: number;
@@ -71,6 +89,9 @@ export class GastosService {
       desde,
       hasta,
       search,
+      q,
+      categoria,
+      categoriaId,
       minMonto,
       maxMonto,
       origen,
@@ -83,91 +104,87 @@ export class GastosService {
     } = f;
 
     if (desde && hasta && new Date(desde) > new Date(hasta)) {
-      throw new BadRequestException('El rango de fechas es inválido: desde > hasta');
+      throw new BadRequestException('El rango de fechas es invalido: desde > hasta');
     }
     if (minMonto && maxMonto && minMonto > maxMonto) {
-      throw new BadRequestException('El rango de monto es inválido: minMonto > maxMonto');
+      throw new BadRequestException('El rango de monto es invalido: minMonto > maxMonto');
     }
 
-    // QueryBuilder para data
-    const qb = this.repo.createQueryBuilder('g')
-      .select(['g.id', 'g.fecha', 'g.monto', 'g.descripcion', 'g.notas', 'g.origen', 'g.ordenCompraId', 'g.createdAt', 'g.updatedAt', 'g.deletedAt']);
+    const textoBusqueda = this.clean(q ?? search);
+    const categoriaFiltro = this.clean(categoria);
 
-    // Soft delete: por defecto excluye eliminados; si incluirEliminados === 'true', incluir
+    const qb = this.repo
+      .createQueryBuilder('g')
+      .leftJoin('g.categoria', 'categoria')
+      .select([
+        'g.id',
+        'g.fecha',
+        'g.monto',
+        'g.descripcion',
+        'g.notas',
+        'g.categoriaId',
+        'g.origen',
+        'g.ordenCompraId',
+        'g.createdAt',
+        'g.updatedAt',
+        'g.deletedAt',
+        'categoria.id',
+        'categoria.nombre',
+        'categoria.descripcion',
+        'categoria.activo',
+      ]);
+
     if (incluirEliminados === 'true') {
       qb.withDeleted();
     } else {
       qb.andWhere('g.deletedAt IS NULL');
     }
 
-    // Filtros
-    if (desde && hasta) {
-      qb.andWhere('g.fecha BETWEEN :desde AND :hasta', { desde, hasta });
-    } else if (desde) {
-      qb.andWhere('g.fecha >= :desde', { desde });
-    } else if (hasta) {
-      qb.andWhere('g.fecha <= :hasta', { hasta });
-    }
+    this.aplicarFiltrosGastos(qb, {
+      desde,
+      hasta,
+      textoBusqueda,
+      categoria: categoriaFiltro,
+      categoriaId,
+      origen,
+      ordenCompraId,
+      minMonto,
+      maxMonto,
+    });
 
-    if (search) {
-      qb.andWhere('(g.descripcion ILIKE :q OR g.notas ILIKE :q)', { q: `%${search}%` });
-    }
-    if (origen) {
-      qb.andWhere('g.origen = :origen', { origen });
-    }
-    if (ordenCompraId) {
-      qb.andWhere('g.ordenCompraId = :ordenCompraId', { ordenCompraId });
-    }
-
-    if (minMonto !== undefined) {
-      qb.andWhere('g.monto >= :minMonto', { minMonto });
-    }
-    if (maxMonto !== undefined) {
-      qb.andWhere('g.monto <= :maxMonto', { maxMonto });
-    }
-
-    // Orden
     const orderMap: Record<string, string> = {
       fecha: 'g.fecha',
       monto: 'g.monto',
       createdAt: 'g.createdAt',
+      categoria: 'categoria.nombre',
     };
     qb.orderBy(orderMap[orderBy], order);
 
-    // Paginado
     qb.skip((page - 1) * limit).take(limit);
 
     const [data, totalItems] = await qb.getManyAndCount();
 
-    // Suma total con los mismos filtros
-    const sumQb = this.repo.createQueryBuilder('g').select('COALESCE(SUM(g.monto), 0)', 'total');
+    const sumQb = this.repo
+      .createQueryBuilder('g')
+      .leftJoin('g.categoria', 'categoria')
+      .select('COALESCE(SUM(g.monto), 0)', 'total');
     if (incluirEliminados === 'true') {
       sumQb.withDeleted();
     } else {
       sumQb.andWhere('g.deletedAt IS NULL');
     }
-    if (desde && hasta) {
-      sumQb.andWhere('g.fecha BETWEEN :desde AND :hasta', { desde, hasta });
-    } else if (desde) {
-      sumQb.andWhere('g.fecha >= :desde', { desde });
-    } else if (hasta) {
-      sumQb.andWhere('g.fecha <= :hasta', { hasta });
-    }
-    if (search) {
-      sumQb.andWhere('(g.descripcion ILIKE :q OR g.notas ILIKE :q)', { q: `%${search}%` });
-    }
-    if (origen) {
-      sumQb.andWhere('g.origen = :origen', { origen });
-    }
-    if (ordenCompraId) {
-      sumQb.andWhere('g.ordenCompraId = :ordenCompraId', { ordenCompraId });
-    }
-    if (minMonto !== undefined) {
-      sumQb.andWhere('g.monto >= :minMonto', { minMonto });
-    }
-    if (maxMonto !== undefined) {
-      sumQb.andWhere('g.monto <= :maxMonto', { maxMonto });
-    }
+
+    this.aplicarFiltrosGastos(sumQb, {
+      desde,
+      hasta,
+      textoBusqueda,
+      categoria: categoriaFiltro,
+      categoriaId,
+      origen,
+      ordenCompraId,
+      minMonto,
+      maxMonto,
+    });
 
     const row = await sumQb.getRawOne<{ total: string } | null>();
     const totalMontoFiltrado = row?.total ?? '0';
@@ -182,16 +199,192 @@ export class GastosService {
     };
   }
 
+  async listarCategorias(
+    activo: 'true' | 'false' | 'all' = 'true',
+  ): Promise<GastoCategoria[]> {
+    const qb = this.categoriaRepo
+      .createQueryBuilder('categoria')
+      .orderBy('LOWER(categoria.nombre)', 'ASC');
+
+    if (activo !== 'all') {
+      qb.where('categoria.activo = :activo', { activo: activo !== 'false' });
+    }
+
+    return qb.getMany();
+  }
+
+  async crearCategoria(dto: CreateGastoCategoriaDto): Promise<GastoCategoria> {
+    const nombre = this.cleanRequired(dto.nombre, 'nombre');
+    await this.assertNombreCategoriaDisponible(nombre);
+
+    const categoria = this.categoriaRepo.create({
+      nombre,
+      descripcion: this.clean(dto.descripcion) ?? null,
+      activo: true,
+    });
+
+    return this.categoriaRepo.save(categoria);
+  }
+
+  async actualizarCategoria(
+    id: number,
+    dto: UpdateGastoCategoriaDto,
+  ): Promise<GastoCategoria> {
+    const categoria = await this.obtenerCategoria(id);
+
+    if (dto.nombre !== undefined) {
+      const nombre = this.cleanRequired(dto.nombre, 'nombre');
+      if (nombre.toLowerCase() !== categoria.nombre.toLowerCase()) {
+        await this.assertNombreCategoriaDisponible(nombre, id);
+      }
+      categoria.nombre = nombre;
+    }
+
+    if (dto.descripcion !== undefined) {
+      categoria.descripcion = this.clean(dto.descripcion) ?? null;
+    }
+
+    if (dto.activo !== undefined) {
+      categoria.activo = dto.activo;
+    }
+
+    return this.categoriaRepo.save(categoria);
+  }
+
+  async activarCategoria(id: number): Promise<GastoCategoria> {
+    const categoria = await this.obtenerCategoria(id);
+    categoria.activo = true;
+    return this.categoriaRepo.save(categoria);
+  }
+
+  async desactivarCategoria(id: number): Promise<GastoCategoria> {
+    const categoria = await this.obtenerCategoria(id);
+    categoria.activo = false;
+    return this.categoriaRepo.save(categoria);
+  }
+
   async eliminar(id: number): Promise<void> {
     const gasto = await this.repo.findOne({ where: { id } });
     if (!gasto) throw new NotFoundException('Gasto no encontrado');
     await this.repo.softRemove(gasto);
   }
 
-  // Opción: borrado definitivo (útil para datos de prueba – restringilo si querés)
   async eliminarDefinitivo(id: number): Promise<void> {
     const gasto = await this.repo.findOne({ where: { id }, withDeleted: true });
     if (!gasto) throw new NotFoundException('Gasto no encontrado');
     await this.repo.remove(gasto);
+  }
+
+  private aplicarFiltrosGastos(
+    qb: SelectQueryBuilder<Gasto>,
+    filtros: {
+      desde?: string;
+      hasta?: string;
+      textoBusqueda?: string | null;
+      categoria?: string | null;
+      categoriaId?: number;
+      origen?: GastoOrigen;
+      ordenCompraId?: number;
+      minMonto?: number;
+      maxMonto?: number;
+    },
+  ) {
+    const {
+      desde,
+      hasta,
+      textoBusqueda,
+      categoria,
+      categoriaId,
+      origen,
+      ordenCompraId,
+      minMonto,
+      maxMonto,
+    } = filtros;
+
+    if (desde && hasta) {
+      qb.andWhere('g.fecha BETWEEN :desde AND :hasta', { desde, hasta });
+    } else if (desde) {
+      qb.andWhere('g.fecha >= :desde', { desde });
+    } else if (hasta) {
+      qb.andWhere('g.fecha <= :hasta', { hasta });
+    }
+
+    if (textoBusqueda) {
+      qb.andWhere(
+        '(g.descripcion ILIKE :textoBusqueda OR g.notas ILIKE :textoBusqueda OR categoria.nombre ILIKE :textoBusqueda)',
+        { textoBusqueda: `%${textoBusqueda}%` },
+      );
+    }
+
+    if (categoriaId) {
+      qb.andWhere('g.categoriaId = :categoriaId', { categoriaId });
+    }
+
+    if (categoria) {
+      const categoriaComoId = Number(categoria);
+      if (Number.isInteger(categoriaComoId) && categoriaComoId > 0) {
+        qb.andWhere('g.categoriaId = :categoriaComoId', { categoriaComoId });
+      } else {
+        qb.andWhere('LOWER(categoria.nombre) = LOWER(:categoriaNombre)', {
+          categoriaNombre: categoria,
+        });
+      }
+    }
+
+    if (origen) {
+      qb.andWhere('g.origen = :origen', { origen });
+    }
+    if (ordenCompraId) {
+      qb.andWhere('g.ordenCompraId = :ordenCompraId', { ordenCompraId });
+    }
+
+    if (minMonto !== undefined) {
+      qb.andWhere('g.monto >= :minMonto', { minMonto });
+    }
+    if (maxMonto !== undefined) {
+      qb.andWhere('g.monto <= :maxMonto', { maxMonto });
+    }
+  }
+
+  private async obtenerCategoria(id: number): Promise<GastoCategoria> {
+    const categoria = await this.categoriaRepo.findOne({ where: { id } });
+    if (!categoria) throw new NotFoundException('Categoria de gasto no encontrada');
+    return categoria;
+  }
+
+  private async obtenerCategoriaActiva(id: number): Promise<GastoCategoria> {
+    const categoria = await this.obtenerCategoria(id);
+    if (!categoria.activo) {
+      throw new BadRequestException('La categoria de gasto esta inactiva');
+    }
+    return categoria;
+  }
+
+  private async assertNombreCategoriaDisponible(
+    nombre: string,
+    excluirId?: number,
+  ): Promise<void> {
+    const existente = await this.categoriaRepo
+      .createQueryBuilder('categoria')
+      .where('LOWER(categoria.nombre) = LOWER(:nombre)', { nombre })
+      .getOne();
+
+    if (existente && existente.id !== excluirId) {
+      throw new BadRequestException(`La categoria de gasto "${nombre}" ya existe`);
+    }
+  }
+
+  private clean(value?: string | null): string | null | undefined {
+    if (value === undefined) return undefined;
+    const cleaned = value?.trim();
+    return cleaned || null;
+  }
+
+  private cleanRequired(value: string | undefined | null, field: string): string {
+    const cleaned = value?.trim();
+    if (!cleaned) {
+      throw new BadRequestException(`${field} es obligatorio`);
+    }
+    return cleaned;
   }
 }

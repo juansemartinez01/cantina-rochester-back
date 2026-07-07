@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, MaxLength } from 'class-validator';
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, MaxLength, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateGastoDto {
@@ -18,4 +18,10 @@ export class CreateGastoDto {
   @IsOptional()
   @IsString()
   notas?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (value !== null && value !== undefined ? Number(value) : value))
+  @IsInt()
+  @Min(1)
+  categoriaId?: number | null;
 }

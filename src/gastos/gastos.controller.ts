@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { GastosService } from './gastos.service';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { FiltroGastoDto } from './dto/filtro-gasto.dto';
+import { CreateGastoCategoriaDto } from './dto/create-gasto-categoria.dto';
+import { UpdateGastoCategoriaDto } from './dto/update-gasto-categoria.dto';
 
 @Controller('gastos')
 export class GastosController {
@@ -16,6 +18,34 @@ export class GastosController {
   @Patch(':id')
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateGastoDto) {
     return this.service.actualizar(id, dto);
+  }
+
+  @Get('categorias')
+  listarCategorias(@Query('activo') activo?: 'true' | 'false' | 'all') {
+    return this.service.listarCategorias(activo);
+  }
+
+  @Post('categorias')
+  crearCategoria(@Body() dto: CreateGastoCategoriaDto) {
+    return this.service.crearCategoria(dto);
+  }
+
+  @Patch('categorias/:id')
+  actualizarCategoria(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateGastoCategoriaDto,
+  ) {
+    return this.service.actualizarCategoria(id, dto);
+  }
+
+  @Patch('categorias/:id/desactivar')
+  desactivarCategoria(@Param('id', ParseIntPipe) id: number) {
+    return this.service.desactivarCategoria(id);
+  }
+
+  @Patch('categorias/:id/activar')
+  activarCategoria(@Param('id', ParseIntPipe) id: number) {
+    return this.service.activarCategoria(id);
   }
 
   @Get(':id')
