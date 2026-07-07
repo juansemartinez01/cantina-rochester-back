@@ -24,4 +24,10 @@ export class CreateGastoDto {
   @IsInt()
   @Min(1)
   categoriaId?: number | null;
+
+  @IsOptional()
+  @Transform(({ value }) => (value !== null && value !== undefined ? Number(value) : value))
+  @IsInt()
+  @Min(1)
+  almacenId?: number | null;
 }

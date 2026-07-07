@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository, SelectQueryBuilder } from 'typeorm';
 import { Gasto, GastoOrigen } from './gasto.entity';
 import { GastoCategoria } from './gasto-categoria.entity';
+import { Almacen } from 'src/almacen/almacen.entity';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { FiltroGastoDto } from './dto/filtro-gasto.dto';
@@ -16,11 +17,16 @@ export class GastosService {
     private readonly repo: Repository<Gasto>,
     @InjectRepository(GastoCategoria)
     private readonly categoriaRepo: Repository<GastoCategoria>,
+    @InjectRepository(Almacen)
+    private readonly almacenRepo: Repository<Almacen>,
   ) {}
 
   async crear(dto: CreateGastoDto): Promise<Gasto> {
     const categoria = dto.categoriaId
       ? await this.obtenerCategoriaActiva(dto.categoriaId)
+      : null;
+    const almacen = dto.almacenId
+      ? await this.obtenerAlmacen(dto.almacenId)
       : null;
     const montoFix2 = Number(dto.monto.toFixed(2));
     const entity = this.repo.create({
@@ -30,6 +36,8 @@ export class GastosService {
       notas: this.clean(dto.notas) ?? null,
       categoriaId: categoria?.id ?? null,
       categoria,
+      almacenId: almacen?.id ?? null,
+      almacen,
       origen: GastoOrigen.MANUAL,
       ordenCompraId: null,
     });
@@ -41,7 +49,7 @@ export class GastosService {
   async actualizar(id: number, dto: UpdateGastoDto): Promise<Gasto> {
     const gasto = await this.repo.findOne({
       where: { id },
-      relations: ['categoria'],
+      relations: ['categoria', 'almacen'],
     });
     if (!gasto) throw new NotFoundException('Gasto no encontrado');
 
@@ -61,6 +69,13 @@ export class GastosService {
       gasto.categoriaId = categoria?.id ?? null;
       gasto.categoria = categoria;
     }
+    if (dto.almacenId !== undefined) {
+      const almacen = dto.almacenId
+        ? await this.obtenerAlmacen(dto.almacenId)
+        : null;
+      gasto.almacenId = almacen?.id ?? null;
+      gasto.almacen = almacen;
+    }
 
     await this.repo.save(gasto);
     return this.obtenerPorId(id);
@@ -70,7 +85,7 @@ export class GastosService {
     const where: FindOptionsWhere<Gasto> = { id };
     const gasto = await this.repo.findOne({
       where,
-      relations: ['categoria'],
+      relations: ['categoria', 'almacen'],
       withDeleted: incluirEliminados,
     });
     if (!gasto) throw new NotFoundException('Gasto no encontrado');
@@ -92,6 +107,7 @@ export class GastosService {
       q,
       categoria,
       categoriaId,
+      almacenId,
       minMonto,
       maxMonto,
       origen,
@@ -116,6 +132,7 @@ export class GastosService {
     const qb = this.repo
       .createQueryBuilder('g')
       .leftJoin('g.categoria', 'categoria')
+      .leftJoin('g.almacen', 'almacen')
       .select([
         'g.id',
         'g.fecha',
@@ -123,6 +140,7 @@ export class GastosService {
         'g.descripcion',
         'g.notas',
         'g.categoriaId',
+        'g.almacenId',
         'g.origen',
         'g.ordenCompraId',
         'g.createdAt',
@@ -132,6 +150,9 @@ export class GastosService {
         'categoria.nombre',
         'categoria.descripcion',
         'categoria.activo',
+        'almacen.id',
+        'almacen.nombre',
+        'almacen.ubicacion',
       ]);
 
     if (incluirEliminados === 'true') {
@@ -146,6 +167,7 @@ export class GastosService {
       textoBusqueda,
       categoria: categoriaFiltro,
       categoriaId,
+      almacenId,
       origen,
       ordenCompraId,
       minMonto,
@@ -167,6 +189,7 @@ export class GastosService {
     const sumQb = this.repo
       .createQueryBuilder('g')
       .leftJoin('g.categoria', 'categoria')
+      .leftJoin('g.almacen', 'almacen')
       .select('COALESCE(SUM(g.monto), 0)', 'total');
     if (incluirEliminados === 'true') {
       sumQb.withDeleted();
@@ -180,6 +203,7 @@ export class GastosService {
       textoBusqueda,
       categoria: categoriaFiltro,
       categoriaId,
+      almacenId,
       origen,
       ordenCompraId,
       minMonto,
@@ -283,6 +307,7 @@ export class GastosService {
       textoBusqueda?: string | null;
       categoria?: string | null;
       categoriaId?: number;
+      almacenId?: number;
       origen?: GastoOrigen;
       ordenCompraId?: number;
       minMonto?: number;
@@ -295,6 +320,7 @@ export class GastosService {
       textoBusqueda,
       categoria,
       categoriaId,
+      almacenId,
       origen,
       ordenCompraId,
       minMonto,
@@ -331,6 +357,10 @@ export class GastosService {
       }
     }
 
+    if (almacenId) {
+      qb.andWhere('g.almacenId = :almacenId', { almacenId });
+    }
+
     if (origen) {
       qb.andWhere('g.origen = :origen', { origen });
     }
@@ -358,6 +388,12 @@ export class GastosService {
       throw new BadRequestException('La categoria de gasto esta inactiva');
     }
     return categoria;
+  }
+
+  private async obtenerAlmacen(id: number): Promise<Almacen> {
+    const almacen = await this.almacenRepo.findOne({ where: { id } });
+    if (!almacen) throw new NotFoundException('Almacen no encontrado');
+    return almacen;
   }
 
   private async assertNombreCategoriaDisponible(

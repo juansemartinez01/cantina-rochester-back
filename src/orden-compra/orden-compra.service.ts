@@ -212,6 +212,7 @@ export class OrdenCompraService {
         notas: this.buildGastoNotas(dto),
         origen: GastoOrigen.ORDEN_COMPRA,
         ordenCompraId: orden.id,
+        almacenId: orden.almacen_id,
       });
       await manager.save(gasto);
 
@@ -805,6 +806,7 @@ export class OrdenCompraService {
     gasto.notas = this.buildGastoNotas(dto);
     gasto.origen = GastoOrigen.ORDEN_COMPRA;
     gasto.ordenCompraId = orden.id;
+    gasto.almacenId = orden.almacen_id;
 
     const gastoGuardado = await manager.save(gasto);
     if (orden.gastoId !== gastoGuardado.id) {

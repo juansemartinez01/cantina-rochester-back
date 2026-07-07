@@ -32,6 +32,12 @@ export class FiltroGastoDto {
   categoriaId?: number;
 
   @IsOptional()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : value))
+  @IsInt()
+  @Min(1)
+  almacenId?: number;
+
+  @IsOptional()
   @IsIn(Object.values(GastoOrigen))
   origen?: GastoOrigen;
 
