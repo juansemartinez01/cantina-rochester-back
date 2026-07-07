@@ -26,6 +26,7 @@ import { ExtraccionIngresoModule } from './extraccion/extraccion-ingreso.module'
 import { FacturaModule } from './factura/factura.module';
 import { GastosModule } from './gastos/gastos.module';
 import { CajaModule } from './caja/caja.module';
+import { CuentaCorrienteModule } from './cuenta-corriente/cuenta-corriente.module';
 
 const isRailwayDeploy =
   !!process.env.RAILWAY_ENVIRONMENT_NAME || !!process.env.RAILWAY_PROJECT_ID;
@@ -69,6 +70,7 @@ const shouldRunMigrations =
     FacturaModule,
     GastosModule,
     CajaModule,
+    CuentaCorrienteModule,
   ],
   controllers: [AppController],
   providers: [AppService],

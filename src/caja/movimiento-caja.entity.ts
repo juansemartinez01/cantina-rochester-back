@@ -30,6 +30,14 @@ export class MovimientoCaja {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   monto: number;
 
+  @Column({
+    name: 'medio_pago',
+    type: 'enum',
+    enum: ['EFECTIVO', 'BANCARIZADO'],
+    default: 'EFECTIVO',
+  })
+  medio_pago: 'EFECTIVO' | 'BANCARIZADO';
+
   @Column({ length: 500 })
   motivo: string;
 

@@ -4,6 +4,7 @@ import { Usuario } from '../usuario/usuario.entity';
 import { IngresoVenta } from 'src/ingreso/ingreso-venta.entity';
 import { Almacen } from 'src/almacen/almacen.entity';
 import { VentaAjuste } from './venta-ajuste.entity';
+import { TipoCobroVenta } from './venta-tipo-cobro.enum';
 
 @Entity('venta')
 export class Venta {
@@ -27,6 +28,17 @@ export class Venta {
 
   @Column({ type: 'varchar', length: 20, default: 'PENDIENTE' })
   estado: string;
+
+  @Column({
+    name: 'tipo_cobro',
+    type: 'varchar',
+    length: 30,
+    default: TipoCobroVenta.CONTADO,
+  })
+  tipoCobro: TipoCobroVenta;
+
+  @Column({ name: 'cuenta_corriente_id', type: 'int', nullable: true })
+  cuentaCorrienteId: number | null;
 
   @ManyToOne(() => Usuario, usuario => usuario.ventas, { nullable: true })
   @JoinColumn({ name: 'usuario_id' })

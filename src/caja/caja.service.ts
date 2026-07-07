@@ -60,6 +60,7 @@ export class CajaService {
       caja_id: cajaId,
       tipo: dto.tipo,
       monto: dto.monto,
+      medio_pago: dto.medio_pago ?? 'EFECTIVO',
       motivo: dto.motivo,
       observacion: dto.observacion ?? null,
       usuario_id: usuarioId,
@@ -102,6 +103,8 @@ export class CajaService {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
+        ingresos_manuales_bancarizado:
+          resumen.ingresos_manuales_bancarizado.toFixed(2),
         egresos_manuales: resumen.egresos_manuales.toFixed(2),
         retiros: resumen.retiros.toFixed(2),
         efectivo_esperado: efectivo_esperado.toFixed(2),
@@ -128,6 +131,8 @@ export class CajaService {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
+        ingresos_manuales_bancarizado:
+          resumen.ingresos_manuales_bancarizado.toFixed(2),
         egresos_manuales: resumen.egresos_manuales.toFixed(2),
         retiros: resumen.retiros.toFixed(2),
         efectivo_esperado: resumen.efectivo_esperado.toFixed(2),
@@ -169,6 +174,8 @@ export class CajaService {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
+        ingresos_manuales_bancarizado:
+          resumen.ingresos_manuales_bancarizado.toFixed(2),
         egresos_manuales: resumen.egresos_manuales.toFixed(2),
         retiros: resumen.retiros.toFixed(2),
         efectivo_esperado: resumen.efectivo_esperado.toFixed(2),
@@ -239,6 +246,7 @@ export class CajaService {
     cobros_efectivo: number;
     cobros_bancarizado: number;
     ingresos_manuales: number;
+    ingresos_manuales_bancarizado: number;
     egresos_manuales: number;
     retiros: number;
     efectivo_esperado: number;
@@ -266,22 +274,31 @@ export class CajaService {
     const movimientos = await this.movimientoRepo
       .createQueryBuilder('m')
       .select('m.tipo', 'tipo')
+      .addSelect('m.medio_pago', 'medio_pago')
       .addSelect('SUM(m.monto)', 'total')
       .where('m.caja_id = :cajaId', { cajaId: sesion.id })
       .andWhere('m.anulado = false')
       .groupBy('m.tipo')
+      .addGroupBy('m.medio_pago')
       .getRawMany();
 
     const movMap: Record<string, number> = {};
     movimientos.forEach(m => {
-      movMap[m.tipo] = parseFloat(m.total || 0);
+      const medioPago = m.medio_pago ?? 'EFECTIVO';
+      movMap[`${m.tipo}:${medioPago}`] = parseFloat(m.total || 0);
     });
 
     const cobros_efectivo = cobrosMap['EFECTIVO'] ?? 0;
     const cobros_bancarizado = cobrosMap['BANCARIZADO'] ?? 0;
-    const ingresos_manuales = movMap['INGRESO'] ?? 0;
-    const egresos_manuales = movMap['EGRESO'] ?? 0;
-    const retiros = movMap['RETIRO'] ?? 0;
+    const ingresos_manuales = movMap['INGRESO:EFECTIVO'] ?? 0;
+    const ingresos_manuales_bancarizado =
+      movMap['INGRESO:BANCARIZADO'] ?? 0;
+    const egresos_manuales =
+      (movMap['EGRESO:EFECTIVO'] ?? 0) +
+      (movMap['EGRESO:BANCARIZADO'] ?? 0);
+    const retiros =
+      (movMap['RETIRO:EFECTIVO'] ?? 0) +
+      (movMap['RETIRO:BANCARIZADO'] ?? 0);
 
     const efectivo_esperado =
       Number(sesion.monto_inicial) +
@@ -294,6 +311,7 @@ export class CajaService {
       cobros_efectivo,
       cobros_bancarizado,
       ingresos_manuales,
+      ingresos_manuales_bancarizado,
       egresos_manuales,
       retiros,
       efectivo_esperado: parseFloat(efectivo_esperado.toFixed(2)),

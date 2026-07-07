@@ -12,6 +12,7 @@ import { MovimientoStockModule } from '../movimiento-stock/movimiento-stock.modu
 import { UsuarioModule } from '../usuario/usuario.module';
 import { PromocionModule } from 'src/promocion/promocion.module';
 import { IngresoVentaModule } from 'src/ingreso/ingreso-venta.module';
+import { CuentaCorrienteModule } from 'src/cuenta-corriente/cuenta-corriente.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { IngresoVentaModule } from 'src/ingreso/ingreso-venta.module';
     UsuarioModule,
     PromocionModule,
     IngresoVentaModule,
+    CuentaCorrienteModule,
   ],
   providers: [VentaService],
   controllers: [VentaController],

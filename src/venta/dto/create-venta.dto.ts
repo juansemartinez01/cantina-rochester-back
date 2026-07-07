@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsEnum,
   IsInt,
   IsOptional,
   ValidateNested,
@@ -9,6 +10,7 @@ import { CreateVentaItemDto } from './create-venta-item.dto';
 import { CreateVentaPromoDto } from './create-venta-promo.dto';
 import { CreateVentaPagoDto } from './create-venta-pago.dto';
 import { CreateVentaAjusteDto } from './create-venta-ajuste.dto';
+import { TipoCobroVenta } from '../venta-tipo-cobro.enum';
 
 export class CreateVentaDto {
   @Type(() => Number)
@@ -40,4 +42,13 @@ export class CreateVentaDto {
   @ValidateNested({ each: true })
   @Type(() => CreateVentaAjusteDto)
   ajustes?: CreateVentaAjusteDto[];
+
+  @IsOptional()
+  @IsEnum(TipoCobroVenta)
+  tipoCobro?: TipoCobroVenta;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  cuentaCorrienteId?: number;
 }

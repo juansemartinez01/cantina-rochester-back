@@ -36,6 +36,8 @@ import { Producto } from 'src/producto/producto.entity';
 import { StockActual } from 'src/stock-actual/stock-actual.entity';
 import { MovimientoStock } from 'src/movimiento-stock/movimiento-stock.entity';
 import moment from 'moment-timezone';
+import { CuentaCorrienteService } from 'src/cuenta-corriente/cuenta-corriente.service';
+import { TipoCobroVenta } from './venta-tipo-cobro.enum';
 
 @Injectable()
 export class VentaService {
@@ -44,6 +46,7 @@ export class VentaService {
     private readonly repo: Repository<Venta>,
     private readonly productoService: ProductoService,
     private readonly promoService: PromocionService,
+    private readonly cuentaCorrienteService: CuentaCorrienteService,
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
@@ -72,9 +75,27 @@ export class VentaService {
         dto.usuario,
       );
       const total = resumenAjustes.total;
+      const tipoCobro = dto.tipoCobro ?? TipoCobroVenta.CONTADO;
+      if (tipoCobro === TipoCobroVenta.CUENTA_CORRIENTE) {
+        if (!dto.cuentaCorrienteId) {
+          throw new BadRequestException(
+            'cuentaCorrienteId es obligatorio para ventas a cuenta corriente',
+          );
+        }
+      } else if (dto.cuentaCorrienteId) {
+        throw new BadRequestException(
+          'cuentaCorrienteId solo puede enviarse con tipoCobro CUENTA_CORRIENTE',
+        );
+      }
 
-      const pagos = this.normalizarPagos(dto.pagos, total);
-      this.validarTotalPagos(pagos, total);
+      const pagos = this.normalizarPagos(dto.pagos, total, {
+        permitirSinPagos: tipoCobro === TipoCobroVenta.CUENTA_CORRIENTE,
+      });
+      if (tipoCobro === TipoCobroVenta.CONTADO) {
+        this.validarTotalPagos(pagos, total);
+      } else {
+        this.validarPagoInicialCuentaCorriente(pagos, total);
+      }
 
       const ventaRepo = manager.getRepository(Venta);
       const venta = ventaRepo.create({
@@ -85,6 +106,11 @@ export class VentaService {
         totalDescuentos: resumenAjustes.totalDescuentos,
         totalRecargos: resumenAjustes.totalRecargos,
         total,
+        tipoCobro,
+        cuentaCorrienteId:
+          tipoCobro === TipoCobroVenta.CUENTA_CORRIENTE
+            ? dto.cuentaCorrienteId
+            : null,
         estado: 'CONFIRMADA',
         fecha: moment().tz('America/Argentina/Buenos_Aires').toDate(),
       });
@@ -98,6 +124,18 @@ export class VentaService {
             venta_id: saved.id,
           })),
         );
+      }
+
+      if (tipoCobro === TipoCobroVenta.CUENTA_CORRIENTE) {
+        await this.cuentaCorrienteService.registrarVentaCuentaCorrienteTx({
+          manager,
+          cuentaCorrienteId: dto.cuentaCorrienteId!,
+          venta: saved,
+          almacenId: dto.almacenId,
+          total,
+          pagos,
+          usuarioId: dto.usuario?.id,
+        });
       }
 
       if (pagos.length > 0) {
@@ -205,6 +243,8 @@ export class VentaService {
         'venta.totalRecargos',
         'venta.total',
         'venta.estado',
+        'venta.tipoCobro',
+        'venta.cuentaCorrienteId',
 
         'usuario.id',
         'usuario.nombre',
@@ -872,12 +912,13 @@ export class VentaService {
   private normalizarPagos(
     pagos: CreateVentaDto['pagos'],
     total: number,
+    options: { permitirSinPagos?: boolean } = {},
   ): Array<{ medio: MedioPagoVenta; monto: number }> {
     const acumulados = new Map<MedioPagoVenta, number>();
     const pagosEntrada = pagos ?? [];
 
     if (pagosEntrada.length === 0) {
-      if (total === 0) return [];
+      if (total === 0 || options.permitirSinPagos) return [];
       throw new BadRequestException('La venta debe incluir al menos un pago');
     }
 
@@ -920,6 +961,21 @@ export class VentaService {
     if (Math.abs(totalPagos - total) > 0.01) {
       throw new BadRequestException(
         `La suma de pagos (${totalPagos}) debe coincidir con el total de la venta (${total})`,
+      );
+    }
+  }
+
+  private validarPagoInicialCuentaCorriente(
+    pagos: Array<{ medio: MedioPagoVenta; monto: number }>,
+    total: number,
+  ) {
+    const totalPagos = this.to2(
+      pagos.reduce((acc, pago) => acc + Number(pago.monto), 0),
+    );
+
+    if (totalPagos - total > 0.01) {
+      throw new BadRequestException(
+        `El pago inicial (${totalPagos}) no puede superar el total de la venta (${total}). Para generar saldo a favor, registrar un pago posterior en cuenta corriente.`,
       );
     }
   }

@@ -8,6 +8,10 @@ export class AgregarMovimientoDto {
   @Min(0.01)
   monto: number;
 
+  @IsOptional()
+  @IsEnum(['EFECTIVO', 'BANCARIZADO'])
+  medio_pago?: 'EFECTIVO' | 'BANCARIZADO';
+
   @IsString()
   @MinLength(3)
   @MaxLength(500)
