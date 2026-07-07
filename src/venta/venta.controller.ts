@@ -16,6 +16,10 @@ import { Venta } from './venta.entity';
 import { UsuarioService } from '../usuario/usuario.service';
 import { EstadisticasVentasDto } from './dto/estadisticas-ventas.dto';
 import { UpdateEstadoVentaDto } from './dto/update-estado-venta.dto';
+import {
+  MetodoPagoPersistido,
+  normalizarFiltroMetodoPago,
+} from 'src/common/metodo-pago.enum';
 
 @Controller('ventas')
 export class VentaController {
@@ -46,7 +50,7 @@ export class VentaController {
     @Query('usuarioId') usuarioId?: string,
     @Query('estado') estado?: string,
     @Query('almacenId') almacenId?: string,
-    @Query('tipo') tipo?: 'EFECTIVO' | 'BANCARIZADO',
+    @Query('tipo') tipo?: string,
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '50',
     @Query('ordenCampo') ordenCampo: string = 'fecha',
@@ -60,7 +64,7 @@ export class VentaController {
       usuarioId,
       estado,
       almacenId,
-      tipo,
+      tipo: normalizarFiltroMetodoPago(tipo) as MetodoPagoPersistido | undefined,
       page: +page,
       limit: +limit,
       ordenCampo,

@@ -17,6 +17,12 @@ import {
   MedioPagoVenta,
   normalizarMedioPago,
 } from './dto/create-venta-pago.dto';
+import {
+  MetodoPagoPersistido,
+  esMetodoPago,
+  metodosParaFiltroPago,
+  normalizarFiltroMetodoPago,
+} from 'src/common/metodo-pago.enum';
 import { VentaItem } from './venta-item.entity';
 import {
   VentaAjuste,
@@ -184,7 +190,7 @@ export class VentaService {
     usuarioId?: string;
     estado?: string;
     almacenId?: string;
-    tipo?: 'EFECTIVO' | 'BANCARIZADO';
+    tipo?: MetodoPagoPersistido;
     page?: number;
     limit?: number;
     ordenCampo?: string;
@@ -198,6 +204,9 @@ export class VentaService {
       totalAcumulado: number;
       efectivo: number;
       bancarizado: number;
+      transferencia: number;
+      debito: number;
+      credito: number;
     };
   }> {
     const {
@@ -313,8 +322,10 @@ export class VentaService {
       }
     }
 
-    if (tipo) {
-      query.andWhere('ingreso.tipo = :tipo', { tipo });
+    const tipoFiltrado = normalizarFiltroMetodoPago(tipo);
+    if (tipoFiltrado) {
+      const tiposPago = metodosParaFiltroPago(tipoFiltrado);
+      query.andWhere('ingreso.tipo IN (:...tiposPago)', { tiposPago });
     }
 
     const camposValidos = ['fecha', 'id', 'estado'];
@@ -348,7 +359,7 @@ export class VentaService {
       usuarioId?: string;
       estado?: string;
       almacenId?: string;
-      tipo?: 'EFECTIVO' | 'BANCARIZADO';
+      tipo?: MetodoPagoPersistido;
     },
     tipoMode: 'joined' | 'exists' | 'none' = 'joined',
   ) {
@@ -402,19 +413,22 @@ export class VentaService {
       }
     }
 
-    if (tipo && tipoMode === 'joined') {
-      query.andWhere('ingreso.tipo = :tipo', { tipo });
+    const tipoFiltrado = normalizarFiltroMetodoPago(tipo);
+    if (tipoFiltrado && tipoMode === 'joined') {
+      const tiposPago = metodosParaFiltroPago(tipoFiltrado);
+      query.andWhere('ingreso.tipo IN (:...tiposPago)', { tiposPago });
     }
 
-    if (tipo && tipoMode === 'exists') {
+    if (tipoFiltrado && tipoMode === 'exists') {
+      const tiposPago = metodosParaFiltroPago(tipoFiltrado);
       query.andWhere(
         `EXISTS (
           SELECT 1
           FROM ingreso_venta ingreso_filtro
           WHERE ingreso_filtro.venta_id = venta.id
-            AND ingreso_filtro.tipo = :tipo
+            AND ingreso_filtro.tipo IN (:...tiposPago)
         )`,
-        { tipo },
+        { tiposPago },
       );
     }
   }
@@ -427,7 +441,7 @@ export class VentaService {
     usuarioId?: string;
     estado?: string;
     almacenId?: string;
-    tipo?: 'EFECTIVO' | 'BANCARIZADO';
+    tipo?: MetodoPagoPersistido;
   }) {
     const totalQuery = this.repo
       .createQueryBuilder('venta')
@@ -447,14 +461,28 @@ export class VentaService {
         'efectivo',
       )
       .addSelect(
-        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'BANCARIZADO' THEN ingreso.monto ELSE 0 END), 0)`,
+        `COALESCE(SUM(CASE WHEN ingreso.tipo IN ('BANCARIZADO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO') THEN ingreso.monto ELSE 0 END), 0)`,
         'bancarizado',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'TRANSFERENCIA' THEN ingreso.monto ELSE 0 END), 0)`,
+        'transferencia',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'DEBITO' THEN ingreso.monto ELSE 0 END), 0)`,
+        'debito',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'CREDITO' THEN ingreso.monto ELSE 0 END), 0)`,
+        'credito',
       );
 
     this.aplicarFiltrosBaseVentas(ingresosQuery, filtros, 'none');
 
-    if (filtros.tipo) {
-      ingresosQuery.andWhere('ingreso.tipo = :tipo', { tipo: filtros.tipo });
+    const tipoFiltrado = normalizarFiltroMetodoPago(filtros.tipo);
+    if (tipoFiltrado) {
+      const tiposPago = metodosParaFiltroPago(tipoFiltrado);
+      ingresosQuery.andWhere('ingreso.tipo IN (:...tiposPago)', { tiposPago });
     }
 
     const [totalRaw, ingresosRaw] = await Promise.all([
@@ -466,6 +494,9 @@ export class VentaService {
       totalAcumulado: this.to2(Number(totalRaw?.totalAcumulado ?? 0)),
       efectivo: this.to2(Number(ingresosRaw?.efectivo ?? 0)),
       bancarizado: this.to2(Number(ingresosRaw?.bancarizado ?? 0)),
+      transferencia: this.to2(Number(ingresosRaw?.transferencia ?? 0)),
+      debito: this.to2(Number(ingresosRaw?.debito ?? 0)),
+      credito: this.to2(Number(ingresosRaw?.credito ?? 0)),
     };
   }
 
@@ -924,9 +955,9 @@ export class VentaService {
 
     for (const pago of pagosEntrada) {
       const medio = normalizarMedioPago(pago.medio);
-      if (medio !== 'EFECTIVO' && medio !== 'BANCARIZADO') {
+      if (!esMetodoPago(medio)) {
         throw new BadRequestException(
-          'medio debe ser EFECTIVO, BANCARIZADO o un alias bancarizado valido',
+          'medio debe ser EFECTIVO, TRANSFERENCIA, DEBITO o CREDITO',
         );
       }
 

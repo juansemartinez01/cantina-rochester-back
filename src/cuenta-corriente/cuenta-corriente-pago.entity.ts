@@ -11,9 +11,16 @@ import { CuentaCorriente } from './cuenta-corriente.entity';
 import { Almacen } from 'src/almacen/almacen.entity';
 import { Usuario } from 'src/usuario/usuario.entity';
 import { CuentaCorrientePagoAplicacion } from './cuenta-corriente-pago-aplicacion.entity';
+import {
+  MetodoPago,
+  METODOS_PAGO_PERSISTIDOS,
+} from 'src/common/metodo-pago.enum';
 
 export enum CuentaCorrienteMedioPago {
   EFECTIVO = 'EFECTIVO',
+  TRANSFERENCIA = 'TRANSFERENCIA',
+  DEBITO = 'DEBITO',
+  CREDITO = 'CREDITO',
   BANCARIZADO = 'BANCARIZADO',
 }
 
@@ -39,8 +46,8 @@ export class CuentaCorrientePago {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   monto: number;
 
-  @Column({ name: 'medio_pago', type: 'enum', enum: CuentaCorrienteMedioPago })
-  medioPago: CuentaCorrienteMedioPago;
+  @Column({ name: 'medio_pago', type: 'enum', enum: METODOS_PAGO_PERSISTIDOS })
+  medioPago: MetodoPago | 'BANCARIZADO';
 
   @Column({ type: 'varchar', length: 120, nullable: true })
   referencia: string | null;

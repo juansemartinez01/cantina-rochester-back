@@ -5,6 +5,10 @@ import { IngresoVenta } from './ingreso-venta.entity';
 import { CreateIngresoVentaDto } from './dto/create-ingreso-venta.dto';
 import { Venta } from '../venta/venta.entity';
 import { FiltroIngresoVentaDto } from './dto/filtro-ingreso-venta.dto';
+import {
+  metodosParaFiltroPago,
+  normalizarFiltroMetodoPago,
+} from 'src/common/metodo-pago.enum';
 
 @Injectable()
 export class IngresoVentaService {
@@ -63,7 +67,11 @@ export class IngresoVentaService {
     .skip((page - 1) * limit)
     .take(limit);
 
-  if (tipo) query.andWhere('ingreso.tipo = :tipo', { tipo });
+  const tipoFiltrado = normalizarFiltroMetodoPago(tipo);
+  if (tipoFiltrado) {
+    const tiposPago = metodosParaFiltroPago(tipoFiltrado);
+    query.andWhere('ingreso.tipo IN (:...tiposPago)', { tiposPago });
+  }
   if (ventaId) query.andWhere('venta.id = :ventaId', { ventaId });
   if (montoMin !== undefined) query.andWhere('ingreso.monto >= :montoMin', { montoMin });
   if (montoMax !== undefined) query.andWhere('ingreso.monto <= :montoMax', { montoMax });
@@ -116,7 +124,7 @@ export class IngresoVentaService {
 
     const whereBase = condiciones.length > 0 ? `AND ${condiciones.join(' AND ')}` : '';
 
-    const [efectivo, bancarizado] = await Promise.all([
+    const [efectivo, bancarizado, transferencia, debito, credito] = await Promise.all([
       this.repo
         .createQueryBuilder('ingreso')
         .innerJoin('ingreso.venta', 'venta') // ✅ importante para acceder al almacén
@@ -128,16 +136,46 @@ export class IngresoVentaService {
         .createQueryBuilder('ingreso')
         .innerJoin('ingreso.venta', 'venta') // ✅ también acá
         .select('SUM(ingreso.monto)', 'total')
-        .where(`ingreso.tipo = :tipo ${whereBase}`, { tipo: 'BANCARIZADO', ...parametros })
+        .where(`ingreso.tipo IN (:...tipos) ${whereBase}`, {
+          tipos: ['BANCARIZADO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO'],
+          ...parametros,
+        })
+        .getRawOne(),
+
+      this.repo
+        .createQueryBuilder('ingreso')
+        .innerJoin('ingreso.venta', 'venta')
+        .select('SUM(ingreso.monto)', 'total')
+        .where(`ingreso.tipo = :tipo ${whereBase}`, { tipo: 'TRANSFERENCIA', ...parametros })
+        .getRawOne(),
+
+      this.repo
+        .createQueryBuilder('ingreso')
+        .innerJoin('ingreso.venta', 'venta')
+        .select('SUM(ingreso.monto)', 'total')
+        .where(`ingreso.tipo = :tipo ${whereBase}`, { tipo: 'DEBITO', ...parametros })
+        .getRawOne(),
+
+      this.repo
+        .createQueryBuilder('ingreso')
+        .innerJoin('ingreso.venta', 'venta')
+        .select('SUM(ingreso.monto)', 'total')
+        .where(`ingreso.tipo = :tipo ${whereBase}`, { tipo: 'CREDITO', ...parametros })
         .getRawOne(),
     ]);
 
     const totalEfectivo = parseFloat(efectivo?.total || '0');
     const totalBancarizado = parseFloat(bancarizado?.total || '0');
+    const totalTransferencia = parseFloat(transferencia?.total || '0');
+    const totalDebito = parseFloat(debito?.total || '0');
+    const totalCredito = parseFloat(credito?.total || '0');
 
     return {
       efectivo: totalEfectivo,
       bancarizado: totalBancarizado,
+      transferencia: totalTransferencia,
+      debito: totalDebito,
+      credito: totalCredito,
       total: totalEfectivo + totalBancarizado,
     };
   }

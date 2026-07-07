@@ -8,6 +8,10 @@ import {
 } from 'typeorm';
 import { Usuario } from 'src/usuario/usuario.entity';
 import { SesionCaja } from './sesion-caja.entity';
+import {
+  MetodoPagoPersistido,
+  METODOS_PAGO_PERSISTIDOS,
+} from 'src/common/metodo-pago.enum';
 
 @Entity('movimiento_caja')
 export class MovimientoCaja {
@@ -33,10 +37,10 @@ export class MovimientoCaja {
   @Column({
     name: 'medio_pago',
     type: 'enum',
-    enum: ['EFECTIVO', 'BANCARIZADO'],
+    enum: METODOS_PAGO_PERSISTIDOS,
     default: 'EFECTIVO',
   })
-  medio_pago: 'EFECTIVO' | 'BANCARIZADO';
+  medio_pago: MetodoPagoPersistido;
 
   @Column({ length: 500 })
   motivo: string;

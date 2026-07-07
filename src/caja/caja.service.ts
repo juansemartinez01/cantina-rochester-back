@@ -12,6 +12,10 @@ import { AbrirCajaDto } from './dto/abrir-caja.dto';
 import { AgregarMovimientoDto } from './dto/agregar-movimiento.dto';
 import { CerrarCajaDto } from './dto/cerrar-caja.dto';
 import { AnularMovimientoDto } from './dto/anular-movimiento.dto';
+import {
+  METODOS_PAGO_BANCARIZADOS,
+  esMetodoPagoBancarizado,
+} from 'src/common/metodo-pago.enum';
 
 @Injectable()
 export class CajaService {
@@ -102,6 +106,7 @@ export class CajaService {
         monto_inicial: Number(sesion.monto_inicial).toFixed(2),
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
+        cobros_por_metodo: resumen.cobros_por_metodo,
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
@@ -130,6 +135,7 @@ export class CajaService {
         monto_inicial: Number(sesion.monto_inicial).toFixed(2),
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
+        cobros_por_metodo: resumen.cobros_por_metodo,
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
@@ -173,6 +179,7 @@ export class CajaService {
       resumen_parcial: {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
+        cobros_por_metodo: resumen.cobros_por_metodo,
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
@@ -245,6 +252,7 @@ export class CajaService {
   private async calcularResumen(sesion: SesionCaja): Promise<{
     cobros_efectivo: number;
     cobros_bancarizado: number;
+    cobros_por_metodo: Record<string, string>;
     ingresos_manuales: number;
     ingresos_manuales_bancarizado: number;
     egresos_manuales: number;
@@ -289,16 +297,42 @@ export class CajaService {
     });
 
     const cobros_efectivo = cobrosMap['EFECTIVO'] ?? 0;
-    const cobros_bancarizado = cobrosMap['BANCARIZADO'] ?? 0;
+    const cobros_bancarizado =
+      (cobrosMap['BANCARIZADO'] ?? 0) +
+      METODOS_PAGO_BANCARIZADOS.reduce(
+        (acc, metodo) => acc + (cobrosMap[metodo] ?? 0),
+        0,
+      );
+    const cobros_por_metodo = {
+      EFECTIVO: cobros_efectivo.toFixed(2),
+      TRANSFERENCIA: (cobrosMap['TRANSFERENCIA'] ?? 0).toFixed(2),
+      DEBITO: (cobrosMap['DEBITO'] ?? 0).toFixed(2),
+      CREDITO: (cobrosMap['CREDITO'] ?? 0).toFixed(2),
+      BANCARIZADO_LEGACY: (cobrosMap['BANCARIZADO'] ?? 0).toFixed(2),
+    };
     const ingresos_manuales = movMap['INGRESO:EFECTIVO'] ?? 0;
-    const ingresos_manuales_bancarizado =
-      movMap['INGRESO:BANCARIZADO'] ?? 0;
+    const ingresos_manuales_bancarizado = Object.entries(movMap)
+      .filter(([key]) => {
+        const [tipo, medioPago] = key.split(':');
+        return tipo === 'INGRESO' && esMetodoPagoBancarizado(medioPago);
+      })
+      .reduce((acc, [, total]) => acc + total, 0);
     const egresos_manuales =
       (movMap['EGRESO:EFECTIVO'] ?? 0) +
-      (movMap['EGRESO:BANCARIZADO'] ?? 0);
+      Object.entries(movMap)
+        .filter(([key]) => {
+          const [tipo, medioPago] = key.split(':');
+          return tipo === 'EGRESO' && esMetodoPagoBancarizado(medioPago);
+        })
+        .reduce((acc, [, total]) => acc + total, 0);
     const retiros =
       (movMap['RETIRO:EFECTIVO'] ?? 0) +
-      (movMap['RETIRO:BANCARIZADO'] ?? 0);
+      Object.entries(movMap)
+        .filter(([key]) => {
+          const [tipo, medioPago] = key.split(':');
+          return tipo === 'RETIRO' && esMetodoPagoBancarizado(medioPago);
+        })
+        .reduce((acc, [, total]) => acc + total, 0);
 
     const efectivo_esperado =
       Number(sesion.monto_inicial) +
@@ -310,6 +344,7 @@ export class CajaService {
     return {
       cobros_efectivo,
       cobros_bancarizado,
+      cobros_por_metodo,
       ingresos_manuales,
       ingresos_manuales_bancarizado,
       egresos_manuales,

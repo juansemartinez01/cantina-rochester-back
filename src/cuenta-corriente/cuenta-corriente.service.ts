@@ -11,10 +11,7 @@ import {
   CuentaCorrienteVenta,
   CuentaCorrienteVentaEstado,
 } from './cuenta-corriente-venta.entity';
-import {
-  CuentaCorrienteMedioPago,
-  CuentaCorrientePago,
-} from './cuenta-corriente-pago.entity';
+import { CuentaCorrientePago } from './cuenta-corriente-pago.entity';
 import {
   CuentaCorrienteMovimiento,
   CuentaCorrienteMovimientoTipo,
@@ -29,6 +26,7 @@ import { SesionCaja } from 'src/caja/sesion-caja.entity';
 import { MovimientoCaja } from 'src/caja/movimiento-caja.entity';
 import { CuentaCorrientePagoAplicacion } from './cuenta-corriente-pago-aplicacion.entity';
 import { Venta } from 'src/venta/venta.entity';
+import { MetodoPago } from 'src/common/metodo-pago.enum';
 
 @Injectable()
 export class CuentaCorrienteService {
@@ -430,7 +428,7 @@ export class CuentaCorrienteService {
     venta: Venta;
     almacenId: number;
     total: number;
-    pagos: Array<{ medio: 'EFECTIVO' | 'BANCARIZADO'; monto: number }>;
+    pagos: Array<{ medio: MetodoPago; monto: number }>;
     usuarioId?: number;
   }) {
     const {
@@ -520,7 +518,7 @@ export class CuentaCorrienteService {
         cuentaCorrienteId: cuenta.id,
         almacenId,
         monto: montoPago,
-        medioPago: pago.medio as CuentaCorrienteMedioPago,
+        medioPago: pago.medio,
         referencia: `Venta #${venta.id}`,
         observacion: 'Pago inicial de venta a cuenta corriente',
         usuarioId: usuarioId ?? null,

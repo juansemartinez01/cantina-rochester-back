@@ -1,11 +1,17 @@
 // dto/filtro-ingreso-venta.dto.ts
-import { IsOptional, IsEnum, IsNumber, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsIn, IsNumber, IsDateString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  MetodoPagoPersistido,
+  METODOS_PAGO_PERSISTIDOS,
+  normalizarFiltroMetodoPago,
+} from 'src/common/metodo-pago.enum';
 
 export class FiltroIngresoVentaDto {
   @IsOptional()
-  @IsEnum(['EFECTIVO', 'BANCARIZADO'])
-  tipo?: 'EFECTIVO' | 'BANCARIZADO';
+  @Transform(({ value }) => normalizarFiltroMetodoPago(value))
+  @IsIn(METODOS_PAGO_PERSISTIDOS)
+  tipo?: MetodoPagoPersistido;
 
   @IsOptional()
   @Type(() => Number)

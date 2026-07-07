@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { IngresoVentaService } from './ingreso-venta.service';
 import { CreateIngresoVentaDto } from './dto/create-ingreso-venta.dto';
 import { FiltroIngresoVentaDto } from './dto/filtro-ingreso-venta.dto';
+import { normalizarFiltroMetodoPago } from 'src/common/metodo-pago.enum';
 
 @Controller('ingreso-venta')
 export class IngresoVentaController {
@@ -26,8 +27,7 @@ async obtenerIngresosConFiltros(
   @Query('ordenCampo') ordenCampo: string = 'fecha',
   @Query('ordenDireccion') ordenDireccion: 'ASC' | 'DESC' = 'DESC',
 ) {
-  const tipoFiltrado: "EFECTIVO" | "BANCARIZADO" | undefined =
-    tipo === "EFECTIVO" || tipo === "BANCARIZADO" ? tipo : undefined;
+  const tipoFiltrado = normalizarFiltroMetodoPago(tipo);
 
   return this.service.obtenerTodosConFiltros({
     tipo: tipoFiltrado,

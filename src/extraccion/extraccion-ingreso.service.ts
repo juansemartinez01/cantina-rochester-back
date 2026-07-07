@@ -7,6 +7,7 @@ import { CreateExtraccionDto } from './dto/create-extraccion.dto';
 import { IngresoVenta } from 'src/ingreso/ingreso-venta.entity';
 import { FiltroExtraccionDto } from './dto/filtro-extraccion.dto';
 import { UpdateExtraccionDto } from './dto/update-extraccion.dto';
+import { metodosParaFiltroPago } from 'src/common/metodo-pago.enum';
 
 @Injectable()
 export class ExtraccionIngresoService {
@@ -19,10 +20,11 @@ export class ExtraccionIngresoService {
 
   async crear(dto: CreateExtraccionDto) {
     // 1. Obtener total disponible del tipo
+    const tiposIngreso = metodosParaFiltroPago(dto.origen);
     const total = await this.ingresoRepo
       .createQueryBuilder('ing')
       .select('SUM(ing.monto)', 'suma')
-      .where('ing.tipo = :tipo', { tipo: dto.origen })
+      .where('ing.tipo IN (:...tiposIngreso)', { tiposIngreso })
       .getRawOne();
 
     const totalDisponible = parseFloat(total.suma || 0);
@@ -133,7 +135,10 @@ export class ExtraccionIngresoService {
   };
 
   tipos.forEach(tipo => {
-    const totalIngreso = ingresosMap[tipo] || 0;
+    const totalIngreso = metodosParaFiltroPago(tipo).reduce(
+      (acc, metodo) => acc + (ingresosMap[metodo] || 0),
+      0,
+    );
     const totalExtraccion = extraccionesMap[tipo] || 0;
     resultado[tipo] = parseFloat((totalIngreso - totalExtraccion).toFixed(2));
   });
@@ -160,10 +165,11 @@ async editarExtraccion(id: number, dto: UpdateExtraccionDto) {
     const nuevoOrigen = dto.origen || ext.origen;
     const nuevoMonto = dto.monto ?? ext.monto;
 
+    const tiposIngreso = metodosParaFiltroPago(nuevoOrigen);
     const ingresos = await this.ingresoRepo
       .createQueryBuilder('ing')
       .select('SUM(ing.monto)', 'suma')
-      .where('ing.tipo = :tipo', { tipo: nuevoOrigen })
+      .where('ing.tipo IN (:...tiposIngreso)', { tiposIngreso })
       .getRawOne();
 
     const totalIngresos = parseFloat(ingresos.suma || 0);

@@ -1,33 +1,19 @@
 import { Transform, Type } from 'class-transformer';
 import { IsIn, IsNumber, Min } from 'class-validator';
+import {
+  MetodoPago,
+  METODOS_PAGO,
+  normalizarMetodoPago,
+} from 'src/common/metodo-pago.enum';
 
-export type MedioPagoVenta = 'EFECTIVO' | 'BANCARIZADO';
-
-const MEDIO_PAGO_ALIASES: Record<string, MedioPagoVenta> = {
-  EFECTIVO: 'EFECTIVO',
-  CASH: 'EFECTIVO',
-  BANCARIZADO: 'BANCARIZADO',
-  TRANSFERENCIA: 'BANCARIZADO',
-  TRANSFER: 'BANCARIZADO',
-  DEBITO: 'BANCARIZADO',
-  DEBIT: 'BANCARIZADO',
-  CREDITO: 'BANCARIZADO',
-  CREDIT: 'BANCARIZADO',
-  QR: 'BANCARIZADO',
-};
-
-export function normalizarMedioPago(value: unknown): MedioPagoVenta | unknown {
-  if (typeof value !== 'string') return value;
-
-  const normalized = value.trim().toUpperCase();
-  return MEDIO_PAGO_ALIASES[normalized] ?? normalized;
-}
+export type MedioPagoVenta = MetodoPago;
+export const normalizarMedioPago = normalizarMetodoPago;
 
 export class CreateVentaPagoDto {
   @Transform(({ value }) => normalizarMedioPago(value))
-  @IsIn(['EFECTIVO', 'BANCARIZADO'], {
+  @IsIn(METODOS_PAGO, {
     message:
-      'medio debe ser EFECTIVO, BANCARIZADO o un alias bancarizado valido',
+      'medio debe ser EFECTIVO, TRANSFERENCIA, DEBITO o CREDITO',
   })
   medio: MedioPagoVenta;
 

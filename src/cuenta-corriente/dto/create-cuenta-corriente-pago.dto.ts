@@ -1,14 +1,18 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
-  IsEnum,
   IsInt,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
   Min,
 } from 'class-validator';
-import { CuentaCorrienteMedioPago } from '../cuenta-corriente-pago.entity';
+import {
+  MetodoPago,
+  METODOS_PAGO,
+  normalizarMetodoPago,
+} from 'src/common/metodo-pago.enum';
 
 export class CreateCuentaCorrientePagoDto {
   @Type(() => Number)
@@ -20,8 +24,12 @@ export class CreateCuentaCorrientePagoDto {
   @Min(0.01)
   monto: number;
 
-  @IsEnum(CuentaCorrienteMedioPago)
-  medioPago: CuentaCorrienteMedioPago;
+  @Transform(({ value }) => normalizarMetodoPago(value))
+  @IsIn(METODOS_PAGO, {
+    message:
+      'medioPago debe ser EFECTIVO, TRANSFERENCIA, DEBITO o CREDITO',
+  })
+  medioPago: MetodoPago;
 
   @IsOptional()
   @IsString()
