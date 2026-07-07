@@ -1,6 +1,6 @@
 import { UsuarioRol } from '../usuario-rol/usuario-rol.entity';
 import { Venta } from '../venta/venta.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 @Entity('usuarios')
 export class Usuario {
@@ -19,6 +19,9 @@ export class Usuario {
 
   @Column({ length: 255, unique: false })
   email: string;
+
+  @Column({ type: 'boolean', default: true })
+  activo: boolean;
 
   @OneToMany(() => UsuarioRol, usuarioRol => usuarioRol.usuario)
   roles: UsuarioRol[];

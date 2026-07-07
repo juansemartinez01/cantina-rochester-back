@@ -1,12 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Usuario } from './usuario.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import * as bcrypt from 'bcrypt';
 import { UsuarioRol } from 'src/usuario-rol/usuario-rol.entity';
-import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/role/role.entity';
 
 @Injectable()
@@ -31,8 +30,17 @@ export class UsuarioService {
     });
   }
 
-  findAll(): Promise<Usuario[]> {
-    return this.repo.find({ relations: ['roles', 'roles.rol'] });
+  findAll(activo: 'true' | 'false' | 'all' = 'true'): Promise<Usuario[]> {
+    const where: FindOptionsWhere<Usuario> | undefined =
+      activo === 'all'
+        ? undefined
+        : { activo: activo !== 'false' };
+
+    return this.repo.find({
+      where,
+      relations: ['roles', 'roles.rol'],
+      order: { id: 'ASC' },
+    });
   }
 
   async findOne(id: number): Promise<Usuario> {
@@ -49,6 +57,7 @@ export class UsuarioService {
   user.nombre = dto.nombre;
   user.usuario = dto.usuario;
   user.email = dto.email;
+  user.activo = true;
   // generamos el hash aquí
   user.clave_hash = await bcrypt.hash(dto.password, 10);
   return this.repo.save(user);
@@ -106,8 +115,25 @@ export class UsuarioService {
 
 
 
-  async remove(id: number): Promise<void> {
-    const res = await this.repo.delete(id);
-    if (res.affected === 0) throw new NotFoundException(`Usuario ${id} no encontrado`);
+  async desactivar(id: number): Promise<Usuario> {
+    const usuario = await this.findOne(id);
+    if (!usuario.activo) return usuario;
+
+    usuario.activo = false;
+    await this.repo.save(usuario);
+    return this.findOne(id);
+  }
+
+  async activar(id: number): Promise<Usuario> {
+    const usuario = await this.findOne(id);
+    if (usuario.activo) return usuario;
+
+    usuario.activo = true;
+    await this.repo.save(usuario);
+    return this.findOne(id);
+  }
+
+  async remove(id: number): Promise<Usuario> {
+    return this.desactivar(id);
   }
 }

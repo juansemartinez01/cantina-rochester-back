@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Patch, Query } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -10,8 +10,8 @@ export class UsuarioController {
   constructor(private readonly service: UsuarioService) {}
 
   @Get()
-  getAll(): Promise<Usuario[]> {
-    return this.service.findAll();
+  getAll(@Query('activo') activo?: 'true' | 'false' | 'all'): Promise<Usuario[]> {
+    return this.service.findAll(activo);
   }
 
   @Get(':id')
@@ -33,8 +33,18 @@ export class UsuarioController {
     return this.service.update(+id, dto);
   }
 
+  @Patch(':id/desactivar')
+  desactivar(@Param('id') id: string): Promise<Usuario> {
+    return this.service.desactivar(+id);
+  }
+
+  @Patch(':id/activar')
+  activar(@Param('id') id: string): Promise<Usuario> {
+    return this.service.activar(+id);
+  }
+
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: string): Promise<Usuario> {
     return this.service.remove(+id);
   }
 }
