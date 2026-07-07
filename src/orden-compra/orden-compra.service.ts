@@ -249,15 +249,7 @@ export class OrdenCompraService {
 
   async actualizarOrden(id: number, dto: UpdateOrdenCompraDto) {
     await this.dataSource.transaction(async manager => {
-      const orden = await manager
-        .getRepository(OrdenCompra)
-        .createQueryBuilder('orden')
-        .leftJoinAndSelect('orden.proveedor', 'proveedor')
-        .leftJoinAndSelect('orden.items', 'items')
-        .leftJoinAndSelect('items.producto', 'producto')
-        .where('orden.id = :id', { id })
-        .setLock('pessimistic_write')
-        .getOne();
+      const orden = await this.obtenerOrdenBloqueadaConDetalle(manager, id);
 
       if (!orden) {
         throw new NotFoundException(`Orden de compra ${id} no encontrada`);
@@ -345,15 +337,7 @@ export class OrdenCompraService {
     }
 
     await this.dataSource.transaction(async manager => {
-      const orden = await manager
-        .getRepository(OrdenCompra)
-        .createQueryBuilder('orden')
-        .leftJoinAndSelect('orden.proveedor', 'proveedor')
-        .leftJoinAndSelect('orden.items', 'items')
-        .leftJoinAndSelect('items.producto', 'producto')
-        .where('orden.id = :id', { id })
-        .setLock('pessimistic_write')
-        .getOne();
+      const orden = await this.obtenerOrdenBloqueadaConDetalle(manager, id);
 
       if (!orden) {
         throw new NotFoundException(`Orden de compra ${id} no encontrada`);
@@ -396,6 +380,25 @@ export class OrdenCompraService {
     });
 
     return this.obtenerDetalle(id);
+  }
+
+  private async obtenerOrdenBloqueadaConDetalle(
+    manager: EntityManager,
+    id: number,
+  ): Promise<OrdenCompra | null> {
+    const repo = manager.getRepository(OrdenCompra);
+    const ordenBloqueada = await repo
+      .createQueryBuilder('orden')
+      .where('orden.id = :id', { id })
+      .setLock('pessimistic_write')
+      .getOne();
+
+    if (!ordenBloqueada) return null;
+
+    return repo.findOne({
+      where: { id },
+      relations: ['proveedor', 'items', 'items.producto'],
+    });
   }
 
   private async getProveedorOrFail(
