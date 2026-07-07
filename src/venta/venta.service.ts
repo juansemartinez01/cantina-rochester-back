@@ -778,6 +778,14 @@ export class VentaService {
           `Promocion ${promoItem.promocionId} no esta activa`,
         );
       }
+      if (
+        promo.almacenId != null &&
+        Number(promo.almacenId) !== Number(dto.almacenId)
+      ) {
+        throw new BadRequestException(
+          `Promocion ${promoItem.promocionId} no esta disponible para el almacen ${dto.almacenId}`,
+        );
+      }
       if (!promo.productos?.length) {
         throw new BadRequestException(
           `Promocion ${promoItem.promocionId} no tiene productos`,

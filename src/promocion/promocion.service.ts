@@ -1,12 +1,18 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Promocion } from './promocion.entity';
 import { CreatePromocionDto } from './dto/create-promocion.dto';
 import { PromocionProducto } from './promocion-producto.entity';
 import { UpdatePromocionDto } from './dto/update-promocion.dto';
 import { Producto } from 'src/producto/producto.entity';
 import { QueryProductosPromocionActivaDto } from './dto/query-productos-promocion-activa.dto';
+import { Almacen } from 'src/almacen/almacen.entity';
 
 @Injectable()
 export class PromocionService {
@@ -18,73 +24,98 @@ export class PromocionService {
     private readonly promoProdRepo: Repository<PromocionProducto>,
 
     @InjectRepository(Producto) private readonly prodRepo: Repository<Producto>,
+    @InjectRepository(Almacen)
+    private readonly almacenRepo: Repository<Almacen>,
   ) {}
 
   async create(dto: CreatePromocionDto): Promise<Promocion> {
-  const existente = await this.promoRepo.findOne({
-    where: { codigo: dto.codigo },
-    relations: ['productos', 'productos.producto'],
-  });
-  if (existente) {
-    if (existente.activo) {
-      const productos = existente.productos.map(p => ({
-        id: p.producto.id,
-        nombre: p.producto.nombre,
-        cantidad: p.cantidad,
-        cantidad_gramos: p.cantidad_gramos,
-      }));
-      throw new ConflictException({
-        mensaje: `Ya existe una promoción ACTIVA con el código "${dto.codigo}"`,
-        productos,
-      });
-    } else {
-      throw new ConflictException(`El código "${dto.codigo}" pertenece a una promoción INACTIVA. Por favor use otro código.`);
-    }
-  }
-
-  const productosProcesados: PromocionProducto[] = [];
-  for (const p of dto.productos) {
-    const prod = await this.prodRepo.findOne({ where: { id: p.productoId } });
-    if (!prod) throw new NotFoundException(`Producto ${p.productoId} no encontrado`);
-
-    const esPorGramos = !!prod.es_por_gramos;
-    const traePiezas = p.cantidad != null;
-    const traeGramos = p.cantidad_gramos != null;
-
-    if (esPorGramos) {
-      if (!traeGramos || traePiezas) {
-        throw new BadRequestException(`El producto ${prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').`);
-      }
-    } else {
-      if (!traePiezas || traeGramos) {
-        throw new BadRequestException(`El producto ${prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').`);
+    const almacen = dto.almacenId
+      ? await this.obtenerAlmacen(dto.almacenId)
+      : null;
+    const existente = await this.promoRepo.findOne({
+      where: { codigo: dto.codigo },
+      relations: ['productos', 'productos.producto'],
+    });
+    if (existente) {
+      if (existente.activo) {
+        const productos = existente.productos.map((p) => ({
+          id: p.producto.id,
+          nombre: p.producto.nombre,
+          cantidad: p.cantidad,
+          cantidad_gramos: p.cantidad_gramos,
+        }));
+        throw new ConflictException({
+          mensaje: `Ya existe una promoción ACTIVA con el código "${dto.codigo}"`,
+          productos,
+        });
+      } else {
+        throw new ConflictException(
+          `El código "${dto.codigo}" pertenece a una promoción INACTIVA. Por favor use otro código.`,
+        );
       }
     }
 
-    const pp = new PromocionProducto();
-    pp.producto = prod;
-    pp.cantidad = esPorGramos ? null : p.cantidad!;
-    pp.cantidad_gramos = esPorGramos ? p.cantidad_gramos!.toFixed(3) : null;
+    const productosProcesados: PromocionProducto[] = [];
+    for (const p of dto.productos) {
+      const prod = await this.prodRepo.findOne({ where: { id: p.productoId } });
+      if (!prod)
+        throw new NotFoundException(`Producto ${p.productoId} no encontrado`);
 
-    productosProcesados.push(pp);
+      const esPorGramos = !!prod.es_por_gramos;
+      const traePiezas = p.cantidad != null;
+      const traeGramos = p.cantidad_gramos != null;
+
+      if (esPorGramos) {
+        if (!traeGramos || traePiezas) {
+          throw new BadRequestException(
+            `El producto ${prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').`,
+          );
+        }
+      } else {
+        if (!traePiezas || traeGramos) {
+          throw new BadRequestException(
+            `El producto ${prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').`,
+          );
+        }
+      }
+
+      const pp = new PromocionProducto();
+      pp.producto = prod;
+      pp.cantidad = esPorGramos ? null : p.cantidad!;
+      pp.cantidad_gramos = esPorGramos ? p.cantidad_gramos!.toFixed(3) : null;
+
+      productosProcesados.push(pp);
+    }
+
+    const promocion = this.promoRepo.create({
+      codigo: dto.codigo,
+      precioPromo: dto.precioPromo,
+      almacenId: almacen?.id ?? null,
+      almacen,
+      productos: productosProcesados,
+    });
+
+    return this.promoRepo.save(promocion);
   }
 
-  const promocion = this.promoRepo.create({
-    codigo: dto.codigo,
-    precioPromo: dto.precioPromo,
-    productos: productosProcesados,
-  });
+  findAll(almacenId?: number): Promise<Promocion[]> {
+    const qb = this.promoRepo
+      .createQueryBuilder('promocion')
+      .leftJoinAndSelect('promocion.almacen', 'almacen')
+      .leftJoinAndSelect('promocion.productos', 'productos')
+      .leftJoinAndSelect('productos.producto', 'producto')
+      .orderBy('promocion.id', 'DESC');
 
-  return this.promoRepo.save(promocion);
-}
+    this.aplicarFiltroAlmacenPromocion(qb, almacenId);
 
-
-  findAll(): Promise<Promocion[]> {
-    return this.promoRepo.find({ relations: ['productos', 'productos.producto'] });
+    return qb.getMany();
   }
 
   async findOne(id: number): Promise<Promocion> {
-    const promocion = await this.promoRepo.findOne({ where: { id }, relations: ['productos', 'productos.producto'] });
+    const promocion = await this.promoRepo.findOne({
+      where: { id },
+      relations: ['almacen', 'productos', 'productos.producto'],
+    });
     if (!promocion) {
       throw new Error(`Promocion with id ${id} not found`);
     }
@@ -95,134 +126,210 @@ export class PromocionService {
     await this.promoRepo.delete(id);
   }
 
-async findByCodigo(codigo: string): Promise<Promocion> {
-  const promocion = await this.promoRepo.findOne({
-    where: { codigo },
-    relations: ['productos', 'productos.producto'],
-  });
+  async findByCodigo(codigo: string, almacenId?: number): Promise<Promocion> {
+    const promocion = await this.promoRepo.findOne({
+      where: { codigo },
+      relations: ['almacen', 'productos', 'productos.producto'],
+    });
 
-  if (!promocion) {
-    throw new NotFoundException(`No se encontró ninguna promoción con el código "${codigo}"`);
-  }
-
-  return promocion;
-}
-
-async getPromocionById(id: number): Promise<Promocion> {
-  const promocion = await this.promoRepo.findOne({
-    where: { id },
-    relations: ['productos', 'productos.producto'],
-  });
-
-  if (!promocion) {
-    throw new NotFoundException(`No se encontró ninguna promoción con el id "${id}"`);
-  }
-
-  return promocion;
-}
-
-async update(id: number, dto: UpdatePromocionDto): Promise<Promocion> {
-  const promocion = await this.promoRepo.findOne({ where: { id }, relations: ['productos'] });
-  if (!promocion) throw new NotFoundException(`Promoción con id ${id} no encontrada`);
-
-  if (dto.codigo !== undefined) promocion.codigo = dto.codigo;
-  if (dto.precioPromo !== undefined) promocion.precioPromo = dto.precioPromo;
-
-  // reemplazar productos si vienen
-  if (dto.productos) {
-    await this.promoProdRepo.delete({ promocion: { id } });
-
-    const nuevos: PromocionProducto[] = [];
-    for (const p of dto.productos) {
-      const prod = await this.prodRepo.findOne({ where: { id: p.productoId } });
-      if (!prod) throw new NotFoundException(`Producto ${p.productoId} no encontrado`);
-
-      const esPorGramos = !!prod.es_por_gramos;
-      const traePiezas = p.cantidad != null;
-      const traeGramos = p.cantidad_gramos != null;
-
-      if (esPorGramos) {
-        if (!traeGramos || traePiezas) {
-          throw new BadRequestException(`El producto ${prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').`);
-        }
-      } else {
-        if (!traePiezas || traeGramos) {
-          throw new BadRequestException(`El producto ${prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').`);
-        }
-      }
-
-      const pp = new PromocionProducto();
-      pp.producto = prod;
-      pp.cantidad = esPorGramos ? null : p.cantidad!;
-      pp.cantidad_gramos = esPorGramos ? p.cantidad_gramos!.toFixed(3) : null;
-      nuevos.push(pp);
+    if (!promocion) {
+      throw new NotFoundException(
+        `No se encontró ninguna promoción con el código "${codigo}"`,
+      );
     }
-    promocion.productos = nuevos;
+
+    this.validarPromocionDisponibleEnAlmacen(promocion, almacenId);
+
+    return promocion;
   }
 
-  return this.promoRepo.save(promocion);
-}
+  async getPromocionById(id: number): Promise<Promocion> {
+    const promocion = await this.promoRepo.findOne({
+      where: { id },
+      relations: ['almacen', 'productos', 'productos.producto'],
+    });
 
+    if (!promocion) {
+      throw new NotFoundException(
+        `No se encontró ninguna promoción con el id "${id}"`,
+      );
+    }
 
-async findActivas(): Promise<Promocion[]> {
-  return this.promoRepo.find({
-    where: { activo: true },
-    relations: ['productos', 'productos.producto'],
-  });
-}
-
-async findProductosEnPromocionesActivas(query: QueryProductosPromocionActivaDto) {
-  const page = Number(query.page ?? 1);
-  const limit = Math.min(Number(query.limit ?? 50), 200);
-  const skip = (page - 1) * limit;
-
-  const qb = this.promoProdRepo
-    .createQueryBuilder('pp')
-    .innerJoinAndSelect('pp.promocion', 'promocion', 'promocion.activo = :activo', {
-      activo: true,
-    })
-    .innerJoinAndSelect('pp.producto', 'producto')
-    .orderBy('promocion.id', 'DESC')
-    .addOrderBy('pp.id', 'DESC');
-
-  const [items, total] = await qb.skip(skip).take(limit).getManyAndCount();
-
-  return {
-    page,
-    limit,
-    total,
-    totalPages: Math.ceil(total / limit),
-    data: items,
-  };
-}
-
-private async setActivo(id: number, activo: boolean): Promise<{ message: string }> {
-  const promocion = await this.promoRepo.findOne({ where: { id } });
-  if (!promocion) {
-    throw new NotFoundException(`No se encontró ninguna promoción con id ${id}`);
+    return promocion;
   }
 
-  promocion.activo = activo;
-  await this.promoRepo.save(promocion);
+  async update(id: number, dto: UpdatePromocionDto): Promise<Promocion> {
+    const promocion = await this.promoRepo.findOne({
+      where: { id },
+      relations: ['almacen', 'productos'],
+    });
+    if (!promocion)
+      throw new NotFoundException(`Promoción con id ${id} no encontrada`);
 
-  return {
-    message: activo
-      ? `Promoción con id ${id} activada correctamente`
-      : `Promoción con id ${id} desactivada correctamente`,
-  };
-}
+    if (dto.codigo !== undefined) promocion.codigo = dto.codigo;
+    if (dto.precioPromo !== undefined) promocion.precioPromo = dto.precioPromo;
+    if (dto.almacenId !== undefined) {
+      const almacen = dto.almacenId
+        ? await this.obtenerAlmacen(dto.almacenId)
+        : null;
+      promocion.almacenId = almacen?.id ?? null;
+      promocion.almacen = almacen;
+    }
 
-async activar(id: number): Promise<{ message: string }> {
-  return this.setActivo(id, true);
-}
+    // reemplazar productos si vienen
+    if (dto.productos) {
+      await this.promoProdRepo.delete({ promocion: { id } });
 
-async desactivar(id: number): Promise<{ message: string }> {
-  return this.setActivo(id, false);
-}
+      const nuevos: PromocionProducto[] = [];
+      for (const p of dto.productos) {
+        const prod = await this.prodRepo.findOne({
+          where: { id: p.productoId },
+        });
+        if (!prod)
+          throw new NotFoundException(`Producto ${p.productoId} no encontrado`);
 
-async borrarLogicamente(id: number): Promise<{ message: string }> {
-  return this.desactivar(id);
-}
+        const esPorGramos = !!prod.es_por_gramos;
+        const traePiezas = p.cantidad != null;
+        const traeGramos = p.cantidad_gramos != null;
 
+        if (esPorGramos) {
+          if (!traeGramos || traePiezas) {
+            throw new BadRequestException(
+              `El producto ${prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').`,
+            );
+          }
+        } else {
+          if (!traePiezas || traeGramos) {
+            throw new BadRequestException(
+              `El producto ${prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').`,
+            );
+          }
+        }
 
+        const pp = new PromocionProducto();
+        pp.producto = prod;
+        pp.cantidad = esPorGramos ? null : p.cantidad!;
+        pp.cantidad_gramos = esPorGramos ? p.cantidad_gramos!.toFixed(3) : null;
+        nuevos.push(pp);
+      }
+      promocion.productos = nuevos;
+    }
+
+    return this.promoRepo.save(promocion);
+  }
+
+  async findActivas(almacenId?: number): Promise<Promocion[]> {
+    const qb = this.promoRepo
+      .createQueryBuilder('promocion')
+      .leftJoinAndSelect('promocion.almacen', 'almacen')
+      .leftJoinAndSelect('promocion.productos', 'productos')
+      .leftJoinAndSelect('productos.producto', 'producto')
+      .where('promocion.activo = :activo', { activo: true })
+      .orderBy('promocion.id', 'DESC');
+
+    this.aplicarFiltroAlmacenPromocion(qb, almacenId);
+
+    return qb.getMany();
+  }
+
+  async findProductosEnPromocionesActivas(
+    query: QueryProductosPromocionActivaDto,
+  ) {
+    const page = Number(query.page ?? 1);
+    const limit = Math.min(Number(query.limit ?? 50), 200);
+    const skip = (page - 1) * limit;
+
+    const qb = this.promoProdRepo
+      .createQueryBuilder('pp')
+      .innerJoinAndSelect(
+        'pp.promocion',
+        'promocion',
+        'promocion.activo = :activo',
+        {
+          activo: true,
+        },
+      )
+      .innerJoinAndSelect('pp.producto', 'producto')
+      .orderBy('promocion.id', 'DESC')
+      .addOrderBy('pp.id', 'DESC');
+
+    this.aplicarFiltroAlmacenPromocion(qb, query.almacenId, 'promocion');
+
+    const [items, total] = await qb.skip(skip).take(limit).getManyAndCount();
+
+    return {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      data: items,
+    };
+  }
+
+  private async setActivo(
+    id: number,
+    activo: boolean,
+  ): Promise<{ message: string }> {
+    const promocion = await this.promoRepo.findOne({ where: { id } });
+    if (!promocion) {
+      throw new NotFoundException(
+        `No se encontró ninguna promoción con id ${id}`,
+      );
+    }
+
+    promocion.activo = activo;
+    await this.promoRepo.save(promocion);
+
+    return {
+      message: activo
+        ? `Promoción con id ${id} activada correctamente`
+        : `Promoción con id ${id} desactivada correctamente`,
+    };
+  }
+
+  async activar(id: number): Promise<{ message: string }> {
+    return this.setActivo(id, true);
+  }
+
+  async desactivar(id: number): Promise<{ message: string }> {
+    return this.setActivo(id, false);
+  }
+
+  async borrarLogicamente(id: number): Promise<{ message: string }> {
+    return this.desactivar(id);
+  }
+
+  private async obtenerAlmacen(id: number): Promise<Almacen> {
+    const almacen = await this.almacenRepo.findOne({ where: { id } });
+    if (!almacen) {
+      throw new NotFoundException(`Almacen ${id} no encontrado`);
+    }
+    return almacen;
+  }
+
+  private aplicarFiltroAlmacenPromocion(
+    qb: SelectQueryBuilder<any>,
+    almacenId?: number,
+    alias = 'promocion',
+  ): void {
+    if (!almacenId) return;
+    qb.andWhere(
+      `(${alias}.almacen_id = :almacenId OR ${alias}.almacen_id IS NULL)`,
+      {
+        almacenId,
+      },
+    );
+  }
+
+  private validarPromocionDisponibleEnAlmacen(
+    promocion: Promocion,
+    almacenId?: number,
+  ): void {
+    if (!almacenId || promocion.almacenId == null) return;
+    if (Number(promocion.almacenId) !== Number(almacenId)) {
+      throw new NotFoundException(
+        `No se encontro ninguna promocion disponible para el almacen ${almacenId}`,
+      );
+    }
+  }
 }

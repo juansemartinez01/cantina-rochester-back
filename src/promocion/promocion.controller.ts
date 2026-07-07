@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Get, Param, Delete, Put, Query, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Delete,
+  Put,
+  Query,
+  Patch,
+} from '@nestjs/common';
 import { PromocionService } from './promocion.service';
 import { CreatePromocionDto } from './dto/create-promocion.dto';
 import { UpdatePromocionDto } from './dto/update-promocion.dto';
@@ -14,8 +24,8 @@ export class PromocionController {
   }
 
   @Get('activas')
-  getActivas() {
-    return this.service.findActivas();
+  getActivas(@Query('almacenId') almacenId?: string) {
+    return this.service.findActivas(this.parseOptionalId(almacenId));
   }
 
   @Get('activas/productos')
@@ -26,13 +36,16 @@ export class PromocionController {
   }
 
   @Get('codigo/:codigo')
-    findByCodigo(@Param('codigo') codigo: string) {
-    return this.service.findByCodigo(codigo);
-    }
+  findByCodigo(
+    @Param('codigo') codigo: string,
+    @Query('almacenId') almacenId?: string,
+  ) {
+    return this.service.findByCodigo(codigo, this.parseOptionalId(almacenId));
+  }
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query('almacenId') almacenId?: string) {
+    return this.service.findAll(this.parseOptionalId(almacenId));
   }
 
   @Get(':id')
@@ -44,8 +57,6 @@ export class PromocionController {
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
   }
-
-
 
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdatePromocionDto) {
@@ -67,5 +78,9 @@ export class PromocionController {
     return this.service.desactivar(+id);
   }
 
-
+  private parseOptionalId(value?: string): number | undefined {
+    if (value === undefined || value === null || value === '') return undefined;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
 }
