@@ -1,5 +1,4 @@
 import {
-  ArrayMinSize,
   IsArray,
   IsInt,
   IsOptional,
@@ -9,6 +8,7 @@ import { Type } from 'class-transformer';
 import { CreateVentaItemDto } from './create-venta-item.dto';
 import { CreateVentaPromoDto } from './create-venta-promo.dto';
 import { CreateVentaPagoDto } from './create-venta-pago.dto';
+import { CreateVentaAjusteDto } from './create-venta-ajuste.dto';
 
 export class CreateVentaDto {
   @Type(() => Number)
@@ -20,7 +20,6 @@ export class CreateVentaDto {
   almacenId: number;
 
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => CreateVentaPagoDto)
   pagos: CreateVentaPagoDto[];
@@ -35,4 +34,10 @@ export class CreateVentaDto {
   @ValidateNested({ each: true })
   @Type(() => CreateVentaPromoDto)
   promociones?: CreateVentaPromoDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateVentaAjusteDto)
+  ajustes?: CreateVentaAjusteDto[];
 }

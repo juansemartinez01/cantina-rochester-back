@@ -12,11 +12,18 @@ import {
 } from 'typeorm';
 import { Venta } from './venta.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
+import { CreateVentaAjusteDto } from './dto/create-venta-ajuste.dto';
 import {
   MedioPagoVenta,
   normalizarMedioPago,
 } from './dto/create-venta-pago.dto';
 import { VentaItem } from './venta-item.entity';
+import {
+  VentaAjuste,
+  VentaAjusteModo,
+  VentaAjusteOrigen,
+  VentaAjusteTipo,
+} from './venta-ajuste.entity';
 import { ProductoService } from '../producto/producto.service';
 
 import { Usuario } from '../usuario/usuario.entity';
@@ -49,14 +56,24 @@ export class VentaService {
         throw new NotFoundException(`Almacen ${dto.almacenId} no encontrado`);
       }
 
-      const { items, total } = await this.armarItemsVenta(dto, manager);
+      const { items, total: subtotal } = await this.armarItemsVenta(
+        dto,
+        manager,
+      );
       if (items.length === 0) {
         throw new BadRequestException(
           'La venta debe incluir al menos un item o una promocion',
         );
       }
 
-      const pagos = this.normalizarPagos(dto.pagos);
+      const resumenAjustes = this.calcularAjustes(
+        dto.ajustes,
+        subtotal,
+        dto.usuario,
+      );
+      const total = resumenAjustes.total;
+
+      const pagos = this.normalizarPagos(dto.pagos, total);
       this.validarTotalPagos(pagos, total);
 
       const ventaRepo = manager.getRepository(Venta);
@@ -64,19 +81,34 @@ export class VentaService {
         usuario: dto.usuario,
         almacen,
         items,
+        subtotal,
+        totalDescuentos: resumenAjustes.totalDescuentos,
+        totalRecargos: resumenAjustes.totalRecargos,
         total,
         estado: 'CONFIRMADA',
         fecha: moment().tz('America/Argentina/Buenos_Aires').toDate(),
       });
       const saved = await ventaRepo.save(venta);
 
-      await manager.getRepository(IngresoVenta).save(
-        pagos.map((pago) => ({
-          venta: saved,
-          tipo: pago.medio,
-          monto: pago.monto,
-        })),
-      );
+      if (resumenAjustes.ajustes.length > 0) {
+        await manager.getRepository(VentaAjuste).save(
+          resumenAjustes.ajustes.map((ajuste) => ({
+            ...ajuste,
+            venta: saved,
+            venta_id: saved.id,
+          })),
+        );
+      }
+
+      if (pagos.length > 0) {
+        await manager.getRepository(IngresoVenta).save(
+          pagos.map((pago) => ({
+            venta: saved,
+            tipo: pago.medio,
+            monto: pago.monto,
+          })),
+        );
+      }
 
       for (const item of items) {
         if (!item.producto) continue;
@@ -168,6 +200,9 @@ export class VentaService {
       .select([
         'venta.id',
         'venta.fecha',
+        'venta.subtotal',
+        'venta.totalDescuentos',
+        'venta.totalRecargos',
         'venta.total',
         'venta.estado',
 
@@ -405,6 +440,8 @@ export class VentaService {
         'items.producto.unidad',
         'items.producto.categoria',
         'ingresos',
+        'ajustes',
+        'ajustes.usuario',
       ],
     });
 
@@ -730,6 +767,86 @@ export class VentaService {
     return { items, total: this.to2(total) };
   }
 
+  private calcularAjustes(
+    ajustesDto: CreateVentaAjusteDto[] | undefined,
+    subtotal: number,
+    usuario: Usuario,
+  ): {
+    ajustes: VentaAjuste[];
+    totalDescuentos: number;
+    totalRecargos: number;
+    total: number;
+  } {
+    const ajustes: VentaAjuste[] = [];
+    let totalDescuentos = 0;
+    let totalRecargos = 0;
+
+    for (const [index, dto] of (ajustesDto ?? []).entries()) {
+      const motivo = dto.motivo?.trim();
+      if (!motivo) {
+        throw new BadRequestException(
+          `El ajuste #${index + 1} debe incluir un motivo`,
+        );
+      }
+
+      const valor = Number(dto.valor);
+      if (!Number.isFinite(valor) || valor <= 0) {
+        throw new BadRequestException(
+          `El ajuste #${index + 1} debe tener un valor mayor a 0`,
+        );
+      }
+
+      if (
+        dto.tipo === VentaAjusteTipo.DESCUENTO &&
+        dto.modo === VentaAjusteModo.PORCENTAJE &&
+        valor > 100
+      ) {
+        throw new BadRequestException(
+          `El descuento porcentual #${index + 1} no puede superar el 100%`,
+        );
+      }
+
+      const montoAplicado = this.to2(
+        dto.modo === VentaAjusteModo.PORCENTAJE
+          ? (subtotal * valor) / 100
+          : valor,
+      );
+
+      const ajuste = new VentaAjuste();
+      ajuste.tipo = dto.tipo;
+      ajuste.modo = dto.modo;
+      ajuste.valor = this.to2(valor);
+      ajuste.montoAplicado = montoAplicado;
+      ajuste.motivo = motivo;
+      ajuste.codigo = dto.codigo?.trim() || null;
+      ajuste.origen = dto.origen ?? VentaAjusteOrigen.MANUAL;
+      ajuste.usuario = usuario ?? null;
+      ajuste.usuario_id = usuario?.id ?? null;
+
+      ajustes.push(ajuste);
+
+      if (dto.tipo === VentaAjusteTipo.DESCUENTO) {
+        totalDescuentos = this.to2(totalDescuentos + montoAplicado);
+      } else {
+        totalRecargos = this.to2(totalRecargos + montoAplicado);
+      }
+    }
+
+    const total = this.to2(subtotal - totalDescuentos + totalRecargos);
+    if (total < 0) {
+      throw new BadRequestException(
+        `Los descuentos no pueden dejar el total de la venta en negativo. Total calculado: ${total}`,
+      );
+    }
+
+    return {
+      ajustes,
+      totalDescuentos,
+      totalRecargos,
+      total,
+    };
+  }
+
   private validarCantidadSegunProducto(producto: Producto, item: any) {
     const granel = this.isGranel(producto);
     const tienePiezas = item.cantidad !== undefined && item.cantidad !== null;
@@ -754,10 +871,17 @@ export class VentaService {
 
   private normalizarPagos(
     pagos: CreateVentaDto['pagos'],
+    total: number,
   ): Array<{ medio: MedioPagoVenta; monto: number }> {
     const acumulados = new Map<MedioPagoVenta, number>();
+    const pagosEntrada = pagos ?? [];
 
-    for (const pago of pagos ?? []) {
+    if (pagosEntrada.length === 0) {
+      if (total === 0) return [];
+      throw new BadRequestException('La venta debe incluir al menos un pago');
+    }
+
+    for (const pago of pagosEntrada) {
       const medio = normalizarMedioPago(pago.medio);
       if (medio !== 'EFECTIVO' && medio !== 'BANCARIZADO') {
         throw new BadRequestException(

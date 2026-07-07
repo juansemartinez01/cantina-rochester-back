@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Venta } from './venta.entity';
 import { VentaItem } from './venta-item.entity';
+import { VentaAjuste } from './venta-ajuste.entity';
 import { VentaService } from './venta.service';
 import { VentaController } from './venta.controller';
 import { ProductoModule } from '../producto/producto.module';
@@ -14,7 +15,7 @@ import { IngresoVentaModule } from 'src/ingreso/ingreso-venta.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Venta, VentaItem]),
+    TypeOrmModule.forFeature([Venta, VentaItem, VentaAjuste]),
     ProductoModule,
     StockActualModule,        // <— para manipular stock_actual
     MovimientoStockModule,

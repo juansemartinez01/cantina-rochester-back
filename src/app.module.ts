@@ -27,6 +27,11 @@ import { FacturaModule } from './factura/factura.module';
 import { GastosModule } from './gastos/gastos.module';
 import { CajaModule } from './caja/caja.module';
 
+const isRailwayDeploy =
+  !!process.env.RAILWAY_ENVIRONMENT_NAME || !!process.env.RAILWAY_PROJECT_ID;
+const shouldRunMigrations =
+  process.env.DB_MIGRATIONS_RUN === 'true' || isRailwayDeploy;
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -39,7 +44,8 @@ import { CajaModule } from './caja/caja.module';
       database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
-      migrationsRun: false,
+      migrations: [__dirname + '/migrations/*{.ts,.js}'],
+      migrationsRun: shouldRunMigrations,
       ssl:
         process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),

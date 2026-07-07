@@ -4,6 +4,10 @@ export class InitSchema1747320849857 implements MigrationInterface {
     name = 'InitSchema1747320849857'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        if (await queryRunner.hasTable("proveedor")) {
+            return;
+        }
+
         await queryRunner.query(`CREATE TABLE "proveedor" ("id" SERIAL NOT NULL, "nombre" character varying(255) NOT NULL, "contacto" character varying(255), "telefono" character varying(50), "email" character varying(100), CONSTRAINT "PK_405f60886417ece76cb5681550a" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "unidad" ("id" SERIAL NOT NULL, "nombre" character varying(50) NOT NULL, "abreviatura" character varying(20), CONSTRAINT "PK_3f087c90fe8ce6bafe8f8af6779" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "categoria" ("id" SERIAL NOT NULL, "nombre" character varying(100) NOT NULL, "descripcion" text, CONSTRAINT "UQ_6771d90221138c5bf48044fd73d" UNIQUE ("nombre"), CONSTRAINT "PK_f027836b77b84fb4c3a374dc70d" PRIMARY KEY ("id"))`);
