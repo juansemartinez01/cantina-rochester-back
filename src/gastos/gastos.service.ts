@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, FindOptionsWhere, ILike, IsNull, Not, Repository } from 'typeorm';
-import { Gasto } from './gasto.entity';
+import { Gasto, GastoOrigen } from './gasto.entity';
 import { CreateGastoDto } from './dto/create-gasto.dto';
 import { UpdateGastoDto } from './dto/update-gasto.dto';
 import { FiltroGastoDto } from './dto/filtro-gasto.dto';
@@ -21,6 +21,8 @@ export class GastosService {
       monto: montoFix2.toFixed(2), // guardar como string por numeric
       descripcion: dto.descripcion.trim(),
       notas: dto.notas?.trim() ?? null,
+      origen: GastoOrigen.MANUAL,
+      ordenCompraId: null,
     });
     return await this.repo.save(entity);
   }
@@ -71,6 +73,8 @@ export class GastosService {
       search,
       minMonto,
       maxMonto,
+      origen,
+      ordenCompraId,
       page = 1,
       limit = 20,
       orderBy = 'fecha',
@@ -87,7 +91,7 @@ export class GastosService {
 
     // QueryBuilder para data
     const qb = this.repo.createQueryBuilder('g')
-      .select(['g.id', 'g.fecha', 'g.monto', 'g.descripcion', 'g.notas', 'g.createdAt', 'g.updatedAt', 'g.deletedAt']);
+      .select(['g.id', 'g.fecha', 'g.monto', 'g.descripcion', 'g.notas', 'g.origen', 'g.ordenCompraId', 'g.createdAt', 'g.updatedAt', 'g.deletedAt']);
 
     // Soft delete: por defecto excluye eliminados; si incluirEliminados === 'true', incluir
     if (incluirEliminados === 'true') {
@@ -107,6 +111,12 @@ export class GastosService {
 
     if (search) {
       qb.andWhere('(g.descripcion ILIKE :q OR g.notas ILIKE :q)', { q: `%${search}%` });
+    }
+    if (origen) {
+      qb.andWhere('g.origen = :origen', { origen });
+    }
+    if (ordenCompraId) {
+      qb.andWhere('g.ordenCompraId = :ordenCompraId', { ordenCompraId });
     }
 
     if (minMonto !== undefined) {
@@ -145,6 +155,12 @@ export class GastosService {
     }
     if (search) {
       sumQb.andWhere('(g.descripcion ILIKE :q OR g.notas ILIKE :q)', { q: `%${search}%` });
+    }
+    if (origen) {
+      sumQb.andWhere('g.origen = :origen', { origen });
+    }
+    if (ordenCompraId) {
+      sumQb.andWhere('g.ordenCompraId = :ordenCompraId', { ordenCompraId });
     }
     if (minMonto !== undefined) {
       sumQb.andWhere('g.monto >= :minMonto', { minMonto });

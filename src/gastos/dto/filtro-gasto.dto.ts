@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsBooleanString, IsDateString, IsIn, IsInt, IsNumber, IsOptional, IsPositive, IsString, Max, Min } from 'class-validator';
+import { GastoOrigen } from '../gasto.entity';
 
 export class FiltroGastoDto {
   // Fechas (opcionales, inclusivas)
@@ -15,6 +16,16 @@ export class FiltroGastoDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @IsOptional()
+  @IsIn(Object.values(GastoOrigen))
+  origen?: GastoOrigen;
+
+  @IsOptional()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : value))
+  @IsInt()
+  @Min(1)
+  ordenCompraId?: number;
 
   // Filtros de monto
   @IsOptional()

@@ -6,7 +6,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { OrdenCompra } from 'src/orden-compra/orden-compra.entity';
+
+export enum GastoOrigen {
+  MANUAL = 'MANUAL',
+  ORDEN_COMPRA = 'ORDEN_COMPRA',
+}
 
 @Entity('gasto')
 @Index('idx_gasto_fecha', ['fecha'])
@@ -30,6 +38,16 @@ export class Gasto {
   // Campo opcional para notas largas
   @Column({ type: 'text', nullable: true })
   notas?: string | null;
+
+  @Column({ type: 'enum', enum: GastoOrigen, default: GastoOrigen.MANUAL })
+  origen: GastoOrigen;
+
+  @Column({ name: 'orden_compra_id', type: 'int', nullable: true })
+  ordenCompraId: number | null;
+
+  @ManyToOne(() => OrdenCompra, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'orden_compra_id' })
+  ordenCompra: OrdenCompra | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

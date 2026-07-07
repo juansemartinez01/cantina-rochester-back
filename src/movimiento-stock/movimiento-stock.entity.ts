@@ -9,6 +9,8 @@ import {
 import { Producto } from '../producto/producto.entity';
 import { Almacen } from '../almacen/almacen.entity';
 import { Proveedor } from 'src/proveedor/proveedor.entity';
+import { OrdenCompra } from 'src/orden-compra/orden-compra.entity';
+import { OrdenCompraItem } from 'src/orden-compra/orden-compra-item.entity';
 
 @Entity('movimiento_stock')
 export class MovimientoStock {
@@ -65,6 +67,18 @@ export class MovimientoStock {
   @Column({ name: 'precio_total', type: 'decimal', precision: 12, scale: 2, nullable: true })
   precioTotal?: number;
 
-  
+  @Column({ name: 'orden_compra_id', type: 'int', nullable: true })
+  ordenCompraId?: number | null;
+
+  @ManyToOne(() => OrdenCompra, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'orden_compra_id' })
+  ordenCompra?: OrdenCompra | null;
+
+  @Column({ name: 'orden_compra_item_id', type: 'int', nullable: true })
+  ordenCompraItemId?: number | null;
+
+  @ManyToOne(() => OrdenCompraItem, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'orden_compra_item_id' })
+  ordenCompraItem?: OrdenCompraItem | null;
 
 }
