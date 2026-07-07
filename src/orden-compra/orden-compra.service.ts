@@ -386,13 +386,7 @@ export class OrdenCompraService {
       });
 
       if (orden.gastoId) {
-        const gasto = await manager.getRepository(Gasto).findOne({
-          where: { id: orden.gastoId },
-          withDeleted: true,
-        });
-        if (gasto && !gasto.deletedAt) {
-          await manager.getRepository(Gasto).softRemove(gasto);
-        }
+        await manager.getRepository(Gasto).softDelete({ id: orden.gastoId });
       }
 
       orden.estado = OrdenCompraEstado.ANULADA;
@@ -492,6 +486,20 @@ export class OrdenCompraService {
     items: OrdenCompraItemProcesado[],
   ): Promise<Map<number, OrdenCompraItem>> {
     if (orden.items?.length) {
+      const itemIds = orden.items
+        .map(item => item.id)
+        .filter((itemId): itemId is number => itemId != null);
+
+      if (itemIds.length > 0) {
+        await manager
+          .getRepository(MovimientoStock)
+          .createQueryBuilder()
+          .update(MovimientoStock)
+          .set({ ordenCompraItemId: null })
+          .where('orden_compra_item_id IN (:...itemIds)', { itemIds })
+          .execute();
+      }
+
       await manager.getRepository(OrdenCompraItem).remove(orden.items);
     }
 
