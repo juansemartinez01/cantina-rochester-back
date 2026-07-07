@@ -504,9 +504,11 @@ export class OrdenCompraService {
       }
 
       await manager.getRepository(OrdenCompraItem).remove(orden.items);
+      orden.items = [];
     }
 
     const guardados = new Map<number, OrdenCompraItem>();
+    const itemsGuardados: OrdenCompraItem[] = [];
     for (const it of items) {
       const item = manager.create(OrdenCompraItem, {
         orden,
@@ -520,11 +522,13 @@ export class OrdenCompraService {
         fechaVencimiento: it.fechaVencimiento ?? null,
       });
       const guardado = await manager.save(item);
+      itemsGuardados.push(guardado);
       if (!guardados.has(it.productoId)) {
         guardados.set(it.productoId, guardado);
       }
     }
 
+    orden.items = itemsGuardados;
     return guardados;
   }
 
