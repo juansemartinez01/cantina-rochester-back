@@ -13,6 +13,21 @@ import { UpdatePromocionDto } from './dto/update-promocion.dto';
 import { Producto } from 'src/producto/producto.entity';
 import { QueryProductosPromocionActivaDto } from './dto/query-productos-promocion-activa.dto';
 import { Almacen } from 'src/almacen/almacen.entity';
+import { QueryPromocionDto } from './dto/query-promocion.dto';
+
+type PromocionListMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+type PromocionListResponse = {
+  data: Promocion[];
+  meta: PromocionListMeta;
+};
 
 @Injectable()
 export class PromocionService {
@@ -98,7 +113,11 @@ export class PromocionService {
     return this.promoRepo.save(promocion);
   }
 
-  findAll(almacenId?: number): Promise<Promocion[]> {
+  async findAll(query: QueryPromocionDto): Promise<PromocionListResponse> {
+    const page = this.normalizePositiveInt(query.page, 1);
+    const limit = this.normalizePositiveInt(query.limit, 50, 200);
+    const almacenId = this.normalizeOptionalId(query.almacenId);
+
     const qb = this.promoRepo
       .createQueryBuilder('promocion')
       .leftJoinAndSelect('promocion.almacen', 'almacen')
@@ -108,7 +127,24 @@ export class PromocionService {
 
     this.aplicarFiltroAlmacenPromocion(qb, almacenId);
 
-    return qb.getMany();
+    const [data, total] = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1 && totalPages > 0,
+      },
+    };
   }
 
   async findOne(id: number): Promise<Promocion> {
@@ -319,6 +355,28 @@ export class PromocionService {
         almacenId,
       },
     );
+  }
+
+  private normalizePositiveInt(
+    value: number | string | undefined,
+    defaultValue: number,
+    max?: number,
+  ): number {
+    const parsed = value === undefined ? defaultValue : Number(value);
+    if (!Number.isInteger(parsed) || parsed <= 0) {
+      throw new BadRequestException(
+        'page y limit deben ser enteros mayores a 0',
+      );
+    }
+    return max === undefined ? parsed : Math.min(parsed, max);
+  }
+
+  private normalizeOptionalId(
+    value: number | string | undefined | null,
+  ): number | undefined {
+    if (value === undefined || value === null || value === '') return undefined;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
   }
 
   private validarPromocionDisponibleEnAlmacen(

@@ -13,6 +13,7 @@ import { PromocionService } from './promocion.service';
 import { CreatePromocionDto } from './dto/create-promocion.dto';
 import { UpdatePromocionDto } from './dto/update-promocion.dto';
 import { QueryProductosPromocionActivaDto } from './dto/query-productos-promocion-activa.dto';
+import { QueryPromocionDto } from './dto/query-promocion.dto';
 
 @Controller('promociones')
 export class PromocionController {
@@ -44,8 +45,8 @@ export class PromocionController {
   }
 
   @Get()
-  findAll(@Query('almacenId') almacenId?: string) {
-    return this.service.findAll(this.parseOptionalId(almacenId));
+  findAll(@Query() query: QueryPromocionDto) {
+    return this.service.findAll(query);
   }
 
   @Get(':id')
