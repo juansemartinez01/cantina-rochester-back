@@ -20,9 +20,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3001',
       'http://localhost:3000',
-      'https://jagger.up.railway.app',
-      'https://intelligent-bravery-pruebas-desarrollo.up.railway.app',
-      'https://master.d3gmm3116nztyd.amplifyapp.com',
+      'https://frontend-gestioncomercios-production.up.railway.app',
     ], // o true para permitir todos los orígenes (no recomendado en producción)
     credentials: true, // si usas cookies o autenticación con tokens en headers
   });

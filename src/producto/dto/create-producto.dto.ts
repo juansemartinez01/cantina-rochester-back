@@ -1,4 +1,14 @@
-import { IsString, IsNotEmpty, MaxLength, IsOptional, IsInt, IsNumber, IsBoolean } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateProductoDto {
   @IsString()
@@ -32,13 +42,18 @@ export class CreateProductoDto {
 
   @IsBoolean()
   @IsOptional()
-  es_por_gramos?: boolean; // en la entidad default=false
+  es_por_gramos?: boolean;
 
   @IsBoolean()
   @IsOptional()
-  inOferta?: boolean; // en la entidad default=false
+  inOferta?: boolean;
 
-  // ⬇️ NUEVO CAMPO
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  almacenId?: number;
+
   @IsString()
   @IsOptional()
   @MaxLength(255)
