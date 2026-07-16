@@ -21,6 +21,7 @@ async function bootstrap() {
       'http://localhost:3001',
       'http://localhost:3000',
       'https://frontend-gestioncomercios-production.up.railway.app',
+      'https://frontend-sanesquina-production.up.railway.app',
     ], // o true para permitir todos los orígenes (no recomendado en producción)
     credentials: true, // si usas cookies o autenticación con tokens en headers
   });
