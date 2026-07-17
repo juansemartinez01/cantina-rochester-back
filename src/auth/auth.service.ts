@@ -19,8 +19,8 @@ export class AuthService {
   }
 
   /** Valida usuario+contraseña y adjunta roles */
-  async validateUser(usuario: string, pass: string): Promise<any> {
-    const user = await this.usuarioService.findByUsername(usuario);
+  async validateUser(login: string, pass: string): Promise<any> {
+    const user = await this.usuarioService.findByUsername(login);
     if (!user) return null;
     if (!user.activo) return null;
 
