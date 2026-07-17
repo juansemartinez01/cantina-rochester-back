@@ -7,7 +7,6 @@ import { AuthService } from './auth.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
-    // El frontend envia "email", pero aca se usa como nombre de usuario libre.
     super({ usernameField: 'email', passwordField: 'password' });
   }
 

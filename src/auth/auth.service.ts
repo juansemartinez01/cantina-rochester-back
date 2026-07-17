@@ -14,27 +14,25 @@ export class AuthService {
     try {
       return this.jwtService.verify(token);
     } catch {
-      throw new UnauthorizedException('Token inválido');
+      throw new UnauthorizedException('Token invalido');
     }
   }
 
-  /** Valida usuario+contraseña y adjunta roles */
-  async validateUser(login: string, pass: string): Promise<any> {
-    const user = await this.usuarioService.findByUsername(login);
+  /** Valida email+password y adjunta roles */
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.usuarioService.findByEmail(email);
     if (!user) return null;
     if (!user.activo) return null;
 
     const valid = await bcrypt.compare(pass, user.clave_hash);
     if (!valid) return null;
 
-    // Mapear desde user.roles
     const roles = user.roles.map(ur => ur.rol.nombre);
 
-    // Quitar el hash y la relación interna
     const { clave_hash, roles: _, ...rest } = user;
     return {
       ...rest,
-      roles,              // ej: ['Admin','Vendedor']
+      roles,
     };
   }
 
@@ -43,7 +41,7 @@ export class AuthService {
     const payload = { sub: user.id, usuario: user.usuario, roles: user.roles };
     return {
       access_token: this.jwtService.sign(payload),
-      user,               // devolvemos el objeto con id, usuario, nombre, email y roles
+      user,
     };
   }
 }

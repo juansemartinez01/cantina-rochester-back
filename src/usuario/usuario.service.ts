@@ -30,6 +30,13 @@ export class UsuarioService {
     });
   }
 
+  async findByEmail(email: string): Promise<Usuario | null> {
+    return this.repo.findOne({
+      where: { email },
+      relations: ['roles', 'roles.rol'],
+    });
+  }
+
   findAll(activo: 'true' | 'false' | 'all' = 'true'): Promise<Usuario[]> {
     const where: FindOptionsWhere<Usuario> | undefined =
       activo === 'all'
