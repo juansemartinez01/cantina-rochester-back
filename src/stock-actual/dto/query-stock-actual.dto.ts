@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Max,
@@ -31,6 +32,16 @@ export class QueryStockActualDto {
   @IsString()
   @MaxLength(255)
   proveedorNombre?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  cantidadMin?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  cantidadMax?: number;
 
   @IsOptional()
   @Type(() => Number)

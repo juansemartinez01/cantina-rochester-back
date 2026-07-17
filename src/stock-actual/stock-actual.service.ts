@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, EntityManager, Repository } from 'typeorm';
 import { StockActual } from './stock-actual.entity';
@@ -84,6 +84,14 @@ private resolvePrecioFinal(
     return Object.values(query).some((value) => value !== undefined);
   }
 
+  private getCantidadNormalizadaSql(): string {
+    return `CASE
+      WHEN producto.es_por_gramos = true
+      THEN COALESCE(stock.cantidad_gramos, 0)::numeric / 1000
+      ELSE COALESCE(stock.cantidad, 0)::numeric
+    END`;
+  }
+
   private enrichStockRows(rows: StockActual[], overrides: Map<string, number>) {
     for (const r of rows) {
       const prod: any = r.producto;
@@ -166,6 +174,28 @@ private resolvePrecioFinal(
     if (query.proveedorNombre?.trim()) {
       qb.andWhere('producto."proveedorNombre" ILIKE :proveedorNombre', {
         proveedorNombre: `%${query.proveedorNombre.trim()}%`,
+      });
+    }
+
+    if (
+      query.cantidadMin !== undefined &&
+      query.cantidadMax !== undefined &&
+      query.cantidadMin > query.cantidadMax
+    ) {
+      throw new BadRequestException(
+        'cantidadMin no puede ser mayor que cantidadMax',
+      );
+    }
+
+    if (query.cantidadMin !== undefined) {
+      qb.andWhere(`${this.getCantidadNormalizadaSql()} >= :cantidadMin`, {
+        cantidadMin: query.cantidadMin,
+      });
+    }
+
+    if (query.cantidadMax !== undefined) {
+      qb.andWhere(`${this.getCantidadNormalizadaSql()} <= :cantidadMax`, {
+        cantidadMax: query.cantidadMax,
       });
     }
 
