@@ -6,16 +6,35 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SesionCaja } from './sesion-caja.entity';
-import { MovimientoCaja } from './movimiento-caja.entity';
+import {
+  MovimientoCaja,
+  MovimientoCajaOrigen,
+} from './movimiento-caja.entity';
 import { IngresoVenta } from 'src/ingreso/ingreso-venta.entity';
 import { AbrirCajaDto } from './dto/abrir-caja.dto';
 import { AgregarMovimientoDto } from './dto/agregar-movimiento.dto';
 import { CerrarCajaDto } from './dto/cerrar-caja.dto';
 import { AnularMovimientoDto } from './dto/anular-movimiento.dto';
 import {
+  FiltroMovimientoCajaDto,
+  MovimientoCajaTipo,
+  OrdenMovimientoCaja,
+} from './dto/filtro-movimiento-caja.dto';
+import {
+  MetodoPagoPersistido,
   METODOS_PAGO_BANCARIZADOS,
-  esMetodoPagoBancarizado,
+  normalizarFiltroMetodoPago,
 } from 'src/common/metodo-pago.enum';
+
+type TotalesPorMetodo = {
+  efectivo: number;
+  transferencia: number;
+  debito: number;
+  credito: number;
+  bancarizadoLegacy: number;
+  bancarizado: number;
+  total: number;
+};
 
 @Injectable()
 export class CajaService {
@@ -65,6 +84,8 @@ export class CajaService {
       tipo: dto.tipo,
       monto: dto.monto,
       medio_pago: dto.medio_pago ?? 'EFECTIVO',
+      origen: MovimientoCajaOrigen.MANUAL,
+      cuenta_corriente_pago_id: null,
       motivo: dto.motivo,
       observacion: dto.observacion ?? null,
       usuario_id: usuarioId,
@@ -107,6 +128,19 @@ export class CajaService {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
         cobros_por_metodo: resumen.cobros_por_metodo,
+        cobros_ventas: this.formatearTotalesPorMetodo(resumen.cobros_ventas),
+        cobros_cuenta_corriente: this.formatearTotalesPorMetodo(
+          resumen.cobros_cuenta_corriente,
+        ),
+        movimientos_manuales: {
+          ingresos: this.formatearTotalesPorMetodo(
+            resumen.ingresos_manuales_por_metodo,
+          ),
+          egresos: this.formatearTotalesPorMetodo(
+            resumen.egresos_manuales_por_metodo,
+          ),
+          retiros: this.formatearTotalesPorMetodo(resumen.retiros_por_metodo),
+        },
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
@@ -136,6 +170,19 @@ export class CajaService {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
         cobros_por_metodo: resumen.cobros_por_metodo,
+        cobros_ventas: this.formatearTotalesPorMetodo(resumen.cobros_ventas),
+        cobros_cuenta_corriente: this.formatearTotalesPorMetodo(
+          resumen.cobros_cuenta_corriente,
+        ),
+        movimientos_manuales: {
+          ingresos: this.formatearTotalesPorMetodo(
+            resumen.ingresos_manuales_por_metodo,
+          ),
+          egresos: this.formatearTotalesPorMetodo(
+            resumen.egresos_manuales_por_metodo,
+          ),
+          retiros: this.formatearTotalesPorMetodo(resumen.retiros_por_metodo),
+        },
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
@@ -180,6 +227,19 @@ export class CajaService {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
         cobros_por_metodo: resumen.cobros_por_metodo,
+        cobros_ventas: this.formatearTotalesPorMetodo(resumen.cobros_ventas),
+        cobros_cuenta_corriente: this.formatearTotalesPorMetodo(
+          resumen.cobros_cuenta_corriente,
+        ),
+        movimientos_manuales: {
+          ingresos: this.formatearTotalesPorMetodo(
+            resumen.ingresos_manuales_por_metodo,
+          ),
+          egresos: this.formatearTotalesPorMetodo(
+            resumen.egresos_manuales_por_metodo,
+          ),
+          retiros: this.formatearTotalesPorMetodo(resumen.retiros_por_metodo),
+        },
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
@@ -191,6 +251,57 @@ export class CajaService {
   }
 
   // US5 — Anular movimiento
+  async listarMovimientos(cajaId: number, filtro: FiltroMovimientoCajaDto) {
+    await this.getSesionOFail(cajaId);
+
+    const page = this.normalizarEntero(filtro.page, 1, 1);
+    const limit = Math.min(this.normalizarEntero(filtro.limit, 50, 1), 200);
+    const order = this.normalizarOrden(filtro.order);
+    const origen = this.normalizarOrigen(filtro.origen);
+    const tipo = this.normalizarTipo(filtro.tipo);
+    const medioPago = this.normalizarMedioPago(filtro.medio_pago);
+
+    const query = this.movimientoRepo
+      .createQueryBuilder('movimiento')
+      .leftJoinAndSelect('movimiento.usuario', 'usuario')
+      .leftJoinAndSelect(
+        'movimiento.cuentaCorrientePago',
+        'cuentaCorrientePago',
+      )
+      .leftJoinAndSelect(
+        'cuentaCorrientePago.cuentaCorriente',
+        'cuentaCorriente',
+      )
+      .where('movimiento.caja_id = :cajaId', { cajaId });
+
+    if (origen) {
+      query.andWhere('movimiento.origen = :origen', { origen });
+    }
+    if (tipo) {
+      query.andWhere('movimiento.tipo = :tipo', { tipo });
+    }
+    if (medioPago) {
+      query.andWhere('movimiento.medio_pago = :medioPago', { medioPago });
+    }
+
+    const [data, total] = await query
+      .orderBy('movimiento.fecha', order)
+      .addOrderBy('movimiento.id', order)
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+      },
+    };
+  }
+
   async anularMovimiento(
     movimientoId: number,
     dto: AnularMovimientoDto,
@@ -207,6 +318,12 @@ export class CajaService {
     if (movimiento.anulado) {
       throw new BadRequestException(
         `El movimiento #${movimientoId} ya está anulado`,
+      );
+    }
+
+    if (movimiento.origen === MovimientoCajaOrigen.CUENTA_CORRIENTE) {
+      throw new BadRequestException(
+        'Este movimiento proviene de un pago de cuenta corriente. Debe anularse desde cuenta corriente.',
       );
     }
 
@@ -253,6 +370,11 @@ export class CajaService {
     cobros_efectivo: number;
     cobros_bancarizado: number;
     cobros_por_metodo: Record<string, string>;
+    cobros_ventas: TotalesPorMetodo;
+    cobros_cuenta_corriente: TotalesPorMetodo;
+    ingresos_manuales_por_metodo: TotalesPorMetodo;
+    egresos_manuales_por_metodo: TotalesPorMetodo;
+    retiros_por_metodo: TotalesPorMetodo;
     ingresos_manuales: number;
     ingresos_manuales_bancarizado: number;
     egresos_manuales: number;
@@ -283,74 +405,198 @@ export class CajaService {
       .createQueryBuilder('m')
       .select('m.tipo', 'tipo')
       .addSelect('m.medio_pago', 'medio_pago')
+      .addSelect(`COALESCE(m.origen, 'MANUAL')`, 'origen')
       .addSelect('SUM(m.monto)', 'total')
       .where('m.caja_id = :cajaId', { cajaId: sesion.id })
       .andWhere('m.anulado = false')
       .groupBy('m.tipo')
       .addGroupBy('m.medio_pago')
+      .addGroupBy(`COALESCE(m.origen, 'MANUAL')`)
       .getRawMany();
 
     const movMap: Record<string, number> = {};
     movimientos.forEach(m => {
       const medioPago = m.medio_pago ?? 'EFECTIVO';
-      movMap[`${m.tipo}:${medioPago}`] = parseFloat(m.total || 0);
+      const origen = m.origen ?? MovimientoCajaOrigen.MANUAL;
+      movMap[`${origen}:${m.tipo}:${medioPago}`] = parseFloat(m.total || 0);
     });
 
-    const cobros_efectivo = cobrosMap['EFECTIVO'] ?? 0;
-    const cobros_bancarizado =
-      (cobrosMap['BANCARIZADO'] ?? 0) +
-      METODOS_PAGO_BANCARIZADOS.reduce(
-        (acc, metodo) => acc + (cobrosMap[metodo] ?? 0),
-        0,
-      );
+    const cobros_ventas = this.totalesDesdeMapa(cobrosMap);
+    const cobros_cuenta_corriente = this.totalesDesdeMovimientos(
+      movMap,
+      MovimientoCajaOrigen.CUENTA_CORRIENTE,
+      'INGRESO',
+    );
+    const ingresos_manuales_por_metodo = this.totalesDesdeMovimientos(
+      movMap,
+      MovimientoCajaOrigen.MANUAL,
+      'INGRESO',
+    );
+    const egresos_manuales_por_metodo = this.totalesDesdeMovimientos(
+      movMap,
+      MovimientoCajaOrigen.MANUAL,
+      'EGRESO',
+    );
+    const retiros_por_metodo = this.totalesDesdeMovimientos(
+      movMap,
+      MovimientoCajaOrigen.MANUAL,
+      'RETIRO',
+    );
+
+    const cobros_efectivo = cobros_ventas.efectivo;
+    const cobros_bancarizado = cobros_ventas.bancarizado;
     const cobros_por_metodo = {
       EFECTIVO: cobros_efectivo.toFixed(2),
-      TRANSFERENCIA: (cobrosMap['TRANSFERENCIA'] ?? 0).toFixed(2),
-      DEBITO: (cobrosMap['DEBITO'] ?? 0).toFixed(2),
-      CREDITO: (cobrosMap['CREDITO'] ?? 0).toFixed(2),
-      BANCARIZADO_LEGACY: (cobrosMap['BANCARIZADO'] ?? 0).toFixed(2),
+      TRANSFERENCIA: cobros_ventas.transferencia.toFixed(2),
+      DEBITO: cobros_ventas.debito.toFixed(2),
+      CREDITO: cobros_ventas.credito.toFixed(2),
+      BANCARIZADO_LEGACY: cobros_ventas.bancarizadoLegacy.toFixed(2),
     };
-    const ingresos_manuales = movMap['INGRESO:EFECTIVO'] ?? 0;
-    const ingresos_manuales_bancarizado = Object.entries(movMap)
-      .filter(([key]) => {
-        const [tipo, medioPago] = key.split(':');
-        return tipo === 'INGRESO' && esMetodoPagoBancarizado(medioPago);
-      })
-      .reduce((acc, [, total]) => acc + total, 0);
-    const egresos_manuales =
-      (movMap['EGRESO:EFECTIVO'] ?? 0) +
-      Object.entries(movMap)
-        .filter(([key]) => {
-          const [tipo, medioPago] = key.split(':');
-          return tipo === 'EGRESO' && esMetodoPagoBancarizado(medioPago);
-        })
-        .reduce((acc, [, total]) => acc + total, 0);
-    const retiros =
-      (movMap['RETIRO:EFECTIVO'] ?? 0) +
-      Object.entries(movMap)
-        .filter(([key]) => {
-          const [tipo, medioPago] = key.split(':');
-          return tipo === 'RETIRO' && esMetodoPagoBancarizado(medioPago);
-        })
-        .reduce((acc, [, total]) => acc + total, 0);
+    const ingresos_manuales = ingresos_manuales_por_metodo.efectivo;
+    const ingresos_manuales_bancarizado =
+      ingresos_manuales_por_metodo.bancarizado;
+    const egresos_manuales = egresos_manuales_por_metodo.total;
+    const retiros = retiros_por_metodo.total;
 
     const efectivo_esperado =
       Number(sesion.monto_inicial) +
       cobros_efectivo +
+      cobros_cuenta_corriente.efectivo +
       ingresos_manuales -
-      egresos_manuales -
-      retiros;
+      egresos_manuales_por_metodo.efectivo -
+      retiros_por_metodo.efectivo;
 
     return {
       cobros_efectivo,
       cobros_bancarizado,
       cobros_por_metodo,
+      cobros_ventas,
+      cobros_cuenta_corriente,
+      ingresos_manuales_por_metodo,
+      egresos_manuales_por_metodo,
+      retiros_por_metodo,
       ingresos_manuales,
       ingresos_manuales_bancarizado,
       egresos_manuales,
       retiros,
       efectivo_esperado: parseFloat(efectivo_esperado.toFixed(2)),
     };
+  }
+
+  private totalesDesdeMovimientos(
+    movMap: Record<string, number>,
+    origen: MovimientoCajaOrigen,
+    tipo: 'INGRESO' | 'EGRESO' | 'RETIRO',
+  ): TotalesPorMetodo {
+    return this.totalesDesdeMapa({
+      EFECTIVO: movMap[`${origen}:${tipo}:EFECTIVO`] ?? 0,
+      TRANSFERENCIA: movMap[`${origen}:${tipo}:TRANSFERENCIA`] ?? 0,
+      DEBITO: movMap[`${origen}:${tipo}:DEBITO`] ?? 0,
+      CREDITO: movMap[`${origen}:${tipo}:CREDITO`] ?? 0,
+      BANCARIZADO: movMap[`${origen}:${tipo}:BANCARIZADO`] ?? 0,
+    });
+  }
+
+  private totalesDesdeMapa(map: Record<string, number>): TotalesPorMetodo {
+    const efectivo = map['EFECTIVO'] ?? 0;
+    const transferencia = map['TRANSFERENCIA'] ?? 0;
+    const debito = map['DEBITO'] ?? 0;
+    const credito = map['CREDITO'] ?? 0;
+    const bancarizadoLegacy = map['BANCARIZADO'] ?? 0;
+    const bancarizado =
+      bancarizadoLegacy +
+      METODOS_PAGO_BANCARIZADOS.reduce(
+        (acc, metodo) => acc + (map[metodo] ?? 0),
+        0,
+      );
+
+    return {
+      efectivo,
+      transferencia,
+      debito,
+      credito,
+      bancarizadoLegacy,
+      bancarizado,
+      total: efectivo + bancarizado,
+    };
+  }
+
+  private formatearTotalesPorMetodo(totales: TotalesPorMetodo) {
+    return {
+      efectivo: totales.efectivo.toFixed(2),
+      transferencia: totales.transferencia.toFixed(2),
+      debito: totales.debito.toFixed(2),
+      credito: totales.credito.toFixed(2),
+      bancarizadoLegacy: totales.bancarizadoLegacy.toFixed(2),
+      bancarizado: totales.bancarizado.toFixed(2),
+      total: totales.total.toFixed(2),
+    };
+  }
+
+  private normalizarEntero(
+    value: number | string | undefined,
+    defaultValue: number,
+    min: number,
+  ): number {
+    if (value === undefined || value === null || value === '') {
+      return defaultValue;
+    }
+
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < min) {
+      throw new BadRequestException(`Parametro numerico invalido: ${value}`);
+    }
+
+    return parsed;
+  }
+
+  private normalizarOrden(value?: unknown): OrdenMovimientoCaja {
+    if (value === undefined || value === null || value === '') return 'DESC';
+    const normalized = String(value).trim().toUpperCase();
+    if (normalized !== 'ASC' && normalized !== 'DESC') {
+      throw new BadRequestException('order debe ser ASC o DESC');
+    }
+
+    return normalized;
+  }
+
+  private normalizarOrigen(value?: unknown): MovimientoCajaOrigen | undefined {
+    if (value === undefined || value === null || value === '') return undefined;
+    const normalized = String(value).trim().toUpperCase();
+    if (
+      normalized !== MovimientoCajaOrigen.MANUAL &&
+      normalized !== MovimientoCajaOrigen.CUENTA_CORRIENTE
+    ) {
+      throw new BadRequestException(
+        'origen debe ser MANUAL o CUENTA_CORRIENTE',
+      );
+    }
+
+    return normalized as MovimientoCajaOrigen;
+  }
+
+  private normalizarTipo(value?: unknown): MovimientoCajaTipo | undefined {
+    if (value === undefined || value === null || value === '') return undefined;
+    const normalized = String(value).trim().toUpperCase();
+    if (!['INGRESO', 'EGRESO', 'RETIRO'].includes(normalized)) {
+      throw new BadRequestException('tipo debe ser INGRESO, EGRESO o RETIRO');
+    }
+
+    return normalized as MovimientoCajaTipo;
+  }
+
+  private normalizarMedioPago(
+    value?: unknown,
+  ): MetodoPagoPersistido | undefined {
+    if (value === undefined || value === null || value === '') return undefined;
+    const normalized = normalizarFiltroMetodoPago(value);
+    if (!normalized) {
+      throw new BadRequestException(
+        'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO o BANCARIZADO',
+      );
+    }
+
+    return normalized;
   }
 
   private async getSesionOFail(cajaId: number): Promise<SesionCaja> {

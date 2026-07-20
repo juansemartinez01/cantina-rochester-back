@@ -27,11 +27,10 @@ import { FacturaModule } from './factura/factura.module';
 import { GastosModule } from './gastos/gastos.module';
 import { CajaModule } from './caja/caja.module';
 import { CuentaCorrienteModule } from './cuenta-corriente/cuenta-corriente.module';
-
-const isRailwayDeploy =
-  !!process.env.RAILWAY_ENVIRONMENT_NAME || !!process.env.RAILWAY_PROJECT_ID;
-const shouldRunMigrations =
-  process.env.DB_MIGRATIONS_RUN === 'true' || isRailwayDeploy;
+import {
+  shouldRunDatabaseMigrations,
+  shouldSynchronizeSchema,
+} from './database/migration-runtime';
 
 @Module({
   imports: [
@@ -44,9 +43,9 @@ const shouldRunMigrations =
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: shouldSynchronizeSchema(),
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
-      migrationsRun: shouldRunMigrations,
+      migrationsRun: shouldRunDatabaseMigrations(),
       ssl:
         process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),

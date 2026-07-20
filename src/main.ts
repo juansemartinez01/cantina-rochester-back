@@ -7,12 +7,15 @@ import { AppModule } from './app.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Reflector }    from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ensureMigrationBaseline } from './database/migration-runtime';
 
 import 'reflect-metadata';
 
 
 
 async function bootstrap() {
+  await ensureMigrationBaseline();
+
   const app = await NestFactory.create(AppModule);
 
   

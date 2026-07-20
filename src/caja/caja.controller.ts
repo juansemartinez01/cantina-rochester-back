@@ -14,6 +14,7 @@ import { AbrirCajaDto } from './dto/abrir-caja.dto';
 import { AgregarMovimientoDto } from './dto/agregar-movimiento.dto';
 import { CerrarCajaDto } from './dto/cerrar-caja.dto';
 import { AnularMovimientoDto } from './dto/anular-movimiento.dto';
+import { FiltroMovimientoCajaDto } from './dto/filtro-movimiento-caja.dto';
 
 @Controller('caja')
 export class CajaController {
@@ -59,6 +60,14 @@ export class CajaController {
   }
 
   // US2/US3 — Agregar movimiento manual (INGRESO, EGRESO, RETIRO)
+  @Get(':id/movimientos')
+  listarMovimientos(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() filtro: FiltroMovimientoCajaDto,
+  ) {
+    return this.service.listarMovimientos(id, filtro);
+  }
+
   @Post(':id/movimiento')
   agregarMovimiento(
     @Param('id', ParseIntPipe) id: number,

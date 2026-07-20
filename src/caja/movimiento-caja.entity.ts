@@ -8,10 +8,16 @@ import {
 } from 'typeorm';
 import { Usuario } from 'src/usuario/usuario.entity';
 import { SesionCaja } from './sesion-caja.entity';
+import { CuentaCorrientePago } from 'src/cuenta-corriente/cuenta-corriente-pago.entity';
 import {
   MetodoPagoPersistido,
   METODOS_PAGO_PERSISTIDOS,
 } from 'src/common/metodo-pago.enum';
+
+export enum MovimientoCajaOrigen {
+  MANUAL = 'MANUAL',
+  CUENTA_CORRIENTE = 'CUENTA_CORRIENTE',
+}
 
 @Entity('movimiento_caja')
 export class MovimientoCaja {
@@ -41,6 +47,20 @@ export class MovimientoCaja {
     default: 'EFECTIVO',
   })
   medio_pago: MetodoPagoPersistido;
+
+  @Column({
+    type: 'enum',
+    enum: MovimientoCajaOrigen,
+    default: MovimientoCajaOrigen.MANUAL,
+  })
+  origen: MovimientoCajaOrigen;
+
+  @Column({ name: 'cuenta_corriente_pago_id', type: 'int', nullable: true })
+  cuenta_corriente_pago_id: number | null;
+
+  @ManyToOne(() => CuentaCorrientePago, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'cuenta_corriente_pago_id' })
+  cuentaCorrientePago: CuentaCorrientePago | null;
 
   @Column({ length: 500 })
   motivo: string;

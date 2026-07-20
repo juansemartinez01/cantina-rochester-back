@@ -23,7 +23,10 @@ import { FiltroCuentaCorrienteDetalleDto } from './dto/filtro-cuenta-corriente-d
 import { CreateCuentaCorrientePagoDto } from './dto/create-cuenta-corriente-pago.dto';
 import { CreateCuentaCorrienteAjusteDto } from './dto/create-cuenta-corriente-ajuste.dto';
 import { SesionCaja } from 'src/caja/sesion-caja.entity';
-import { MovimientoCaja } from 'src/caja/movimiento-caja.entity';
+import {
+  MovimientoCaja,
+  MovimientoCajaOrigen,
+} from 'src/caja/movimiento-caja.entity';
 import { CuentaCorrientePagoAplicacion } from './cuenta-corriente-pago-aplicacion.entity';
 import { Venta } from 'src/venta/venta.entity';
 import { MetodoPago } from 'src/common/metodo-pago.enum';
@@ -401,6 +404,8 @@ export class CuentaCorrienteService {
         caja_id: caja.id,
         tipo: 'INGRESO',
         medio_pago: dto.medioPago,
+        origen: MovimientoCajaOrigen.CUENTA_CORRIENTE,
+        cuenta_corriente_pago_id: pago.id,
         monto: montoPago,
         motivo: `Cobro cuenta corriente #${cuenta.id} - ${cuenta.nombre}`,
         observacion:
