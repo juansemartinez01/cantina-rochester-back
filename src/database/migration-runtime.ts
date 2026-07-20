@@ -80,11 +80,11 @@ export async function ensureMigrationBaseline(): Promise<void> {
       await dataSource.query(
         `
           INSERT INTO "migrations" ("timestamp", "name")
-          SELECT $1, $2
+          SELECT $1::bigint, $2::varchar
           WHERE NOT EXISTS (
             SELECT 1
             FROM "migrations"
-            WHERE "timestamp" = $1 OR "name" = $2
+            WHERE "timestamp" = $1::bigint OR "name" = $2::varchar
           )
         `,
         [migration.timestamp, migration.name],
