@@ -3,5 +3,6 @@ export enum TipoIngreso {
   TRANSFERENCIA = 'TRANSFERENCIA',
   DEBITO = 'DEBITO',
   CREDITO = 'CREDITO',
+  OTRO = 'OTRO',
   BANCARIZADO = 'BANCARIZADO',
 }

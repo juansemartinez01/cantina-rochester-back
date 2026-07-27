@@ -1,9 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CajaService } from './caja.service';
-import {
-  MovimientoCaja,
-  MovimientoCajaOrigen,
-} from './movimiento-caja.entity';
+import { MovimientoCaja, MovimientoCajaOrigen } from './movimiento-caja.entity';
 
 function createQueryBuilderMock(result: unknown) {
   const qb: any = {
@@ -23,7 +20,11 @@ function createQueryBuilderMock(result: unknown) {
     getManyAndCount: jest.fn(),
   };
 
-  if (Array.isArray(result) && result.length === 2 && Array.isArray(result[0])) {
+  if (
+    Array.isArray(result) &&
+    result.length === 2 &&
+    Array.isArray(result[0])
+  ) {
     qb.getManyAndCount.mockResolvedValue(result);
   } else {
     qb.getRawMany.mockResolvedValue(result);
@@ -84,9 +85,53 @@ describe('CajaService', () => {
     expect(result.origen).toBe(MovimientoCajaOrigen.MANUAL);
   });
 
+  it('agregarMovimiento exige detalle_pago para medio OTRO', async () => {
+    sesionRepo.findOne.mockResolvedValue({ id: 10, estado: 'ABIERTA' });
+
+    await expect(
+      service.agregarMovimiento(
+        10,
+        {
+          tipo: 'INGRESO',
+          monto: 150,
+          medio_pago: 'OTRO',
+          motivo: 'Ingreso manual',
+        },
+        7,
+      ),
+    ).rejects.toThrow(BadRequestException);
+    expect(movimientoRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('agregarMovimiento guarda detalle_pago para medio OTRO', async () => {
+    sesionRepo.findOne.mockResolvedValue({ id: 10, estado: 'ABIERTA' });
+
+    const result = await service.agregarMovimiento(
+      10,
+      {
+        tipo: 'INGRESO',
+        monto: 150,
+        medio_pago: 'OTRO',
+        detalle_pago: 'Mercado Pago',
+        motivo: 'Ingreso manual',
+      },
+      7,
+    );
+
+    expect(movimientoRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        medio_pago: 'OTRO',
+        detalle_pago: 'Mercado Pago',
+      }),
+    );
+    expect(result.detalle_pago).toBe('Mercado Pago');
+  });
+
   it('listarMovimientos aplica filtros y paginacion', async () => {
     sesionRepo.findOne.mockResolvedValue({ id: 10 });
-    const movimientos = [{ id: 1, origen: MovimientoCajaOrigen.CUENTA_CORRIENTE }];
+    const movimientos = [
+      { id: 1, origen: MovimientoCajaOrigen.CUENTA_CORRIENTE },
+    ];
     const qb = createQueryBuilderMock([movimientos, 1]);
     movimientoRepo.createQueryBuilder.mockReturnValue(qb);
 
@@ -135,6 +180,7 @@ describe('CajaService', () => {
       createQueryBuilderMock([
         { tipo: 'EFECTIVO', total: '100' },
         { tipo: 'TRANSFERENCIA', total: '50' },
+        { tipo: 'OTRO', total: '15' },
       ]),
     );
     movimientoRepo.createQueryBuilder.mockReturnValue(
@@ -152,10 +198,22 @@ describe('CajaService', () => {
           total: '30',
         },
         {
+          origen: MovimientoCajaOrigen.CUENTA_CORRIENTE,
+          tipo: 'INGRESO',
+          medio_pago: 'OTRO',
+          total: '12',
+        },
+        {
           origen: MovimientoCajaOrigen.MANUAL,
           tipo: 'INGRESO',
           medio_pago: 'EFECTIVO',
           total: '10',
+        },
+        {
+          origen: MovimientoCajaOrigen.MANUAL,
+          tipo: 'INGRESO',
+          medio_pago: 'OTRO',
+          total: '13',
         },
         {
           origen: MovimientoCajaOrigen.MANUAL,
@@ -178,17 +236,20 @@ describe('CajaService', () => {
       efectivo: '100.00',
       transferencia: '50.00',
       bancarizado: '50.00',
-      total: '150.00',
+      otro: '15.00',
+      total: '165.00',
     });
     expect(result.reporte.cobros_cuenta_corriente).toMatchObject({
       efectivo: '20.00',
       transferencia: '30.00',
       bancarizado: '30.00',
-      total: '50.00',
+      otro: '12.00',
+      total: '62.00',
     });
     expect(result.reporte.movimientos_manuales.ingresos).toMatchObject({
       efectivo: '10.00',
-      total: '10.00',
+      otro: '13.00',
+      total: '23.00',
     });
     expect(result.reporte.movimientos_manuales.egresos).toMatchObject({
       efectivo: '5.00',
@@ -199,6 +260,8 @@ describe('CajaService', () => {
       total: '7.00',
     });
     expect(result.reporte.ingresos_manuales).toBe('10.00');
+    expect(result.reporte.ingresos_manuales_otro).toBe('13.00');
+    expect(result.reporte.cobros_por_metodo.OTRO).toBe('15.00');
     expect(result.reporte.efectivo_esperado).toBe('1125.00');
   });
 

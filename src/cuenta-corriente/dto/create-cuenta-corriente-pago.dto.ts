@@ -7,8 +7,11 @@ import {
   IsString,
   MaxLength,
   Min,
+  MinLength,
+  ValidateIf,
 } from 'class-validator';
 import {
+  DETALLE_PAGO_MAX_LENGTH,
   MetodoPago,
   METODOS_PAGO,
   normalizarMetodoPago,
@@ -27,9 +30,18 @@ export class CreateCuentaCorrientePagoDto {
   @Transform(({ value }) => normalizarMetodoPago(value))
   @IsIn(METODOS_PAGO, {
     message:
-      'medioPago debe ser EFECTIVO, TRANSFERENCIA, DEBITO o CREDITO',
+      'medioPago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
   })
   medioPago: MetodoPago;
+
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @ValidateIf(
+    (p: CreateCuentaCorrientePagoDto) => p.medioPago === MetodoPago.OTRO,
+  )
+  @IsString()
+  @MinLength(3)
+  @MaxLength(DETALLE_PAGO_MAX_LENGTH)
+  detalle_pago?: string;
 
   @IsOptional()
   @IsString()

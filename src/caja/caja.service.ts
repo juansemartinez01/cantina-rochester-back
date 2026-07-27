@@ -6,10 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SesionCaja } from './sesion-caja.entity';
-import {
-  MovimientoCaja,
-  MovimientoCajaOrigen,
-} from './movimiento-caja.entity';
+import { MovimientoCaja, MovimientoCajaOrigen } from './movimiento-caja.entity';
 import { IngresoVenta } from 'src/ingreso/ingreso-venta.entity';
 import { AbrirCajaDto } from './dto/abrir-caja.dto';
 import { AgregarMovimientoDto } from './dto/agregar-movimiento.dto';
@@ -21,9 +18,12 @@ import {
   OrdenMovimientoCaja,
 } from './dto/filtro-movimiento-caja.dto';
 import {
+  DETALLE_PAGO_MAX_LENGTH,
   MetodoPagoPersistido,
   METODOS_PAGO_BANCARIZADOS,
+  normalizarDetallePago,
   normalizarFiltroMetodoPago,
+  requiereDetallePago,
 } from 'src/common/metodo-pago.enum';
 
 type TotalesPorMetodo = {
@@ -31,6 +31,7 @@ type TotalesPorMetodo = {
   transferencia: number;
   debito: number;
   credito: number;
+  otro: number;
   bancarizadoLegacy: number;
   bancarizado: number;
   total: number;
@@ -78,12 +79,15 @@ export class CajaService {
   ): Promise<MovimientoCaja> {
     const sesion = await this.getSesionOFail(cajaId);
     this.assertAbierta(sesion);
+    const medioPago = dto.medio_pago ?? 'EFECTIVO';
+    const detallePago = this.validarDetallePago(medioPago, dto.detalle_pago);
 
     const movimiento = this.movimientoRepo.create({
       caja_id: cajaId,
       tipo: dto.tipo,
       monto: dto.monto,
-      medio_pago: dto.medio_pago ?? 'EFECTIVO',
+      medio_pago: medioPago,
+      detalle_pago: detallePago,
       origen: MovimientoCajaOrigen.MANUAL,
       cuenta_corriente_pago_id: null,
       motivo: dto.motivo,
@@ -106,8 +110,7 @@ export class CajaService {
 
     const resumen = await this.calcularResumen(sesion);
     const efectivo_esperado = resumen.efectivo_esperado;
-    const diferencia =
-      Number(dto.efectivo_contado) - Number(efectivo_esperado);
+    const diferencia = Number(dto.efectivo_contado) - Number(efectivo_esperado);
 
     sesion.estado = 'CERRADA';
     sesion.fecha_cierre = new Date();
@@ -127,6 +130,7 @@ export class CajaService {
         monto_inicial: Number(sesion.monto_inicial).toFixed(2),
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
+        cobros_otro: resumen.cobros_otro.toFixed(2),
         cobros_por_metodo: resumen.cobros_por_metodo,
         cobros_ventas: this.formatearTotalesPorMetodo(resumen.cobros_ventas),
         cobros_cuenta_corriente: this.formatearTotalesPorMetodo(
@@ -144,6 +148,7 @@ export class CajaService {
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
+        ingresos_manuales_otro: resumen.ingresos_manuales_otro.toFixed(2),
         egresos_manuales: resumen.egresos_manuales.toFixed(2),
         retiros: resumen.retiros.toFixed(2),
         efectivo_esperado: efectivo_esperado.toFixed(2),
@@ -169,6 +174,7 @@ export class CajaService {
         monto_inicial: Number(sesion.monto_inicial).toFixed(2),
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
+        cobros_otro: resumen.cobros_otro.toFixed(2),
         cobros_por_metodo: resumen.cobros_por_metodo,
         cobros_ventas: this.formatearTotalesPorMetodo(resumen.cobros_ventas),
         cobros_cuenta_corriente: this.formatearTotalesPorMetodo(
@@ -186,6 +192,7 @@ export class CajaService {
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
+        ingresos_manuales_otro: resumen.ingresos_manuales_otro.toFixed(2),
         egresos_manuales: resumen.egresos_manuales.toFixed(2),
         retiros: resumen.retiros.toFixed(2),
         efectivo_esperado: resumen.efectivo_esperado.toFixed(2),
@@ -226,6 +233,7 @@ export class CajaService {
       resumen_parcial: {
         cobros_efectivo: resumen.cobros_efectivo.toFixed(2),
         cobros_bancarizado: resumen.cobros_bancarizado.toFixed(2),
+        cobros_otro: resumen.cobros_otro.toFixed(2),
         cobros_por_metodo: resumen.cobros_por_metodo,
         cobros_ventas: this.formatearTotalesPorMetodo(resumen.cobros_ventas),
         cobros_cuenta_corriente: this.formatearTotalesPorMetodo(
@@ -243,6 +251,7 @@ export class CajaService {
         ingresos_manuales: resumen.ingresos_manuales.toFixed(2),
         ingresos_manuales_bancarizado:
           resumen.ingresos_manuales_bancarizado.toFixed(2),
+        ingresos_manuales_otro: resumen.ingresos_manuales_otro.toFixed(2),
         egresos_manuales: resumen.egresos_manuales.toFixed(2),
         retiros: resumen.retiros.toFixed(2),
         efectivo_esperado: resumen.efectivo_esperado.toFixed(2),
@@ -342,7 +351,12 @@ export class CajaService {
     hasta?: string;
     page?: number;
     limit?: number;
-  }): Promise<{ data: SesionCaja[]; total: number; page: number; limit: number }> {
+  }): Promise<{
+    data: SesionCaja[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const { almacen_id, desde, hasta, page = 1, limit = 20 } = filtro;
 
     const query = this.sesionRepo
@@ -369,6 +383,7 @@ export class CajaService {
   private async calcularResumen(sesion: SesionCaja): Promise<{
     cobros_efectivo: number;
     cobros_bancarizado: number;
+    cobros_otro: number;
     cobros_por_metodo: Record<string, string>;
     cobros_ventas: TotalesPorMetodo;
     cobros_cuenta_corriente: TotalesPorMetodo;
@@ -377,6 +392,7 @@ export class CajaService {
     retiros_por_metodo: TotalesPorMetodo;
     ingresos_manuales: number;
     ingresos_manuales_bancarizado: number;
+    ingresos_manuales_otro: number;
     egresos_manuales: number;
     retiros: number;
     efectivo_esperado: number;
@@ -396,7 +412,7 @@ export class CajaService {
       .getRawMany();
 
     const cobrosMap: Record<string, number> = {};
-    cobros.forEach(c => {
+    cobros.forEach((c) => {
       cobrosMap[c.tipo] = parseFloat(c.total || 0);
     });
 
@@ -415,7 +431,7 @@ export class CajaService {
       .getRawMany();
 
     const movMap: Record<string, number> = {};
-    movimientos.forEach(m => {
+    movimientos.forEach((m) => {
       const medioPago = m.medio_pago ?? 'EFECTIVO';
       const origen = m.origen ?? MovimientoCajaOrigen.MANUAL;
       movMap[`${origen}:${m.tipo}:${medioPago}`] = parseFloat(m.total || 0);
@@ -445,16 +461,19 @@ export class CajaService {
 
     const cobros_efectivo = cobros_ventas.efectivo;
     const cobros_bancarizado = cobros_ventas.bancarizado;
+    const cobros_otro = cobros_ventas.otro;
     const cobros_por_metodo = {
       EFECTIVO: cobros_efectivo.toFixed(2),
       TRANSFERENCIA: cobros_ventas.transferencia.toFixed(2),
       DEBITO: cobros_ventas.debito.toFixed(2),
       CREDITO: cobros_ventas.credito.toFixed(2),
+      OTRO: cobros_ventas.otro.toFixed(2),
       BANCARIZADO_LEGACY: cobros_ventas.bancarizadoLegacy.toFixed(2),
     };
     const ingresos_manuales = ingresos_manuales_por_metodo.efectivo;
     const ingresos_manuales_bancarizado =
       ingresos_manuales_por_metodo.bancarizado;
+    const ingresos_manuales_otro = ingresos_manuales_por_metodo.otro;
     const egresos_manuales = egresos_manuales_por_metodo.total;
     const retiros = retiros_por_metodo.total;
 
@@ -469,6 +488,7 @@ export class CajaService {
     return {
       cobros_efectivo,
       cobros_bancarizado,
+      cobros_otro,
       cobros_por_metodo,
       cobros_ventas,
       cobros_cuenta_corriente,
@@ -477,6 +497,7 @@ export class CajaService {
       retiros_por_metodo,
       ingresos_manuales,
       ingresos_manuales_bancarizado,
+      ingresos_manuales_otro,
       egresos_manuales,
       retiros,
       efectivo_esperado: parseFloat(efectivo_esperado.toFixed(2)),
@@ -493,6 +514,7 @@ export class CajaService {
       TRANSFERENCIA: movMap[`${origen}:${tipo}:TRANSFERENCIA`] ?? 0,
       DEBITO: movMap[`${origen}:${tipo}:DEBITO`] ?? 0,
       CREDITO: movMap[`${origen}:${tipo}:CREDITO`] ?? 0,
+      OTRO: movMap[`${origen}:${tipo}:OTRO`] ?? 0,
       BANCARIZADO: movMap[`${origen}:${tipo}:BANCARIZADO`] ?? 0,
     });
   }
@@ -502,6 +524,7 @@ export class CajaService {
     const transferencia = map['TRANSFERENCIA'] ?? 0;
     const debito = map['DEBITO'] ?? 0;
     const credito = map['CREDITO'] ?? 0;
+    const otro = map['OTRO'] ?? 0;
     const bancarizadoLegacy = map['BANCARIZADO'] ?? 0;
     const bancarizado =
       bancarizadoLegacy +
@@ -515,9 +538,10 @@ export class CajaService {
       transferencia,
       debito,
       credito,
+      otro,
       bancarizadoLegacy,
       bancarizado,
-      total: efectivo + bancarizado,
+      total: efectivo + bancarizado + otro,
     };
   }
 
@@ -527,6 +551,7 @@ export class CajaService {
       transferencia: totales.transferencia.toFixed(2),
       debito: totales.debito.toFixed(2),
       credito: totales.credito.toFixed(2),
+      otro: totales.otro.toFixed(2),
       bancarizadoLegacy: totales.bancarizadoLegacy.toFixed(2),
       bancarizado: totales.bancarizado.toFixed(2),
       total: totales.total.toFixed(2),
@@ -592,11 +617,32 @@ export class CajaService {
     const normalized = normalizarFiltroMetodoPago(value);
     if (!normalized) {
       throw new BadRequestException(
-        'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO o BANCARIZADO',
+        'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO, OTRO o BANCARIZADO',
       );
     }
 
     return normalized;
+  }
+
+  private validarDetallePago(
+    medioPago: MetodoPagoPersistido,
+    value: string | undefined,
+  ): string | null {
+    const detallePago = normalizarDetallePago(value);
+    if (!requiereDetallePago(medioPago)) return null;
+
+    if (!detallePago || detallePago.length < 3) {
+      throw new BadRequestException(
+        'detalle_pago es obligatorio para movimientos con medio_pago OTRO',
+      );
+    }
+    if (detallePago.length > DETALLE_PAGO_MAX_LENGTH) {
+      throw new BadRequestException(
+        `detalle_pago no puede superar ${DETALLE_PAGO_MAX_LENGTH} caracteres`,
+      );
+    }
+
+    return detallePago;
   }
 
   private async getSesionOFail(cajaId: number): Promise<SesionCaja> {

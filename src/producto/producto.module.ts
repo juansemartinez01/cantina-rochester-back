@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductoService } from './producto.service';
+import { ProductoImportacionService } from './producto-importacion.service';
 import { ProductoController } from './producto.controller';
 import { Producto } from './producto.entity';
 import { Unidad } from 'src/unidad/unidad.entity';
@@ -22,7 +23,7 @@ import { StockActual } from 'src/stock-actual/stock-actual.entity';
     ]),
     ProductoPrecioHistorialModule,
   ],
-  providers: [ProductoService],
+  providers: [ProductoService, ProductoImportacionService],
   controllers: [ProductoController],
   exports: [ProductoService],
 })

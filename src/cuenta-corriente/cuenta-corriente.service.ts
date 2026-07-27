@@ -29,7 +29,12 @@ import {
 } from 'src/caja/movimiento-caja.entity';
 import { CuentaCorrientePagoAplicacion } from './cuenta-corriente-pago-aplicacion.entity';
 import { Venta } from 'src/venta/venta.entity';
-import { MetodoPago } from 'src/common/metodo-pago.enum';
+import {
+  DETALLE_PAGO_MAX_LENGTH,
+  MetodoPago,
+  normalizarDetallePago,
+  requiereDetallePago,
+} from 'src/common/metodo-pago.enum';
 
 @Injectable()
 export class CuentaCorrienteService {
@@ -169,7 +174,10 @@ export class CuentaCorrienteService {
           .select('COUNT(*)', 'cantidadVentas')
           .addSelect('COALESCE(SUM(venta.monto_original), 0)', 'montoOriginal')
           .addSelect('COALESCE(SUM(venta.monto_pagado), 0)', 'montoPagado')
-          .addSelect('COALESCE(SUM(venta.monto_pendiente), 0)', 'montoPendiente')
+          .addSelect(
+            'COALESCE(SUM(venta.monto_pendiente), 0)',
+            'montoPendiente',
+          )
           .where('venta.cuenta_corriente_id = :id', { id })
           .getRawOne(),
         this.pagoRepo
@@ -248,10 +256,7 @@ export class CuentaCorrienteService {
     };
   }
 
-  async listarMovimientos(
-    id: number,
-    filtro: FiltroCuentaCorrienteDetalleDto,
-  ) {
+  async listarMovimientos(id: number, filtro: FiltroCuentaCorrienteDetalleDto) {
     await this.obtenerPorId(id);
     const { page = 1, limit = 50, order = 'DESC' } = filtro;
     const limitFinal = Math.min(limit, 200);
@@ -284,6 +289,10 @@ export class CuentaCorrienteService {
     if (!Number.isFinite(montoPago) || montoPago <= 0) {
       throw new BadRequestException('El monto del pago debe ser mayor a 0');
     }
+    const detallePago = this.validarDetallePago(
+      dto.medioPago,
+      dto.detalle_pago,
+    );
 
     return this.dataSource.transaction(async (manager) => {
       const cuentaRepo = manager.getRepository(CuentaCorriente);
@@ -314,6 +323,7 @@ export class CuentaCorrienteService {
         almacenId: dto.almacenId,
         monto: montoPago,
         medioPago: dto.medioPago,
+        detallePago,
         referencia: this.clean(dto.referencia) ?? null,
         observacion: this.clean(dto.observacion) ?? null,
         usuarioId: usuarioId ?? null,
@@ -404,6 +414,7 @@ export class CuentaCorrienteService {
         caja_id: caja.id,
         tipo: 'INGRESO',
         medio_pago: dto.medioPago,
+        detalle_pago: detallePago,
         origen: MovimientoCajaOrigen.CUENTA_CORRIENTE,
         cuenta_corriente_pago_id: pago.id,
         monto: montoPago,
@@ -433,7 +444,11 @@ export class CuentaCorrienteService {
     venta: Venta;
     almacenId: number;
     total: number;
-    pagos: Array<{ medio: MetodoPago; monto: number }>;
+    pagos: Array<{
+      medio: MetodoPago;
+      monto: number;
+      detalle_pago?: string | null;
+    }>;
     usuarioId?: number;
   }) {
     const {
@@ -499,7 +514,9 @@ export class CuentaCorrienteService {
             : CuentaCorrienteVentaEstado.PENDIENTE,
     });
 
-    let saldoResultante = this.to2(Number(cuenta.saldoActual ?? 0) + totalVenta);
+    let saldoResultante = this.to2(
+      Number(cuenta.saldoActual ?? 0) + totalVenta,
+    );
     await manager.getRepository(CuentaCorrienteMovimiento).save({
       cuentaCorrienteId: cuenta.id,
       tipo: CuentaCorrienteMovimientoTipo.DEUDA,
@@ -519,15 +536,18 @@ export class CuentaCorrienteService {
       const montoPago = this.to2(Number(pago.monto));
       if (montoPago <= 0) continue;
 
-      const pagoGuardado = await manager.getRepository(CuentaCorrientePago).save({
-        cuentaCorrienteId: cuenta.id,
-        almacenId,
-        monto: montoPago,
-        medioPago: pago.medio,
-        referencia: `Venta #${venta.id}`,
-        observacion: 'Pago inicial de venta a cuenta corriente',
-        usuarioId: usuarioId ?? null,
-      });
+      const pagoGuardado = await manager
+        .getRepository(CuentaCorrientePago)
+        .save({
+          cuentaCorrienteId: cuenta.id,
+          almacenId,
+          monto: montoPago,
+          medioPago: pago.medio,
+          detallePago: pago.detalle_pago ?? null,
+          referencia: `Venta #${venta.id}`,
+          observacion: 'Pago inicial de venta a cuenta corriente',
+          usuarioId: usuarioId ?? null,
+        });
       pagosGuardados.push(pagoGuardado);
 
       const montoAplicado = this.to2(Math.min(restanteAplicable, montoPago));
@@ -652,6 +672,27 @@ export class CuentaCorrienteService {
     if (value === undefined) return undefined;
     const cleaned = value?.trim();
     return cleaned ? cleaned : null;
+  }
+
+  private validarDetallePago(
+    medioPago: MetodoPago,
+    value: string | undefined,
+  ): string | null {
+    const detallePago = normalizarDetallePago(value);
+    if (!requiereDetallePago(medioPago)) return null;
+
+    if (!detallePago || detallePago.length < 3) {
+      throw new BadRequestException(
+        'detalle_pago es obligatorio para pagos con medio OTRO',
+      );
+    }
+    if (detallePago.length > DETALLE_PAGO_MAX_LENGTH) {
+      throw new BadRequestException(
+        `detalle_pago no puede superar ${DETALLE_PAGO_MAX_LENGTH} caracteres`,
+      );
+    }
+
+    return detallePago;
   }
 
   private to2(value: number): number {

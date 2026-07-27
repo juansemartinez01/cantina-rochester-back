@@ -1,6 +1,16 @@
-import { IsEnum, IsNumber, IsOptional, IsString, MaxLength, Min, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import {
+  DETALLE_PAGO_MAX_LENGTH,
   MetodoPago,
   METODOS_PAGO,
   normalizarMetodoPago,
@@ -18,9 +28,16 @@ export class AgregarMovimientoDto {
   @Transform(({ value }) => normalizarMetodoPago(value))
   @IsEnum(METODOS_PAGO, {
     message:
-      'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO o CREDITO',
+      'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
   })
   medio_pago?: MetodoPago;
+
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @ValidateIf((m: AgregarMovimientoDto) => m.medio_pago === MetodoPago.OTRO)
+  @IsString()
+  @MinLength(3)
+  @MaxLength(DETALLE_PAGO_MAX_LENGTH)
+  detalle_pago?: string;
 
   @IsString()
   @MinLength(3)

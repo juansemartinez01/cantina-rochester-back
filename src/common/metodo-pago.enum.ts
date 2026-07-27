@@ -3,6 +3,7 @@ export const MetodoPago = {
   TRANSFERENCIA: 'TRANSFERENCIA',
   DEBITO: 'DEBITO',
   CREDITO: 'CREDITO',
+  OTRO: 'OTRO',
 } as const;
 
 export type MetodoPago = (typeof MetodoPago)[keyof typeof MetodoPago];
@@ -20,6 +21,8 @@ export const METODOS_PAGO_PERSISTIDOS = [
 
 export type MetodoPagoPersistido = (typeof METODOS_PAGO_PERSISTIDOS)[number];
 export type CategoriaPago = 'EFECTIVO' | 'BANCARIZADO';
+export type CategoriaReportePago = CategoriaPago | 'OTRO';
+export const DETALLE_PAGO_MAX_LENGTH = 120;
 
 const METODO_PAGO_ALIASES: Record<string, MetodoPago> = {
   EFECTIVO: MetodoPago.EFECTIVO,
@@ -33,6 +36,19 @@ const METODO_PAGO_ALIASES: Record<string, MetodoPago> = {
   CREDITO: MetodoPago.CREDITO,
   CREDIT: MetodoPago.CREDITO,
   QR: MetodoPago.TRANSFERENCIA,
+  QR_EXTERNO: MetodoPago.OTRO,
+  'QR EXTERNO': MetodoPago.OTRO,
+  QR_EXT: MetodoPago.OTRO,
+  OTRO: MetodoPago.OTRO,
+  OTHER: MetodoPago.OTRO,
+  MERCADO_PAGO: MetodoPago.OTRO,
+  'MERCADO PAGO': MetodoPago.OTRO,
+  MERCADOPAGO: MetodoPago.OTRO,
+  MP: MetodoPago.OTRO,
+  CHEQUE: MetodoPago.OTRO,
+  GIFT_CARD: MetodoPago.OTRO,
+  'GIFT CARD': MetodoPago.OTRO,
+  GIFTCARD: MetodoPago.OTRO,
 };
 
 export function normalizarMetodoPago(value: unknown): MetodoPago | unknown {
@@ -66,13 +82,24 @@ export function esMetodoPagoPersistido(
 
 export function esMetodoPagoBancarizado(value: unknown): boolean {
   return (
-    value === 'BANCARIZADO' ||
-    METODOS_PAGO_BANCARIZADOS.includes(value as any)
+    value === 'BANCARIZADO' || METODOS_PAGO_BANCARIZADOS.includes(value as any)
   );
 }
 
-export function categoriaMetodoPago(value: unknown): CategoriaPago {
-  return value === MetodoPago.EFECTIVO ? 'EFECTIVO' : 'BANCARIZADO';
+export function requiereDetallePago(value: unknown): boolean {
+  return value === MetodoPago.OTRO;
+}
+
+export function normalizarDetallePago(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const detalle = value.trim();
+  return detalle.length > 0 ? detalle : null;
+}
+
+export function categoriaMetodoPago(value: unknown): CategoriaReportePago {
+  if (value === MetodoPago.EFECTIVO) return 'EFECTIVO';
+  if (value === MetodoPago.OTRO) return 'OTRO';
+  return 'BANCARIZADO';
 }
 
 export function metodosParaFiltroPago(

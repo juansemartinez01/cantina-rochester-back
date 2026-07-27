@@ -10,8 +10,12 @@ import {
   BadRequestException,
   ParseIntPipe,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductoService } from './producto.service';
+import { ProductoImportacionService } from './producto-importacion.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { Producto } from './producto.entity';
@@ -29,7 +33,36 @@ export class ProductoController {
   constructor(
     private readonly service: ProductoService,
     private readonly precioHistService: ProductoPrecioHistorialService,
+    private readonly importacionService: ProductoImportacionService,
   ) {}
+
+  // ───────────────────────────────────────────────────────────────────
+  // Importación masiva desde Excel (reemplaza el catálogo completo)
+  // ───────────────────────────────────────────────────────────────────
+  @Post('importar')
+  @UseInterceptors(FileInterceptor('file'))
+  importar(
+    @Req() req: Request & { user?: any },
+    @UploadedFile() file: Express.Multer.File,
+    @Query('almacenId') almacenId?: string,
+  ) {
+    if (!file?.buffer) {
+      throw new BadRequestException(
+        'Debe adjuntarse el archivo Excel en el campo "file" (multipart/form-data).',
+      );
+    }
+    const almacenIdNum = Number(almacenId);
+    if (!Number.isInteger(almacenIdNum) || almacenIdNum <= 0) {
+      throw new BadRequestException(
+        'almacenId es obligatorio y debe ser un entero mayor a 0.',
+      );
+    }
+    return this.importacionService.importarDesdeExcel(
+      file.buffer,
+      almacenIdNum,
+      req.user,
+    );
+  }
 
   // ───────────────────────────────────────────────────────────────────
   // Búsqueda avanzada

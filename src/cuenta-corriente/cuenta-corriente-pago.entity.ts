@@ -21,6 +21,7 @@ export enum CuentaCorrienteMedioPago {
   TRANSFERENCIA = 'TRANSFERENCIA',
   DEBITO = 'DEBITO',
   CREDITO = 'CREDITO',
+  OTRO = 'OTRO',
   BANCARIZADO = 'BANCARIZADO',
 }
 
@@ -32,7 +33,9 @@ export class CuentaCorrientePago {
   @Column({ name: 'cuenta_corriente_id', type: 'int' })
   cuentaCorrienteId: number;
 
-  @ManyToOne(() => CuentaCorriente, cuenta => cuenta.pagos, { onDelete: 'CASCADE' })
+  @ManyToOne(() => CuentaCorriente, (cuenta) => cuenta.pagos, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'cuenta_corriente_id' })
   cuentaCorriente: CuentaCorriente;
 
@@ -49,6 +52,14 @@ export class CuentaCorrientePago {
   @Column({ name: 'medio_pago', type: 'enum', enum: METODOS_PAGO_PERSISTIDOS })
   medioPago: MetodoPago | 'BANCARIZADO';
 
+  @Column({
+    name: 'detalle_pago',
+    type: 'varchar',
+    length: 120,
+    nullable: true,
+  })
+  detallePago: string | null;
+
   @Column({ type: 'varchar', length: 120, nullable: true })
   referencia: string | null;
 
@@ -62,7 +73,10 @@ export class CuentaCorrientePago {
   @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario | null;
 
-  @OneToMany(() => CuentaCorrientePagoAplicacion, aplicacion => aplicacion.pago)
+  @OneToMany(
+    () => CuentaCorrientePagoAplicacion,
+    (aplicacion) => aplicacion.pago,
+  )
   aplicaciones: CuentaCorrientePagoAplicacion[];
 
   @CreateDateColumn({ type: 'timestamp' })

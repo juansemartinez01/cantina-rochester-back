@@ -18,10 +18,13 @@ import {
   normalizarMedioPago,
 } from './dto/create-venta-pago.dto';
 import {
+  DETALLE_PAGO_MAX_LENGTH,
   MetodoPagoPersistido,
   esMetodoPago,
   metodosParaFiltroPago,
+  normalizarDetallePago,
   normalizarFiltroMetodoPago,
+  requiereDetallePago,
 } from 'src/common/metodo-pago.enum';
 import { VentaItem } from './venta-item.entity';
 import {
@@ -44,6 +47,12 @@ import { MovimientoStock } from 'src/movimiento-stock/movimiento-stock.entity';
 import moment from 'moment-timezone';
 import { CuentaCorrienteService } from 'src/cuenta-corriente/cuenta-corriente.service';
 import { TipoCobroVenta } from './venta-tipo-cobro.enum';
+
+type PagoNormalizado = {
+  medio: MedioPagoVenta;
+  monto: number;
+  detalle_pago: string | null;
+};
 
 @Injectable()
 export class VentaService {
@@ -150,6 +159,7 @@ export class VentaService {
             venta: saved,
             tipo: pago.medio,
             monto: pago.monto,
+            detalle_pago: pago.detalle_pago,
           })),
         );
       }
@@ -207,6 +217,7 @@ export class VentaService {
       transferencia: number;
       debito: number;
       credito: number;
+      otro: number;
     };
   }> {
     const {
@@ -475,6 +486,10 @@ export class VentaService {
       .addSelect(
         `COALESCE(SUM(CASE WHEN ingreso.tipo = 'CREDITO' THEN ingreso.monto ELSE 0 END), 0)`,
         'credito',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'OTRO' THEN ingreso.monto ELSE 0 END), 0)`,
+        'otro',
       );
 
     this.aplicarFiltrosBaseVentas(ingresosQuery, filtros, 'none');
@@ -497,6 +512,7 @@ export class VentaService {
       transferencia: this.to2(Number(ingresosRaw?.transferencia ?? 0)),
       debito: this.to2(Number(ingresosRaw?.debito ?? 0)),
       credito: this.to2(Number(ingresosRaw?.credito ?? 0)),
+      otro: this.to2(Number(ingresosRaw?.otro ?? 0)),
     };
   }
 
@@ -952,8 +968,8 @@ export class VentaService {
     pagos: CreateVentaDto['pagos'],
     total: number,
     options: { permitirSinPagos?: boolean } = {},
-  ): Array<{ medio: MedioPagoVenta; monto: number }> {
-    const acumulados = new Map<MedioPagoVenta, number>();
+  ): PagoNormalizado[] {
+    const acumulados = new Map<string, PagoNormalizado>();
     const pagosEntrada = pagos ?? [];
 
     if (pagosEntrada.length === 0) {
@@ -965,8 +981,22 @@ export class VentaService {
       const medio = normalizarMedioPago(pago.medio);
       if (!esMetodoPago(medio)) {
         throw new BadRequestException(
-          'medio debe ser EFECTIVO, TRANSFERENCIA, DEBITO o CREDITO',
+          'medio debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
         );
+      }
+
+      const detallePago = normalizarDetallePago(pago.detalle_pago);
+      if (requiereDetallePago(medio)) {
+        if (!detallePago || detallePago.length < 3) {
+          throw new BadRequestException(
+            'detalle_pago es obligatorio para pagos con medio OTRO',
+          );
+        }
+        if (detallePago.length > DETALLE_PAGO_MAX_LENGTH) {
+          throw new BadRequestException(
+            `detalle_pago no puede superar ${DETALLE_PAGO_MAX_LENGTH} caracteres`,
+          );
+        }
       }
 
       const monto = Number(pago.monto);
@@ -976,23 +1006,29 @@ export class VentaService {
         );
       }
 
-      acumulados.set(medio, this.to2((acumulados.get(medio) ?? 0) + monto));
+      const detalleNormalizado = requiereDetallePago(medio)
+        ? detallePago
+        : null;
+      const key = `${medio}:${detalleNormalizado ?? ''}`;
+      const actual = acumulados.get(key);
+      acumulados.set(key, {
+        medio,
+        detalle_pago: detalleNormalizado,
+        monto: this.to2((actual?.monto ?? 0) + monto),
+      });
     }
 
     if (acumulados.size === 0) {
       throw new BadRequestException('La venta debe incluir al menos un pago');
     }
 
-    return [...acumulados.entries()].map(([medio, monto]) => ({
-      medio,
-      monto: this.to2(monto),
+    return [...acumulados.values()].map((pago) => ({
+      ...pago,
+      monto: this.to2(pago.monto),
     }));
   }
 
-  private validarTotalPagos(
-    pagos: Array<{ medio: MedioPagoVenta; monto: number }>,
-    total: number,
-  ) {
+  private validarTotalPagos(pagos: PagoNormalizado[], total: number) {
     const totalPagos = this.to2(
       pagos.reduce((acc, pago) => acc + Number(pago.monto), 0),
     );
@@ -1005,7 +1041,7 @@ export class VentaService {
   }
 
   private validarPagoInicialCuentaCorriente(
-    pagos: Array<{ medio: MedioPagoVenta; monto: number }>,
+    pagos: PagoNormalizado[],
     total: number,
   ) {
     const totalPagos = this.to2(

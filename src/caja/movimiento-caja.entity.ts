@@ -24,7 +24,7 @@ export class MovimientoCaja {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => SesionCaja, caja => caja.movimientos, {
+  @ManyToOne(() => SesionCaja, (caja) => caja.movimientos, {
     nullable: false,
     onDelete: 'CASCADE',
   })
@@ -49,6 +49,14 @@ export class MovimientoCaja {
   medio_pago: MetodoPagoPersistido;
 
   @Column({
+    name: 'detalle_pago',
+    type: 'varchar',
+    length: 120,
+    nullable: true,
+  })
+  detalle_pago: string | null;
+
+  @Column({
     type: 'enum',
     enum: MovimientoCajaOrigen,
     default: MovimientoCajaOrigen.MANUAL,
@@ -58,7 +66,10 @@ export class MovimientoCaja {
   @Column({ name: 'cuenta_corriente_pago_id', type: 'int', nullable: true })
   cuenta_corriente_pago_id: number | null;
 
-  @ManyToOne(() => CuentaCorrientePago, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => CuentaCorrientePago, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'cuenta_corriente_pago_id' })
   cuentaCorrientePago: CuentaCorrientePago | null;
 
