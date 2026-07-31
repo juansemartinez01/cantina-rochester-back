@@ -127,6 +127,29 @@ describe('CajaService', () => {
     expect(result.detalle_pago).toBe('Mercado Pago');
   });
 
+  it('agregarMovimiento normaliza aliases de medio OTRO antes de guardar', async () => {
+    sesionRepo.findOne.mockResolvedValue({ id: 10, estado: 'ABIERTA' });
+
+    await service.agregarMovimiento(
+      10,
+      {
+        tipo: 'INGRESO',
+        monto: 150,
+        medio_pago: 'MERCADO PAGO' as any,
+        detalle_pago: 'Mercado Pago',
+        motivo: 'Ingreso manual',
+      },
+      7,
+    );
+
+    expect(movimientoRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        medio_pago: 'OTRO',
+        detalle_pago: 'Mercado Pago',
+      }),
+    );
+  });
+
   it('listarMovimientos aplica filtros y paginacion', async () => {
     sesionRepo.findOne.mockResolvedValue({ id: 10 });
     const movimientos = [

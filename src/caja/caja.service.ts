@@ -79,7 +79,16 @@ export class CajaService {
   ): Promise<MovimientoCaja> {
     const sesion = await this.getSesionOFail(cajaId);
     this.assertAbierta(sesion);
-    const medioPago = dto.medio_pago ?? 'EFECTIVO';
+    let medioPago: MetodoPagoPersistido = 'EFECTIVO';
+    if (dto.medio_pago) {
+      const normalizado = this.normalizarMedioPago(dto.medio_pago);
+      if (!normalizado) {
+        throw new BadRequestException(
+          'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO, OTRO o BANCARIZADO',
+        );
+      }
+      medioPago = normalizado;
+    }
     const detallePago = this.validarDetallePago(medioPago, dto.detalle_pago);
 
     const movimiento = this.movimientoRepo.create({

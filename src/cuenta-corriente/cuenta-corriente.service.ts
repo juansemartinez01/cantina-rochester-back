@@ -146,11 +146,11 @@ export class CuentaCorrienteService {
     }
 
     if (dto.nombre !== undefined) cuenta.nombre = dto.nombre.trim();
-    if (dto.documento !== undefined) cuenta.documento = documento;
-    if (dto.email !== undefined) cuenta.email = this.clean(dto.email);
-    if (dto.telefono !== undefined) cuenta.telefono = this.clean(dto.telefono);
+    if (dto.documento !== undefined) cuenta.documento = documento ?? null;
+    if (dto.email !== undefined) cuenta.email = this.clean(dto.email) ?? null;
+    if (dto.telefono !== undefined) cuenta.telefono = this.clean(dto.telefono) ?? null;
     if (dto.observaciones !== undefined) {
-      cuenta.observaciones = this.clean(dto.observaciones);
+      cuenta.observaciones = this.clean(dto.observaciones) ?? null;
     }
     if (dto.activa !== undefined) cuenta.activa = dto.activa;
 
@@ -466,16 +466,14 @@ export class CuentaCorrienteService {
       pagos.reduce((acc, pago) => acc + Number(pago.monto), 0),
     );
 
-    if (totalPagado > 0) {
-      const caja = await manager.getRepository(SesionCaja).findOne({
-        where: { almacen_id: almacenId, estado: 'ABIERTA' },
-      });
+    const caja = await manager.getRepository(SesionCaja).findOne({
+      where: { almacen_id: almacenId, estado: 'ABIERTA' },
+    });
 
-      if (!caja) {
-        throw new BadRequestException(
-          `No hay caja abierta para el almacen ${almacenId}`,
-        );
-      }
+    if (!caja) {
+      throw new BadRequestException(
+        `No hay caja abierta para el almacen ${almacenId}`,
+      );
     }
 
     const cuentaRepo = manager.getRepository(CuentaCorriente);
@@ -578,11 +576,26 @@ export class CuentaCorrienteService {
     cuenta.saldoActual = saldoResultante;
     await cuentaRepo.save(cuenta);
 
+    const movimientoCaja = await manager.getRepository(MovimientoCaja).save({
+      caja_id: caja.id,
+      tipo: 'INGRESO',
+      medio_pago: MetodoPago.EFECTIVO,
+      detalle_pago: null,
+      origen: MovimientoCajaOrigen.CUENTA_CORRIENTE,
+      cuenta_corriente_pago_id: null,
+      monto: 0,
+      motivo: `Venta a cuenta corriente #${venta.id} - ${cuenta.nombre}`,
+      observacion: `Deuda generada: ${totalVenta.toFixed(2)} | Pagado inicial: ${totalPagado.toFixed(2)} | Pendiente: ${montoPendiente.toFixed(2)}`,
+      usuario_id: usuarioId,
+      anulado: false,
+    });
+
     return {
       cuenta,
       cuentaVenta,
       pagos: pagosGuardados,
       aplicaciones,
+      movimientoCaja,
       saldoActual: cuenta.saldoActual,
       saldoAFavorGenerado:
         totalPagado > totalVenta ? this.to2(totalPagado - totalVenta) : 0,
