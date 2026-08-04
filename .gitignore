@@ -4,3 +4,4 @@
 .env*
 !.env.production
 .claude/settings.local.json
+/docs/confidencial/
