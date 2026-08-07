@@ -28,7 +28,7 @@ export class AgregarMovimientoDto {
   @Transform(({ value }) => normalizarMetodoPago(value))
   @IsEnum(METODOS_PAGO, {
     message:
-      'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
+      'medio_pago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO',
   })
   medio_pago?: MetodoPago;
 

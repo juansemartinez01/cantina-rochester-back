@@ -19,6 +19,7 @@ import {
 export enum CuentaCorrienteMedioPago {
   EFECTIVO = 'EFECTIVO',
   TRANSFERENCIA = 'TRANSFERENCIA',
+  QR = 'QR',
   DEBITO = 'DEBITO',
   CREDITO = 'CREDITO',
   OTRO = 'OTRO',

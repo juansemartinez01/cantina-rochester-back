@@ -22,7 +22,8 @@ export class CreateIngresoVentaDto {
 
   @Transform(({ value }) => normalizarMetodoPago(value))
   @IsIn(METODOS_PAGO, {
-    message: 'tipo debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
+    message:
+      'tipo debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO',
   })
   tipo: MetodoPago;
 

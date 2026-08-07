@@ -29,6 +29,7 @@ import {
 type TotalesPorMetodo = {
   efectivo: number;
   transferencia: number;
+  qr: number;
   debito: number;
   credito: number;
   otro: number;
@@ -84,7 +85,7 @@ export class CajaService {
       const normalizado = this.normalizarMedioPago(dto.medio_pago);
       if (!normalizado) {
         throw new BadRequestException(
-          'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO, OTRO o BANCARIZADO',
+          'medio_pago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO, OTRO o BANCARIZADO',
         );
       }
       medioPago = normalizado;
@@ -474,6 +475,7 @@ export class CajaService {
     const cobros_por_metodo = {
       EFECTIVO: cobros_efectivo.toFixed(2),
       TRANSFERENCIA: cobros_ventas.transferencia.toFixed(2),
+      QR: cobros_ventas.qr.toFixed(2),
       DEBITO: cobros_ventas.debito.toFixed(2),
       CREDITO: cobros_ventas.credito.toFixed(2),
       OTRO: cobros_ventas.otro.toFixed(2),
@@ -521,6 +523,7 @@ export class CajaService {
     return this.totalesDesdeMapa({
       EFECTIVO: movMap[`${origen}:${tipo}:EFECTIVO`] ?? 0,
       TRANSFERENCIA: movMap[`${origen}:${tipo}:TRANSFERENCIA`] ?? 0,
+      QR: movMap[`${origen}:${tipo}:QR`] ?? 0,
       DEBITO: movMap[`${origen}:${tipo}:DEBITO`] ?? 0,
       CREDITO: movMap[`${origen}:${tipo}:CREDITO`] ?? 0,
       OTRO: movMap[`${origen}:${tipo}:OTRO`] ?? 0,
@@ -531,6 +534,7 @@ export class CajaService {
   private totalesDesdeMapa(map: Record<string, number>): TotalesPorMetodo {
     const efectivo = map['EFECTIVO'] ?? 0;
     const transferencia = map['TRANSFERENCIA'] ?? 0;
+    const qr = map['QR'] ?? 0;
     const debito = map['DEBITO'] ?? 0;
     const credito = map['CREDITO'] ?? 0;
     const otro = map['OTRO'] ?? 0;
@@ -545,6 +549,7 @@ export class CajaService {
     return {
       efectivo,
       transferencia,
+      qr,
       debito,
       credito,
       otro,
@@ -558,6 +563,7 @@ export class CajaService {
     return {
       efectivo: totales.efectivo.toFixed(2),
       transferencia: totales.transferencia.toFixed(2),
+      qr: totales.qr.toFixed(2),
       debito: totales.debito.toFixed(2),
       credito: totales.credito.toFixed(2),
       otro: totales.otro.toFixed(2),
@@ -626,7 +632,7 @@ export class CajaService {
     const normalized = normalizarFiltroMetodoPago(value);
     if (!normalized) {
       throw new BadRequestException(
-        'medio_pago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO, OTRO o BANCARIZADO',
+        'medio_pago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO, OTRO o BANCARIZADO',
       );
     }
 

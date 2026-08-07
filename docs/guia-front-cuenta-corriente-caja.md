@@ -61,6 +61,7 @@ Valores validos:
 ```ts
 EFECTIVO
 TRANSFERENCIA
+QR
 DEBITO
 CREDITO
 OTRO
@@ -71,7 +72,8 @@ Para `OTRO`, `detalle_pago` es obligatorio y debe tener entre 3 y 120 caracteres
 Aliases aceptados por backend en algunos endpoints:
 
 - `CASH` -> `EFECTIVO`
-- `TRANSFER`, `TRANSFERENCIAS`, `QR` -> `TRANSFERENCIA`
+- `TRANSFER`, `TRANSFERENCIAS` -> `TRANSFERENCIA`
+- `QR` -> `QR`
 - `DEBIT` -> `DEBITO`
 - `CREDIT` -> `CREDITO`
 - `QR_EXTERNO`, `MERCADO_PAGO`, `MP`, `CHEQUE`, `GIFT_CARD` -> `OTRO`
@@ -181,6 +183,7 @@ Response ejemplo:
     "cobros_por_metodo": {
       "EFECTIVO": "5550.00",
       "TRANSFERENCIA": "3700.00",
+      "QR": "0.00",
       "DEBITO": "3700.00",
       "CREDITO": "3700.00",
       "OTRO": "3700.00",
@@ -189,6 +192,7 @@ Response ejemplo:
     "cobros_ventas": {
       "efectivo": "5550.00",
       "transferencia": "3700.00",
+      "qr": "0.00",
       "debito": "3700.00",
       "credito": "3700.00",
       "otro": "3700.00",
@@ -199,6 +203,7 @@ Response ejemplo:
     "cobros_cuenta_corriente": {
       "efectivo": "0.00",
       "transferencia": "3700.00",
+      "qr": "0.00",
       "debito": "0.00",
       "credito": "0.00",
       "otro": "0.00",
@@ -840,7 +845,7 @@ Campos:
 
 - `almacenId`: obligatorio. Debe tener caja abierta.
 - `monto`: obligatorio, minimo 0.01.
-- `medioPago`: obligatorio. Valores: `EFECTIVO`, `TRANSFERENCIA`, `DEBITO`, `CREDITO`, `OTRO`.
+- `medioPago`: obligatorio. Valores: `EFECTIVO`, `TRANSFERENCIA`, `QR`, `DEBITO`, `CREDITO`, `OTRO`.
 - `detalle_pago`: obligatorio solo para `OTRO`.
 - `referencia`: opcional, maximo 120.
 - `observacion`: opcional, maximo 500.
@@ -975,7 +980,7 @@ Query params:
 
 - `origen`: `MANUAL` o `CUENTA_CORRIENTE`.
 - `tipo`: `INGRESO`, `EGRESO`, `RETIRO`.
-- `medio_pago`: `EFECTIVO`, `TRANSFERENCIA`, `DEBITO`, `CREDITO`, `OTRO`, `BANCARIZADO`.
+- `medio_pago`: `EFECTIVO`, `TRANSFERENCIA`, `QR`, `DEBITO`, `CREDITO`, `OTRO`, `BANCARIZADO`.
 - `page`: default 1.
 - `limit`: default 50, maximo 200.
 - `order`: `ASC` o `DESC`, default `DESC`.
@@ -1291,7 +1296,7 @@ Nota: hoy no hay endpoint publico de anulacion especifica de pagos de cuenta cor
 | Accion | Requiere caja abierta | Crea ingreso_venta | Crea movimiento_caja | Monto movimiento_caja | Donde suma en reporte |
 | --- | --- | --- | --- | --- | --- |
 | Venta contado efectivo | No por validacion directa de venta | Si | No | N/A | `cobros_ventas.efectivo` |
-| Venta contado transferencia/debito/credito | No por validacion directa de venta | Si | No | N/A | `cobros_ventas.bancarizado` |
+| Venta contado transferencia/QR/debito/credito | No por validacion directa de venta | Si | No | N/A | `cobros_ventas.bancarizado` |
 | Venta contado otro | No por validacion directa de venta | Si | No | N/A | `cobros_ventas.otro` |
 | Venta cuenta corriente sin pago | Si | No | Si, informativo | 0 | No suma dinero |
 | Venta cuenta corriente con pago inicial | Si | Si, por el pago inicial | Si, informativo | 0 | Pago inicial suma en `cobros_ventas` |
@@ -1383,4 +1388,3 @@ Response:
 - En cobro posterior con metodo `OTRO`, requerir `detalle_pago`.
 - Usar `cobros_cuenta_corriente` del reporte para pagos posteriores.
 - Usar `cobros_ventas` del reporte para pagos de ventas y pagos iniciales.
-

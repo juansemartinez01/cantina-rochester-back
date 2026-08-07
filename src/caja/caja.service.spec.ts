@@ -203,6 +203,7 @@ describe('CajaService', () => {
       createQueryBuilderMock([
         { tipo: 'EFECTIVO', total: '100' },
         { tipo: 'TRANSFERENCIA', total: '50' },
+        { tipo: 'QR', total: '40' },
         { tipo: 'OTRO', total: '15' },
       ]),
     );
@@ -223,6 +224,12 @@ describe('CajaService', () => {
         {
           origen: MovimientoCajaOrigen.CUENTA_CORRIENTE,
           tipo: 'INGRESO',
+          medio_pago: 'QR',
+          total: '25',
+        },
+        {
+          origen: MovimientoCajaOrigen.CUENTA_CORRIENTE,
+          tipo: 'INGRESO',
           medio_pago: 'OTRO',
           total: '12',
         },
@@ -231,6 +238,12 @@ describe('CajaService', () => {
           tipo: 'INGRESO',
           medio_pago: 'EFECTIVO',
           total: '10',
+        },
+        {
+          origen: MovimientoCajaOrigen.MANUAL,
+          tipo: 'INGRESO',
+          medio_pago: 'QR',
+          total: '11',
         },
         {
           origen: MovimientoCajaOrigen.MANUAL,
@@ -258,21 +271,24 @@ describe('CajaService', () => {
     expect(result.reporte.cobros_ventas).toMatchObject({
       efectivo: '100.00',
       transferencia: '50.00',
-      bancarizado: '50.00',
+      qr: '40.00',
+      bancarizado: '90.00',
       otro: '15.00',
-      total: '165.00',
+      total: '205.00',
     });
     expect(result.reporte.cobros_cuenta_corriente).toMatchObject({
       efectivo: '20.00',
       transferencia: '30.00',
-      bancarizado: '30.00',
+      qr: '25.00',
+      bancarizado: '55.00',
       otro: '12.00',
-      total: '62.00',
+      total: '87.00',
     });
     expect(result.reporte.movimientos_manuales.ingresos).toMatchObject({
       efectivo: '10.00',
+      qr: '11.00',
       otro: '13.00',
-      total: '23.00',
+      total: '34.00',
     });
     expect(result.reporte.movimientos_manuales.egresos).toMatchObject({
       efectivo: '5.00',
@@ -284,6 +300,7 @@ describe('CajaService', () => {
     });
     expect(result.reporte.ingresos_manuales).toBe('10.00');
     expect(result.reporte.ingresos_manuales_otro).toBe('13.00');
+    expect(result.reporte.cobros_por_metodo.QR).toBe('40.00');
     expect(result.reporte.cobros_por_metodo.OTRO).toBe('15.00');
     expect(result.reporte.efectivo_esperado).toBe('1125.00');
   });

@@ -145,7 +145,7 @@ export class IngresoVentaService {
     const whereBase =
       condiciones.length > 0 ? `AND ${condiciones.join(' AND ')}` : '';
 
-    const [efectivo, bancarizado, transferencia, debito, credito, otro] =
+    const [efectivo, bancarizado, transferencia, qr, debito, credito, otro] =
       await Promise.all([
         this.repo
           .createQueryBuilder('ingreso')
@@ -162,7 +162,7 @@ export class IngresoVentaService {
           .innerJoin('ingreso.venta', 'venta') // ✅ también acá
           .select('SUM(ingreso.monto)', 'total')
           .where(`ingreso.tipo IN (:...tipos) ${whereBase}`, {
-            tipos: ['BANCARIZADO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO'],
+            tipos: ['BANCARIZADO', 'TRANSFERENCIA', 'QR', 'DEBITO', 'CREDITO'],
             ...parametros,
           })
           .getRawOne(),
@@ -173,6 +173,16 @@ export class IngresoVentaService {
           .select('SUM(ingreso.monto)', 'total')
           .where(`ingreso.tipo = :tipo ${whereBase}`, {
             tipo: 'TRANSFERENCIA',
+            ...parametros,
+          })
+          .getRawOne(),
+
+        this.repo
+          .createQueryBuilder('ingreso')
+          .innerJoin('ingreso.venta', 'venta')
+          .select('SUM(ingreso.monto)', 'total')
+          .where(`ingreso.tipo = :tipo ${whereBase}`, {
+            tipo: 'QR',
             ...parametros,
           })
           .getRawOne(),
@@ -211,6 +221,7 @@ export class IngresoVentaService {
     const totalEfectivo = parseFloat(efectivo?.total || '0');
     const totalBancarizado = parseFloat(bancarizado?.total || '0');
     const totalTransferencia = parseFloat(transferencia?.total || '0');
+    const totalQr = parseFloat(qr?.total || '0');
     const totalDebito = parseFloat(debito?.total || '0');
     const totalCredito = parseFloat(credito?.total || '0');
     const totalOtro = parseFloat(otro?.total || '0');
@@ -219,6 +230,7 @@ export class IngresoVentaService {
       efectivo: totalEfectivo,
       bancarizado: totalBancarizado,
       transferencia: totalTransferencia,
+      qr: totalQr,
       debito: totalDebito,
       credito: totalCredito,
       otro: totalOtro,

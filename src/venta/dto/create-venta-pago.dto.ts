@@ -21,7 +21,8 @@ export const normalizarMedioPago = normalizarMetodoPago;
 export class CreateVentaPagoDto {
   @Transform(({ value }) => normalizarMedioPago(value))
   @IsIn(METODOS_PAGO, {
-    message: 'medio debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
+    message:
+      'medio debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO',
   })
   medio: MedioPagoVenta;
 

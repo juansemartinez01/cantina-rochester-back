@@ -30,7 +30,7 @@ export class CreateCuentaCorrientePagoDto {
   @Transform(({ value }) => normalizarMetodoPago(value))
   @IsIn(METODOS_PAGO, {
     message:
-      'medioPago debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
+      'medioPago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO',
   })
   medioPago: MetodoPago;
 

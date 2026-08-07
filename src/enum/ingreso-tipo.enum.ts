@@ -1,6 +1,7 @@
 export enum TipoIngreso {
   EFECTIVO = 'EFECTIVO',
   TRANSFERENCIA = 'TRANSFERENCIA',
+  QR = 'QR',
   DEBITO = 'DEBITO',
   CREDITO = 'CREDITO',
   OTRO = 'OTRO',

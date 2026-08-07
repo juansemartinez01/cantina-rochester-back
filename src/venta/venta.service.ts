@@ -215,6 +215,7 @@ export class VentaService {
       efectivo: number;
       bancarizado: number;
       transferencia: number;
+      qr: number;
       debito: number;
       credito: number;
       otro: number;
@@ -472,12 +473,16 @@ export class VentaService {
         'efectivo',
       )
       .addSelect(
-        `COALESCE(SUM(CASE WHEN ingreso.tipo IN ('BANCARIZADO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO') THEN ingreso.monto ELSE 0 END), 0)`,
+        `COALESCE(SUM(CASE WHEN ingreso.tipo IN ('BANCARIZADO', 'TRANSFERENCIA', 'QR', 'DEBITO', 'CREDITO') THEN ingreso.monto ELSE 0 END), 0)`,
         'bancarizado',
       )
       .addSelect(
         `COALESCE(SUM(CASE WHEN ingreso.tipo = 'TRANSFERENCIA' THEN ingreso.monto ELSE 0 END), 0)`,
         'transferencia',
+      )
+      .addSelect(
+        `COALESCE(SUM(CASE WHEN ingreso.tipo = 'QR' THEN ingreso.monto ELSE 0 END), 0)`,
+        'qr',
       )
       .addSelect(
         `COALESCE(SUM(CASE WHEN ingreso.tipo = 'DEBITO' THEN ingreso.monto ELSE 0 END), 0)`,
@@ -510,6 +515,7 @@ export class VentaService {
       efectivo: this.to2(Number(ingresosRaw?.efectivo ?? 0)),
       bancarizado: this.to2(Number(ingresosRaw?.bancarizado ?? 0)),
       transferencia: this.to2(Number(ingresosRaw?.transferencia ?? 0)),
+      qr: this.to2(Number(ingresosRaw?.qr ?? 0)),
       debito: this.to2(Number(ingresosRaw?.debito ?? 0)),
       credito: this.to2(Number(ingresosRaw?.credito ?? 0)),
       otro: this.to2(Number(ingresosRaw?.otro ?? 0)),
@@ -981,7 +987,7 @@ export class VentaService {
       const medio = normalizarMedioPago(pago.medio);
       if (!esMetodoPago(medio)) {
         throw new BadRequestException(
-          'medio debe ser EFECTIVO, TRANSFERENCIA, DEBITO, CREDITO u OTRO',
+          'medio debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO',
         );
       }
 

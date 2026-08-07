@@ -3,10 +3,14 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './role.entity';
+import { RoleSyncService } from './role-sync.service';
 
 @Controller('roles')
 export class RoleController {
-  constructor(private readonly service: RoleService) {}
+  constructor(
+    private readonly service: RoleService,
+    private readonly roleSync: RoleSyncService,
+  ) {}
 
   @Get()
   getAll(): Promise<Role[]> {
@@ -19,16 +23,22 @@ export class RoleController {
   }
 
   @Post()
-  create(@Body() dto: CreateRoleDto): Promise<Role> {
-    return this.service.create(dto);
+  async create(@Body() dto: CreateRoleDto): Promise<Role> {
+    const role = await this.service.create(dto);
+    await this.roleSync.syncRoleName(role.nombre);
+    return role;
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() dto: UpdateRoleDto,
   ): Promise<Role> {
-    return this.service.update(+id, dto);
+    const role = await this.service.update(+id, dto);
+    if (dto.nombre !== undefined) {
+      await this.roleSync.syncRoleName(role.nombre);
+    }
+    return role;
   }
 
   @Delete(':id')

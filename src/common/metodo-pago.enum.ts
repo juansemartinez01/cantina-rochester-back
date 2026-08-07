@@ -1,6 +1,7 @@
 export const MetodoPago = {
   EFECTIVO: 'EFECTIVO',
   TRANSFERENCIA: 'TRANSFERENCIA',
+  QR: 'QR',
   DEBITO: 'DEBITO',
   CREDITO: 'CREDITO',
   OTRO: 'OTRO',
@@ -11,6 +12,7 @@ export type MetodoPago = (typeof MetodoPago)[keyof typeof MetodoPago];
 export const METODOS_PAGO = Object.values(MetodoPago);
 export const METODOS_PAGO_BANCARIZADOS = [
   MetodoPago.TRANSFERENCIA,
+  MetodoPago.QR,
   MetodoPago.DEBITO,
   MetodoPago.CREDITO,
 ] as const;
@@ -35,7 +37,7 @@ const METODO_PAGO_ALIASES: Record<string, MetodoPago> = {
   DEBIT: MetodoPago.DEBITO,
   CREDITO: MetodoPago.CREDITO,
   CREDIT: MetodoPago.CREDITO,
-  QR: MetodoPago.TRANSFERENCIA,
+  QR: MetodoPago.QR,
   QR_EXTERNO: MetodoPago.OTRO,
   'QR EXTERNO': MetodoPago.OTRO,
   QR_EXT: MetodoPago.OTRO,
