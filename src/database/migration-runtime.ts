@@ -74,6 +74,7 @@ export async function ensureMigrationBaseline(): Promise<void> {
       );
       await dataSource.synchronize(false);
       await dataSource.runMigrations({ transaction: 'all', fake: true });
+      await ensureCanonicalRoles();
       console.log(
         '[migrations] Current schema created and migrations registered.',
       );
@@ -115,6 +116,14 @@ export async function ensureMigrationBaseline(): Promise<void> {
   } finally {
     await dataSource.destroy();
   }
+}
+
+async function ensureCanonicalRoles(): Promise<void> {
+  await dataSource.query(`
+    INSERT INTO "roles" ("nombre")
+    VALUES ('Admin'), ('Vendedor'), ('Cocina')
+    ON CONFLICT ("nombre") DO NOTHING
+  `);
 }
 
 async function getApplicationTables(): Promise<string[]> {

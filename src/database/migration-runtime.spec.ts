@@ -47,6 +47,9 @@ describe('migration runtime', () => {
       transaction: 'all',
       fake: true,
     });
+    expect(mockDataSource.query).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT INTO "roles"'),
+    );
     expect(mockDataSource.destroy).toHaveBeenCalled();
   });
 

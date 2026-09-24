@@ -14,7 +14,7 @@ export class Usuario {
   @Column({ length: 100, unique: true })
   usuario: string;
 
-  @Column({ name: 'clave_hash', length: 255 })
+  @Column({ name: 'clave_hash', length: 255, select: false })
   clave_hash: string;
 
   @Column({ length: 255, unique: false })

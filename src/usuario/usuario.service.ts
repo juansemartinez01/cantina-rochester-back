@@ -24,17 +24,26 @@ export class UsuarioService {
 
   // For authentication: find by username and include roles
   async findByUsername(usuario: string): Promise<Usuario | null> {
-    return this.repo.findOne({
-      where: { usuario },
-      relations: ['roles', 'roles.rol'],
+    return this.findForAuthentication('usuario.usuario = :usuario', {
+      usuario,
     });
   }
 
   async findByEmail(email: string): Promise<Usuario | null> {
-    return this.repo.findOne({
-      where: { email },
-      relations: ['roles', 'roles.rol'],
-    });
+    return this.findForAuthentication('usuario.email = :email', { email });
+  }
+
+  private findForAuthentication(
+    where: string,
+    parameters: Record<string, string>,
+  ): Promise<Usuario | null> {
+    return this.repo
+      .createQueryBuilder('usuario')
+      .addSelect('usuario.clave_hash')
+      .leftJoinAndSelect('usuario.roles', 'usuarioRol')
+      .leftJoinAndSelect('usuarioRol.rol', 'rol')
+      .where(where, parameters)
+      .getOne();
   }
 
   findAll(activo: 'true' | 'false' | 'all' = 'true'): Promise<Usuario[]> {
@@ -67,7 +76,8 @@ export class UsuarioService {
   user.activo = true;
   // generamos el hash aquí
   user.clave_hash = await bcrypt.hash(dto.password, 10);
-  return this.repo.save(user);
+  const saved = await this.repo.save(user);
+  return this.findOne(saved.id);
 }
 
   async update(id: number, dto: UpdateUsuarioDto): Promise<Usuario> {

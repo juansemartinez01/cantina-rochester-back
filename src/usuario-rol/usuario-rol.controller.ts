@@ -3,7 +3,10 @@ import { UsuarioRolService } from './usuario-rol.service';
 import { CreateUsuarioRolDto } from './dto/create-usuario-rol.dto';
 import { UpdateUsuarioRolDto } from './dto/update-usuario-rol.dto';
 import { UsuarioRol } from './usuario-rol.entity';
+import { Roles } from '../auth/roles.decorator';
+import { APP_ROLES } from '../auth/roles.constants';
 
+@Roles(APP_ROLES.ADMIN)
 @Controller('usuario-rol')
 export class UsuarioRolController {
   constructor(private readonly service: UsuarioRolService) {}

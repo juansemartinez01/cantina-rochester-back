@@ -3,8 +3,10 @@ import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './usuario.entity';
-import { Public } from '../auth/isPublic';
+import { Roles } from '../auth/roles.decorator';
+import { APP_ROLES } from '../auth/roles.constants';
 
+@Roles(APP_ROLES.ADMIN)
 @Controller('usuarios')
 export class UsuarioController {
   constructor(private readonly service: UsuarioService) {}
@@ -19,7 +21,6 @@ export class UsuarioController {
     return this.service.findOne(+id);
   }
 
-  @Public()
   @Post()
   create(@Body() dto: CreateUsuarioDto): Promise<Usuario> {
     return this.service.create(dto);

@@ -5,6 +5,7 @@ if (!globalThis.crypto) {
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { RolesGuard } from './auth/roles.guard';
 import { Reflector }    from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ensureMigrationBaseline } from './database/migration-runtime';
@@ -34,7 +35,10 @@ async function bootstrap() {
 
   
   
-  app.useGlobalGuards(new JwtAuthGuard(reflector));
+  app.useGlobalGuards(
+    new JwtAuthGuard(reflector),
+    new RolesGuard(reflector),
+  );
   //app.use(cookieParser());
   await app.listen(process.env.PORT ?? 3000);
 }
