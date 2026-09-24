@@ -33,12 +33,18 @@ const BASELINE_SCHEMA_TABLES = [
   'cuenta_corriente',
 ];
 
+const TYPEORM_INTERNAL_TABLES = ['migrations', 'typeorm_metadata'];
+
 export function isRailwayDeploy(): boolean {
   return !!process.env.RAILWAY_ENVIRONMENT_NAME || !!process.env.RAILWAY_PROJECT_ID;
 }
 
 export function shouldRunDatabaseMigrations(): boolean {
-  return process.env.DB_MIGRATIONS_RUN === 'true' || isRailwayDeploy();
+  if (process.env.DB_MIGRATIONS_RUN !== undefined) {
+    return process.env.DB_MIGRATIONS_RUN === 'true';
+  }
+
+  return isRailwayDeploy();
 }
 
 export function shouldSynchronizeSchema(): boolean {
@@ -61,10 +67,24 @@ export async function ensureMigrationBaseline(): Promise<void> {
   await dataSource.initialize();
 
   try {
+    const applicationTables = await getApplicationTables();
+    if (applicationTables.length === 0) {
+      console.log(
+        '[migrations] Empty database detected; creating the current schema.',
+      );
+      await dataSource.synchronize(false);
+      await dataSource.runMigrations({ transaction: 'all', fake: true });
+      console.log(
+        '[migrations] Current schema created and migrations registered.',
+      );
+      return;
+    }
+
     const hasExistingSchema = await hasBaselineSchema();
     if (!hasExistingSchema) {
-      console.log('[migrations] Existing schema not detected; baseline skipped.');
-      return;
+      throw new Error(
+        `[migrations] Partial database schema detected. Automatic bootstrap was stopped to avoid modifying an inconsistent database. Tables found: ${applicationTables.join(', ')}.`,
+      );
     }
 
     await dataSource.query(`
@@ -95,6 +115,21 @@ export async function ensureMigrationBaseline(): Promise<void> {
   } finally {
     await dataSource.destroy();
   }
+}
+
+async function getApplicationTables(): Promise<string[]> {
+  const rows = await dataSource.query(
+    `
+      SELECT tablename
+      FROM pg_tables
+      WHERE schemaname = current_schema()
+        AND NOT (tablename = ANY($1::text[]))
+      ORDER BY tablename
+    `,
+    [TYPEORM_INTERNAL_TABLES],
+  );
+
+  return rows.map((row: { tablename: string }) => row.tablename);
 }
 
 async function hasBaselineSchema(): Promise<boolean> {
