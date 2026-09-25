@@ -1,0 +1,227 @@
+# ============================================================================
+#  Configuración del manual de usuario
+#  Esto es lo ÚNICO que se edita a mano por proyecto (~5 min).
+#  Todo lo demás se extrae del código.
+# ============================================================================
+
+proyecto:
+  nombre: "Sistema de Gestión Comercial"
+  cliente: "Rochester"
+  version: "1.0"
+  empresa: "Innoview"          # tu empresa, va en portada y pie
+  colorPrimario: "#1e3a5f"
+  colorAcento: "#c8102e"
+  logo: ""                      # ruta a un PNG/SVG; vacío = sin logo
+
+frontend:
+  urlBase: "https://frontend-gestioncomercios-production.up.railway.app"
+  rutaInicio: "/comercio/inicio"
+  # Tiempo que tarda la app en traer datos. El capturador espera contenido real,
+  # pero este es el techo antes de dar por fallida una pantalla.
+  timeoutCargaMs: 20000
+  viewport: { ancho: 1366, alto: 900 }
+
+# --------------------------------------------------------------------------
+#  Espacios de trabajo. La aplicación separa la operación diaria del almacén
+#  de la administración general.
+# --------------------------------------------------------------------------
+espacios:
+  - id: comercio
+    nombre: "Almacén Principal"
+    descripcion: "Operación diaria: ventas, caja, stock y productos del almacén."
+  - id: backoffice
+    nombre: "Backoffice"
+    descripcion: "Administración general de Rochester."
+    ruta: "/rochester-backoffice"
+
+# --------------------------------------------------------------------------
+#  Mapa de navegación REAL, relevado de la aplicación.
+#  Es lo que el backend no puede saber: cómo llega el usuario a cada función.
+#  El scaffold usa esto para escribir la sección "Cómo llegar" de cada módulo.
+# --------------------------------------------------------------------------
+navegacion:
+  caja:
+    menu: "Caja"
+    item: "Gestión de caja"
+    ruta: "/comercio/inicio/caja/gestion"
+    tituloPantalla: "Gestión de caja"
+  venta:
+    menu: "Caja"
+    item: "Caja / Venta"
+    ruta: "/comercio/inicio/caja"
+    tituloPantalla: "Caja / Venta"
+    tambienEn:
+      - { menu: "Gestión", item: "Historial de ventas", ruta: "/comercio/inicio/ingresos", tituloPantalla: "Ingresos" }
+      - { menu: "Gestión", item: "Métricas", ruta: "/comercio/inicio/metricas", tituloPantalla: "Métricas" }
+  producto:
+    menu: "Productos"
+    item: "Lista de productos"
+    ruta: "/comercio/inicio/productos/1-lista-productos-2"
+    tituloPantalla: "Lista de productos"
+  promocion:
+    menu: "Productos"
+    item: "Promociones"
+    ruta: "/comercio/inicio/productos/2-lista-promociones"
+    tituloPantalla: "Promociones"
+  producto-precio-almacen:
+    menu: "Productos"
+    item: "Impresión de precios"
+    ruta: "/comercio/inicio/productos/3-impresion-precios"
+    tituloPantalla: "Impresión de precios"
+  stock-actual:
+    menu: "Stock"
+    item: "Stock"
+    ruta: "/comercio/inicio/stock"
+    tituloPantalla: "Stock"
+  movimiento-stock:
+    menu: "Stock"
+    item: "Ingresos Stock"
+    ruta: "/comercio/inicio/ingresos-stock"
+    tituloPantalla: "Registro de Ingreso de mercadería"
+  orden-compra:
+    menu: "Stock"
+    item: "Ingresos Stock"
+    ruta: "/comercio/inicio/ingresos-stock"
+    tituloPantalla: "Registro de Ingreso de mercadería"
+  ingreso:
+    menu: "Gestión"
+    item: "Historial de ventas"
+    ruta: "/comercio/inicio/ingresos"
+    tituloPantalla: "Ingresos"
+  gastos:
+    menu: "Gestión"
+    item: "Gastos"
+    ruta: "/comercio/inicio/gastos"
+    tituloPantalla: "Gestión de gastos"
+  cuenta-corriente:
+    menu: "Gestión"
+    item: "Cuentas corrientes"
+    ruta: "/comercio/inicio/cuentas-corrientes"
+    tituloPantalla: "Cuentas corrientes"
+  usuario:
+    menu: "Gestión"
+    item: "Usuarios"
+    ruta: "/comercio/inicio/usuarios"
+    tituloPantalla: "Usuarios"
+  proveedor:
+    menu: "Stock"
+    item: "Ingresos Stock → Gestionar proveedores"
+    ruta: "/comercio/inicio/ingresos-stock"
+    tituloPantalla: "Proveedores"
+    nota: "Se accede desde el botón **Gestionar proveedores**, arriba a la derecha de la pantalla de ingresos de mercadería. El mismo botón está disponible en la pantalla de Stock."
+  categoria:
+    menu: "Stock"
+    item: "Ingresos Stock → Gestionar categorías"
+    ruta: "/comercio/inicio/ingresos-stock"
+    tituloPantalla: "Categorías"
+    nota: "Se accede desde el botón **Gestionar categorías**, arriba a la derecha de la pantalla de ingresos de mercadería."
+
+# --------------------------------------------------------------------------
+#  Glosario del negocio: lo único que la IA no puede deducir del código.
+#  Se usa para traducir nombres técnicos a lenguaje del usuario.
+# --------------------------------------------------------------------------
+glosario:
+  Almacen: "Sucursal o punto de venta. Cada almacén tiene su propio stock, caja y precios."
+  Caja: "Sesión de trabajo con dinero. Se abre al empezar el turno y se cierra al terminar, con arqueo."
+  MovimientoStock: "Cualquier entrada o salida de mercadería del depósito."
+  CuentaCorriente: "Crédito otorgado a un cliente para que compre ahora y pague después."
+  ParametroReorden: "Stock mínimo a partir del cual el sistema avisa que hay que reponer."
+  OrdenCompra: "Pedido de mercadería a un proveedor."
+  Extraccion: "Retiro de dinero de la caja."
+  Promocion: "Combo o descuento aplicable a una venta."
+  UCC: "Universidad Católica de Córdoba. Como medio de pago identifica las ventas que quedan a cuenta de la universidad, para clientes que compran mediante cuenta corriente."
+
+# --------------------------------------------------------------------------
+#  Módulos: orden y nombre visible en el manual.
+#  incluir: false -> queda fuera (módulos internos/técnicos).
+# --------------------------------------------------------------------------
+modulos:
+  - id: auth
+    titulo: "Acceso al sistema"
+    incluir: true
+  - id: venta
+    titulo: "Ventas"
+    incluir: true
+  - id: caja
+    titulo: "Caja"
+    incluir: true
+  - id: producto
+    titulo: "Productos"
+    incluir: true
+  - id: stock-actual
+    titulo: "Stock"
+    incluir: true
+  - id: movimiento-stock
+    titulo: "Movimientos de stock"
+    incluir: true
+  - id: promocion
+    titulo: "Promociones"
+    incluir: true
+  - id: cuenta-corriente
+    titulo: "Cuentas corrientes"
+    incluir: true
+  - id: gastos
+    titulo: "Gastos"
+    incluir: true
+  - id: orden-compra
+    titulo: "Órdenes de compra"
+    incluir: true
+  - id: proveedor
+    titulo: "Proveedores"
+    incluir: true
+  - id: categoria
+    titulo: "Categorías"
+    incluir: true
+  - id: unidad
+    titulo: "Unidades de medida"
+    incluir: true
+  - id: almacen
+    titulo: "Almacenes"
+    incluir: true
+  - id: parametro-reorden
+    titulo: "Parámetros de reposición"
+    incluir: true
+  - id: extraccion
+    titulo: "Extracciones de caja"
+    incluir: true
+  - id: ingreso
+    titulo: "Ingresos"
+    incluir: true
+  - id: factura
+    titulo: "Facturación"
+    incluir: true
+  - id: usuario
+    titulo: "Usuarios"
+    incluir: true
+  - id: usuario-rol
+    titulo: "Asignación de roles"
+    incluir: true
+  - id: role
+    titulo: "Roles"
+    incluir: true
+  # Internos: fuera del manual de usuario
+  - id: producto-precio-almacen
+    incluir: false
+  - id: producto-precio-historial
+    incluir: false
+  - id: common
+    incluir: false
+  - id: enum
+    incluir: false
+  - id: _root
+    incluir: false
+
+# --------------------------------------------------------------------------
+#  Perfiles de usuario. Se documentan aunque el backend no los aplique todavía.
+# --------------------------------------------------------------------------
+roles:
+  Admin: "Acceso total. Configura el sistema, gestiona usuarios, ve reportes y cierra cajas."
+  Vendedor: "Opera el día a día: registra ventas, cobra, abre y cierra su caja."
+  Cocina: "Visualiza los pedidos a preparar y marca su avance."
+
+opciones:
+  tono: "usted"                # "usted" | "vos" | "neutro"
+  incluirCapturas: true
+  incluirMatrizPermisos: true
+  incluirCatalogoErrores: true
+  incluirDiagramasEstado: true

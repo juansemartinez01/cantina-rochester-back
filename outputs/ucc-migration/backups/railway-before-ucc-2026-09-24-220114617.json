@@ -1,0 +1,4672 @@
+{
+  "createdAt": "2026-09-24T22:01:07.567Z",
+  "database": "railway",
+  "host": "crossover.proxy.rlwy.net",
+  "port": 34847,
+  "schema": {
+    "columns": [
+      {
+        "table_name": "almacen",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('almacen_id_seq'::regclass)"
+      },
+      {
+        "table_name": "almacen",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "almacen",
+        "column_name": "ubicacion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "almacen",
+        "column_name": "capacidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "categoria",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('categoria_id_seq'::regclass)"
+      },
+      {
+        "table_name": "categoria",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "categoria",
+        "column_name": "descripcion",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('cuenta_corriente_id_seq'::regclass)"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "documento",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "email",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "telefono",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "activa",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "true"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "saldo_actual",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "'0'::numeric"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "observaciones",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "column_name": "updated_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('cuenta_corriente_movimiento_id_seq'::regclass)"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "cuenta_corriente_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "tipo",
+        "data_type": "USER-DEFINED",
+        "udt_name": "cuenta_corriente_movimiento_tipo_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "venta_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "pago_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "monto",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "saldo_resultante",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "descripcion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('cuenta_corriente_pago_id_seq'::regclass)"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "cuenta_corriente_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "monto",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "medio_pago",
+        "data_type": "USER-DEFINED",
+        "udt_name": "cuenta_corriente_pago_medio_pago_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "detalle_pago",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "referencia",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "observacion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('cuenta_corriente_pago_aplicacion_id_seq'::regclass)"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "column_name": "pago_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "column_name": "cuenta_corriente_venta_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "column_name": "monto_aplicado",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('cuenta_corriente_venta_id_seq'::regclass)"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "cuenta_corriente_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "venta_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "monto_original",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "monto_pagado",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "'0'::numeric"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "monto_pendiente",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "estado",
+        "data_type": "USER-DEFINED",
+        "udt_name": "cuenta_corriente_venta_estado_enum",
+        "is_nullable": "NO",
+        "column_default": "'PENDIENTE'::cuenta_corriente_venta_estado_enum"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('extraccion_ingreso_id_seq'::regclass)"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "column_name": "origen",
+        "data_type": "USER-DEFINED",
+        "udt_name": "extraccion_ingreso_origen_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "column_name": "monto",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "column_name": "motivo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('factura_venta_item_id_seq'::regclass)"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "column_name": "cantidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "factura_venta_item",
+        "column_name": "subtotal",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "factura_venta_item",
+        "column_name": "factura_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "factura_venta_item",
+        "column_name": "venta_item_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('facturas_id_seq'::regclass)"
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "cuit_emisor",
+        "data_type": "bigint",
+        "udt_name": "int8",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "importe_total",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "punto_venta",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "factura_tipo",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "metodo_pago",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "test",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "cae",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "vencimiento_cae",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "facturas",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('gasto_id_seq'::regclass)"
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "fecha",
+        "data_type": "date",
+        "udt_name": "date",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "monto",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "descripcion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "notas",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "categoria_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "origen",
+        "data_type": "USER-DEFINED",
+        "udt_name": "gasto_origen_enum",
+        "is_nullable": "NO",
+        "column_default": "'MANUAL'::gasto_origen_enum"
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "orden_compra_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "gasto",
+        "column_name": "deleted_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto_categoria",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('gasto_categoria_id_seq'::regclass)"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto_categoria",
+        "column_name": "descripcion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "gasto_categoria",
+        "column_name": "activo",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "true"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('ingreso_venta_id_seq'::regclass)"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "column_name": "tipo",
+        "data_type": "USER-DEFINED",
+        "udt_name": "ingreso_venta_tipo_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "ingreso_venta",
+        "column_name": "monto",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "ingreso_venta",
+        "column_name": "detalle_pago",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "ingreso_venta",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "column_name": "venta_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "migrations",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('migrations_id_seq'::regclass)"
+      },
+      {
+        "table_name": "migrations",
+        "column_name": "timestamp",
+        "data_type": "bigint",
+        "udt_name": "int8",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "migrations",
+        "column_name": "name",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('movimiento_caja_id_seq'::regclass)"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "caja_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "tipo",
+        "data_type": "USER-DEFINED",
+        "udt_name": "movimiento_caja_tipo_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "monto",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "medio_pago",
+        "data_type": "USER-DEFINED",
+        "udt_name": "movimiento_caja_medio_pago_enum",
+        "is_nullable": "NO",
+        "column_default": "'EFECTIVO'::movimiento_caja_medio_pago_enum"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "detalle_pago",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "origen",
+        "data_type": "USER-DEFINED",
+        "udt_name": "movimiento_caja_origen_enum",
+        "is_nullable": "NO",
+        "column_default": "'MANUAL'::movimiento_caja_origen_enum"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "cuenta_corriente_pago_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "motivo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "observacion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "anulado",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "motivo_anulacion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "anulado_por_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_caja",
+        "column_name": "fecha_anulacion",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('movimiento_stock_id_seq'::regclass)"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "origen_almacen",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "destino_almacen",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "cantidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "cantidad_gramos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "tipo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "motivo",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "proveedor_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "precio_unitario",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "precio_total",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "orden_compra_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "movimiento_stock",
+        "column_name": "orden_compra_item_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('orden_compra_id_seq'::regclass)"
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "total",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "estado",
+        "data_type": "USER-DEFINED",
+        "udt_name": "orden_compra_estado_enum",
+        "is_nullable": "NO",
+        "column_default": "'ACTIVA'::orden_compra_estado_enum"
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "gasto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "numero_comprobante",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "observacion",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "motivo_anulacion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "fecha_anulacion",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra",
+        "column_name": "proveedor_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('orden_compra_item_id_seq'::regclass)"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "cantidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "cantidad_gramos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "precioUnitario",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "subtotal",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "fecha_vencimiento",
+        "data_type": "date",
+        "udt_name": "date",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "orden_compra_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orden_compra_item",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "parametros_reorden",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('parametros_reorden_id_seq'::regclass)"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "parametros_reorden",
+        "column_name": "nivel_minimo",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "parametros_reorden",
+        "column_name": "nivel_optimo",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('producto_id_seq'::regclass)"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "sku",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "descripcion",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "unidad_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "categoria_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "updated_at",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "barcode",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "precioBase",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "'0'::numeric"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "activo",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "true"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "es_por_gramos",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "inOferta",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "producto",
+        "column_name": "precio_updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto",
+        "column_name": "proveedorNombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "precio",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "inOferta",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "precio_oferta",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "moneda",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": "'ARS'::character varying"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('producto_precio_historial_id_seq'::regclass)"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "tipo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "precio_anterior",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "precio_nuevo",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "usuario_id",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "usuario_nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "origen",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('promocion_id_seq'::regclass)"
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "codigo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "precioPromo",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "createdAt",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "updatedAt",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "promocion",
+        "column_name": "activo",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "true"
+      },
+      {
+        "table_name": "promocion_producto",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('promocion_producto_id_seq'::regclass)"
+      },
+      {
+        "table_name": "promocion_producto",
+        "column_name": "cantidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "promocion_producto",
+        "column_name": "cantidad_gramos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "promocion_producto",
+        "column_name": "promocion_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "promocion_producto",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "proveedor",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('proveedor_id_seq'::regclass)"
+      },
+      {
+        "table_name": "proveedor",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "proveedor",
+        "column_name": "contacto",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "proveedor",
+        "column_name": "telefono",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "proveedor",
+        "column_name": "email",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "roles",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('roles_id_seq'::regclass)"
+      },
+      {
+        "table_name": "roles",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('sesion_caja_id_seq'::regclass)"
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "monto_inicial",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "estado",
+        "data_type": "USER-DEFINED",
+        "udt_name": "sesion_caja_estado_enum",
+        "is_nullable": "NO",
+        "column_default": "'ABIERTA'::sesion_caja_estado_enum"
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "observacion",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "fecha_apertura",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "fecha_cierre",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "efectivo_contado",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "sesion_caja",
+        "column_name": "diferencia",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "stock_actual",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "stock_actual",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "stock_actual",
+        "column_name": "cantidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "stock_actual",
+        "column_name": "last_updated",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "stock_actual",
+        "column_name": "cantidad_gramos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "unidad",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('unidad_id_seq'::regclass)"
+      },
+      {
+        "table_name": "unidad",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "unidad",
+        "column_name": "abreviatura",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "usuario_rol",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('usuario_rol_id_seq'::regclass)"
+      },
+      {
+        "table_name": "usuario_rol",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "usuario_rol",
+        "column_name": "rol_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "usuarios",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('usuarios_id_seq'::regclass)"
+      },
+      {
+        "table_name": "usuarios",
+        "column_name": "nombre",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "usuarios",
+        "column_name": "usuario",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "usuarios",
+        "column_name": "clave_hash",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "usuarios",
+        "column_name": "email",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "usuarios",
+        "column_name": "activo",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "true"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('venta_id_seq'::regclass)"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "subtotal",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "'0'::numeric"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "total_descuentos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "'0'::numeric"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "total_recargos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "'0'::numeric"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "total",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta",
+        "column_name": "estado",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": "'PENDIENTE'::character varying"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "tipo_cobro",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": "'CONTADO'::character varying"
+      },
+      {
+        "table_name": "venta",
+        "column_name": "cuenta_corriente_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta",
+        "column_name": "almacen_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('venta_ajuste_id_seq'::regclass)"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "venta_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "tipo",
+        "data_type": "USER-DEFINED",
+        "udt_name": "venta_ajuste_tipo_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "modo",
+        "data_type": "USER-DEFINED",
+        "udt_name": "venta_ajuste_modo_enum",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "valor",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "monto_aplicado",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "motivo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "codigo",
+        "data_type": "character varying",
+        "udt_name": "varchar",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "origen",
+        "data_type": "USER-DEFINED",
+        "udt_name": "venta_ajuste_origen_enum",
+        "is_nullable": "NO",
+        "column_default": "'MANUAL'::venta_ajuste_origen_enum"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "usuario_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_ajuste",
+        "column_name": "fecha",
+        "data_type": "timestamp without time zone",
+        "udt_name": "timestamp",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "NO",
+        "column_default": "nextval('venta_item_id_seq'::regclass)"
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "cantidad",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "cantidad_gramos",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "precioUnitario",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "subtotal",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "venta_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "venta_item",
+        "column_name": "producto_id",
+        "data_type": "integer",
+        "udt_name": "int4",
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "constraints": [
+      {
+        "table_name": "almacen",
+        "constraint_name": "PK_78a1ec4675cb911ff041d485b3b",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "almacen",
+        "constraint_name": "almacen_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "almacen",
+        "constraint_name": "almacen_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "categoria",
+        "constraint_name": "PK_f027836b77b84fb4c3a374dc70d",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "categoria",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "categoria",
+        "constraint_name": "UQ_6771d90221138c5bf48044fd73d",
+        "constraint_type": "UNIQUE",
+        "column_name": "nombre",
+        "foreign_table_name": "categoria",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "categoria",
+        "constraint_name": "categoria_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "categoria",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "categoria",
+        "constraint_name": "categoria_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "categoria",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "PK_3812e646eafdee728526c6d9911",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "cuenta_corriente_activa_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "activa"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "cuenta_corriente_created_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "created_at"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "cuenta_corriente_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "cuenta_corriente_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "cuenta_corriente_saldo_actual_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "saldo_actual"
+      },
+      {
+        "table_name": "cuenta_corriente",
+        "constraint_name": "cuenta_corriente_updated_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "updated_at"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "FK_6a5e72fd24d8ac41396caf3c552",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "cuenta_corriente_id",
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "FK_977e4594acec653c3f10ea6fe6e",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "venta_id",
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "FK_c165efac5ef7adf4dd362579299",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "FK_c266bfc014fb9b05285f69e84a5",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "pago_id",
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "PK_e4731dce07c8b4384acab11127b",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_cuenta_corriente_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "cuenta_corriente_id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_descripcion_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "descripcion"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_monto_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "monto"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_saldo_resultante_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "saldo_resultante"
+      },
+      {
+        "table_name": "cuenta_corriente_movimiento",
+        "constraint_name": "cuenta_corriente_movimiento_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_movimiento",
+        "foreign_column_name": "tipo"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "FK_2946ad5b6b6ff04f7dbc2fb9d75",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "cuenta_corriente_id",
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "FK_2dba4d57de6ed35a6895968b17e",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "FK_64057bde5ce4867616b8a931fb9",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "PK_d37eaf3cb2126aa74f19fcc78eb",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "cuenta_corriente_pago_almacen_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "cuenta_corriente_pago_cuenta_corriente_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "cuenta_corriente_id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "cuenta_corriente_pago_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "cuenta_corriente_pago_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "cuenta_corriente_pago_medio_pago_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "medio_pago"
+      },
+      {
+        "table_name": "cuenta_corriente_pago",
+        "constraint_name": "cuenta_corriente_pago_monto_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "monto"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "FK_491578f492268a3c1881723e65f",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "pago_id",
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "FK_c9dcd0fea1ca81d2c674e192070",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "cuenta_corriente_venta_id",
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "PK_f54152eb01f7e89db356a04dbc6",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "cuenta_corriente_pago_aplicacion",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "cuenta_corriente_pago_aplica_cuenta_corriente_venta_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago_aplicacion",
+        "foreign_column_name": "cuenta_corriente_venta_id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "cuenta_corriente_pago_aplicacion_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago_aplicacion",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "cuenta_corriente_pago_aplicacion_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago_aplicacion",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "cuenta_corriente_pago_aplicacion_monto_aplicado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago_aplicacion",
+        "foreign_column_name": "monto_aplicado"
+      },
+      {
+        "table_name": "cuenta_corriente_pago_aplicacion",
+        "constraint_name": "cuenta_corriente_pago_aplicacion_pago_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_pago_aplicacion",
+        "foreign_column_name": "pago_id"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "FK_48d87f6a9e2a7b7df5f707b7899",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "venta_id",
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "FK_978ade7a9229d4c0d693c3bd6a9",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "cuenta_corriente_id",
+        "foreign_table_name": "cuenta_corriente",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "PK_7330ddd9cd098b35b335fbd60e6",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_cuenta_corriente_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "cuenta_corriente_id"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_estado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "estado"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_monto_original_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "monto_original"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_monto_pagado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "monto_pagado"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_monto_pendiente_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "monto_pendiente"
+      },
+      {
+        "table_name": "cuenta_corriente_venta",
+        "constraint_name": "cuenta_corriente_venta_venta_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "cuenta_corriente_venta",
+        "foreign_column_name": "venta_id"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "constraint_name": "PK_3551e36749f874ce864a341f0a6",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "extraccion_ingreso",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "constraint_name": "extraccion_ingreso_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "extraccion_ingreso",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "constraint_name": "extraccion_ingreso_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "extraccion_ingreso",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "constraint_name": "extraccion_ingreso_monto_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "extraccion_ingreso",
+        "foreign_column_name": "monto"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "constraint_name": "extraccion_ingreso_motivo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "extraccion_ingreso",
+        "foreign_column_name": "motivo"
+      },
+      {
+        "table_name": "extraccion_ingreso",
+        "constraint_name": "extraccion_ingreso_origen_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "extraccion_ingreso",
+        "foreign_column_name": "origen"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "constraint_name": "FK_4b290c8e7a0f4254327994bc90a",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "factura_id",
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "constraint_name": "FK_b8cd0668c062c80857aa7805d77",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "venta_item_id",
+        "foreign_table_name": "venta_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "constraint_name": "PK_f45b05047cd7bc9951098ffc90c",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "factura_venta_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "constraint_name": "factura_venta_item_cantidad_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "factura_venta_item",
+        "foreign_column_name": "cantidad"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "constraint_name": "factura_venta_item_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "factura_venta_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "factura_venta_item",
+        "constraint_name": "factura_venta_item_subtotal_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "factura_venta_item",
+        "foreign_column_name": "subtotal"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "FK_8ad13edb0940880412aebbc13ee",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "PK_f302947c1e4773639b20707a8bc",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_cuit_emisor_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "cuit_emisor"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_factura_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "factura_tipo"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_importe_total_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "importe_total"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_metodo_pago_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "metodo_pago"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_punto_venta_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "punto_venta"
+      },
+      {
+        "table_name": "facturas",
+        "constraint_name": "facturas_test_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "facturas",
+        "foreign_column_name": "test"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "FK_81d076a62bc9a3d1901e3ecdc00",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "orden_compra_id",
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "FK_d90584b1ac6b68ab0ec9ba1fc46",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "categoria_id",
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "FK_ee0399201aacc626847be613e75",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "PK_cf2336fd738eaca8aab31dcb07b",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_created_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "created_at"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_descripcion_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "descripcion"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_monto_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "monto"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_origen_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "origen"
+      },
+      {
+        "table_name": "gasto",
+        "constraint_name": "gasto_updated_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "updated_at"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "PK_d90584b1ac6b68ab0ec9ba1fc46",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "UQ_ce984bcda2f0aeb2f2321811943",
+        "constraint_type": "UNIQUE",
+        "column_name": "nombre",
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "gasto_categoria_activo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "activo"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "gasto_categoria_created_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "created_at"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "gasto_categoria_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "gasto_categoria_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "gasto_categoria",
+        "constraint_name": "gasto_categoria_updated_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "gasto_categoria",
+        "foreign_column_name": "updated_at"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "constraint_name": "FK_243eee3fa76f6c3b7685e09b16c",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "venta_id",
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "constraint_name": "PK_bf66dd2716d9a8fe4f0ce7e1cd8",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "ingreso_venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "constraint_name": "ingreso_venta_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "ingreso_venta",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "constraint_name": "ingreso_venta_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "ingreso_venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "constraint_name": "ingreso_venta_monto_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "ingreso_venta",
+        "foreign_column_name": "monto"
+      },
+      {
+        "table_name": "ingreso_venta",
+        "constraint_name": "ingreso_venta_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "ingreso_venta",
+        "foreign_column_name": "tipo"
+      },
+      {
+        "table_name": "migrations",
+        "constraint_name": "PK_8c82d7f526340ab734260ea46be",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "migrations",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "migrations",
+        "constraint_name": "migrations_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "migrations",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "migrations",
+        "constraint_name": "migrations_name_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "migrations",
+        "foreign_column_name": "name"
+      },
+      {
+        "table_name": "migrations",
+        "constraint_name": "migrations_timestamp_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "migrations",
+        "foreign_column_name": "timestamp"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "FK_33b031680979a63dad22118e756",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "FK_b870c2b74c2007c7a04dfd38bd5",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "cuenta_corriente_pago_id",
+        "foreign_table_name": "cuenta_corriente_pago",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "FK_bc0bab64db0cdde1b3f7dc49323",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "anulado_por_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "FK_f823715e8a343bb71bd4d5a7745",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "caja_id",
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "PK_e62ca281558a262e275dc24c65a",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_anulado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "anulado"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_caja_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "caja_id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_medio_pago_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "medio_pago"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_monto_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "monto"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_motivo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "motivo"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_origen_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "origen"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "tipo"
+      },
+      {
+        "table_name": "movimiento_caja",
+        "constraint_name": "movimiento_caja_usuario_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_caja",
+        "foreign_column_name": "usuario_id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "FK_31e100540494920a2e8682fc966",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "proveedor_id",
+        "foreign_table_name": "proveedor",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "FK_710f568fa31814d122557802f62",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "FK_a00bb22afdc6ff542a10f9ef358",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "origen_almacen",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "FK_be447bcf6bae9a958dfcb1ffc45",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "orden_compra_item_id",
+        "foreign_table_name": "orden_compra_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "FK_c5d5b442c236d6d868e037ac17c",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "destino_almacen",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "FK_fa734fc22cb00d5a8fbbdb6e566",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "orden_compra_id",
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "PK_ec7f6fe6c53203485a1591921d1",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "movimiento_stock",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "movimiento_stock_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_stock",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "movimiento_stock_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_stock",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "movimiento_stock_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_stock",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "movimiento_stock",
+        "constraint_name": "movimiento_stock_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "movimiento_stock",
+        "foreign_column_name": "tipo"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "FK_096a71ed3af74805515a871f306",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "proveedor_id",
+        "foreign_table_name": "proveedor",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "FK_11aa4c286b838bd22fe62f5d4d6",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "gasto_id",
+        "foreign_table_name": "gasto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "PK_173f061aa56f5acd1ddfacceeb7",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "REL_11aa4c286b838bd22fe62f5d4d",
+        "constraint_type": "UNIQUE",
+        "column_name": "gasto_id",
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "gasto_id"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "orden_compra_estado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "estado"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "orden_compra_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "orden_compra_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra",
+        "constraint_name": "orden_compra_proveedor_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "proveedor_id"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "FK_bfa93177ecf49ad5ac6cb462079",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "orden_compra_id",
+        "foreign_table_name": "orden_compra",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "FK_c233783302e1021c3e8c9fbd2ef",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "PK_cbad44a0af5288109e9cd43a9c3",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "orden_compra_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "orden_compra_item_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "orden_compra_item_precioUnitario_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra_item",
+        "foreign_column_name": "precioUnitario"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "orden_compra_item_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra_item",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "orden_compra_item",
+        "constraint_name": "orden_compra_item_subtotal_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "orden_compra_item",
+        "foreign_column_name": "subtotal"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "FK_fe3e8c59c851c815877859ea5aa",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "PK_b99cfb88ba02eb1a5a6c1b03909",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "parametros_reorden",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "UQ_fe3e8c59c851c815877859ea5aa",
+        "constraint_type": "UNIQUE",
+        "column_name": "producto_id",
+        "foreign_table_name": "parametros_reorden",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "parametros_reorden_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "parametros_reorden",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "parametros_reorden_nivel_minimo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "parametros_reorden",
+        "foreign_column_name": "nivel_minimo"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "parametros_reorden_nivel_optimo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "parametros_reorden",
+        "foreign_column_name": "nivel_optimo"
+      },
+      {
+        "table_name": "parametros_reorden",
+        "constraint_name": "parametros_reorden_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "parametros_reorden",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "FK_1ae19a0cb542cf735d454bab0b5",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "categoria_id",
+        "foreign_table_name": "categoria",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "FK_c3ef80e6d1049faa1c6d3130acc",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "unidad_id",
+        "foreign_table_name": "unidad",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "PK_5be023b11909fe103e24c740c7d",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "UQ_3c5101ec12b5234d77ea71853c3",
+        "constraint_type": "UNIQUE",
+        "column_name": "barcode",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "barcode"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "UQ_eb70b0b1c60ed7e2bfaacc060fa",
+        "constraint_type": "UNIQUE",
+        "column_name": "sku",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "sku"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_activo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "activo"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_created_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "created_at"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_es_por_gramos_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "es_por_gramos"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_inOferta_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "inOferta"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_precioBase_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "precioBase"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_sku_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "sku"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_unidad_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "unidad_id"
+      },
+      {
+        "table_name": "producto",
+        "constraint_name": "producto_updated_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto",
+        "foreign_column_name": "updated_at"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "FK_4a2022c6daf2e0b1fc6816a595d",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "FK_efd0e67be98c70d8e31fdaf2d64",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "PK_201a5124dda5ac42e729c4df92a",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "PK_201a5124dda5ac42e729c4df92a",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "PK_201a5124dda5ac42e729c4df92a",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "PK_201a5124dda5ac42e729c4df92a",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "producto_precio_almacen_almacen_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "producto_precio_almacen_inOferta_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "inOferta"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "producto_precio_almacen_moneda_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "moneda"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "producto_precio_almacen_precio_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "precio"
+      },
+      {
+        "table_name": "producto_precio_almacen",
+        "constraint_name": "producto_precio_almacen_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_almacen",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "FK_97d4eb9def55880eeb624c527b4",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "FK_b1a5a269615fe404e8e6891694a",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "PK_7616026bcf453465739758f3bbe",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "producto_precio_historial",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "producto_precio_historial_created_at_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_historial",
+        "foreign_column_name": "created_at"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "producto_precio_historial_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_historial",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "producto_precio_historial_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_historial",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "producto_precio_historial",
+        "constraint_name": "producto_precio_historial_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "producto_precio_historial",
+        "foreign_column_name": "tipo"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "FK_c19edf10ff62140c37cd9a41105",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "PK_cc82201f126d1e004467fc54bfc",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "UQ_f1b5a483b19649e37bc37fa1dc4",
+        "constraint_type": "UNIQUE",
+        "column_name": "codigo",
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "codigo"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "promocion_activo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "activo"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "promocion_codigo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "codigo"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "promocion_createdAt_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "createdAt"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "promocion_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "promocion_precioPromo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "precioPromo"
+      },
+      {
+        "table_name": "promocion",
+        "constraint_name": "promocion_updatedAt_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "updatedAt"
+      },
+      {
+        "table_name": "promocion_producto",
+        "constraint_name": "FK_03c14006c77303b398e05a8a343",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "promocion_id",
+        "foreign_table_name": "promocion",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "promocion_producto",
+        "constraint_name": "FK_913f5a74636a7e020f03d0646a6",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "promocion_producto",
+        "constraint_name": "PK_a8631378d07664795a104b87e93",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "promocion_producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "promocion_producto",
+        "constraint_name": "promocion_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "promocion_producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "proveedor",
+        "constraint_name": "PK_405f60886417ece76cb5681550a",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "proveedor",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "proveedor",
+        "constraint_name": "proveedor_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "proveedor",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "proveedor",
+        "constraint_name": "proveedor_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "proveedor",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "roles",
+        "constraint_name": "PK_c1433d71a4838793a49dcad46ab",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "roles",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "roles",
+        "constraint_name": "UQ_a5be7aa67e759e347b1c6464e10",
+        "constraint_type": "UNIQUE",
+        "column_name": "nombre",
+        "foreign_table_name": "roles",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "roles",
+        "constraint_name": "roles_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "roles",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "roles",
+        "constraint_name": "roles_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "roles",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "FK_58e857ee82554cd9ef9dd89b707",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "FK_e08358622cfad234889d1e1d6e3",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "PK_eb4a2f539fe83b4f37df12da840",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "sesion_caja_almacen_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "sesion_caja_estado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "estado"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "sesion_caja_fecha_apertura_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "fecha_apertura"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "sesion_caja_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "sesion_caja_monto_inicial_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "monto_inicial"
+      },
+      {
+        "table_name": "sesion_caja",
+        "constraint_name": "sesion_caja_usuario_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "sesion_caja",
+        "foreign_column_name": "usuario_id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "FK_00d0507fe3b92776f2318cdb09a",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "FK_61c22430e92f7cadf0f909b762a",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "PK_8993348ce0c91423595da771848",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "PK_8993348ce0c91423595da771848",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "PK_8993348ce0c91423595da771848",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "PK_8993348ce0c91423595da771848",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "stock_actual_almacen_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "stock_actual_cantidad_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "cantidad"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "stock_actual_last_updated_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "last_updated"
+      },
+      {
+        "table_name": "stock_actual",
+        "constraint_name": "stock_actual_producto_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "stock_actual",
+        "foreign_column_name": "producto_id"
+      },
+      {
+        "table_name": "unidad",
+        "constraint_name": "PK_3f087c90fe8ce6bafe8f8af6779",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "unidad",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "unidad",
+        "constraint_name": "unidad_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "unidad",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "unidad",
+        "constraint_name": "unidad_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "unidad",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "usuario_rol",
+        "constraint_name": "FK_29e9a9079c7ba01c1b301cf5555",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "usuario_rol",
+        "constraint_name": "FK_ac8911cd54a61461c9926541401",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "rol_id",
+        "foreign_table_name": "roles",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "usuario_rol",
+        "constraint_name": "PK_6c336b0a51b5c4d22614cb02533",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "usuario_rol",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "usuario_rol",
+        "constraint_name": "usuario_rol_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuario_rol",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "usuario_rol",
+        "constraint_name": "usuario_rol_rol_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuario_rol",
+        "foreign_column_name": "rol_id"
+      },
+      {
+        "table_name": "usuario_rol",
+        "constraint_name": "usuario_rol_usuario_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuario_rol",
+        "foreign_column_name": "usuario_id"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "PK_d7281c63c176e152e4c531594a8",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "UQ_0790a401b9d234fa921e9aa1777",
+        "constraint_type": "UNIQUE",
+        "column_name": "usuario",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "usuario"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "usuarios_activo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "activo"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "usuarios_clave_hash_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "clave_hash"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "usuarios_email_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "email"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "usuarios_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "usuarios_nombre_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "nombre"
+      },
+      {
+        "table_name": "usuarios",
+        "constraint_name": "usuarios_usuario_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "usuario"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "FK_18e7293d1cd9fc719c232348c3e",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "almacen_id",
+        "foreign_table_name": "almacen",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "FK_89bc3aa08059be02886d102c019",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "PK_8bb53d01fe72521d5cfb1f149d4",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_almacen_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "almacen_id"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_estado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "estado"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_subtotal_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "subtotal"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_tipo_cobro_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "tipo_cobro"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_total_descuentos_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "total_descuentos"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_total_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "total"
+      },
+      {
+        "table_name": "venta",
+        "constraint_name": "venta_total_recargos_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta",
+        "foreign_column_name": "total_recargos"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "FK_7cafecddc4f55e0383cde106233",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "venta_id",
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "FK_d227efeaffa23f0f04bb8bf9e63",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "usuario_id",
+        "foreign_table_name": "usuarios",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "PK_99a33b08292986b7bddf8907e7f",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_fecha_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "fecha"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_modo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "modo"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_monto_aplicado_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "monto_aplicado"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_motivo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "motivo"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_origen_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "origen"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_tipo_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "tipo"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_valor_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "valor"
+      },
+      {
+        "table_name": "venta_ajuste",
+        "constraint_name": "venta_ajuste_venta_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_ajuste",
+        "foreign_column_name": "venta_id"
+      },
+      {
+        "table_name": "venta_item",
+        "constraint_name": "FK_2cb0d9adab90c2ef6f6db573d0c",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "producto_id",
+        "foreign_table_name": "producto",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_item",
+        "constraint_name": "FK_a274f515c1475bb6111e8ed4789",
+        "constraint_type": "FOREIGN KEY",
+        "column_name": "venta_id",
+        "foreign_table_name": "venta",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_item",
+        "constraint_name": "PK_789dbe96f074ed37f0bfa4de483",
+        "constraint_type": "PRIMARY KEY",
+        "column_name": "id",
+        "foreign_table_name": "venta_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_item",
+        "constraint_name": "venta_item_id_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_item",
+        "foreign_column_name": "id"
+      },
+      {
+        "table_name": "venta_item",
+        "constraint_name": "venta_item_precioUnitario_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_item",
+        "foreign_column_name": "precioUnitario"
+      },
+      {
+        "table_name": "venta_item",
+        "constraint_name": "venta_item_subtotal_not_null",
+        "constraint_type": "CHECK",
+        "column_name": null,
+        "foreign_table_name": "venta_item",
+        "foreign_column_name": "subtotal"
+      }
+    ],
+    "sequences": [
+      {
+        "sequence_name": "almacen_id_seq"
+      },
+      {
+        "sequence_name": "categoria_id_seq"
+      },
+      {
+        "sequence_name": "cuenta_corriente_id_seq"
+      },
+      {
+        "sequence_name": "cuenta_corriente_movimiento_id_seq"
+      },
+      {
+        "sequence_name": "cuenta_corriente_pago_aplicacion_id_seq"
+      },
+      {
+        "sequence_name": "cuenta_corriente_pago_id_seq"
+      },
+      {
+        "sequence_name": "cuenta_corriente_venta_id_seq"
+      },
+      {
+        "sequence_name": "extraccion_ingreso_id_seq"
+      },
+      {
+        "sequence_name": "factura_venta_item_id_seq"
+      },
+      {
+        "sequence_name": "facturas_id_seq"
+      },
+      {
+        "sequence_name": "gasto_categoria_id_seq"
+      },
+      {
+        "sequence_name": "gasto_id_seq"
+      },
+      {
+        "sequence_name": "ingreso_venta_id_seq"
+      },
+      {
+        "sequence_name": "migrations_id_seq"
+      },
+      {
+        "sequence_name": "movimiento_caja_id_seq"
+      },
+      {
+        "sequence_name": "movimiento_stock_id_seq"
+      },
+      {
+        "sequence_name": "orden_compra_id_seq"
+      },
+      {
+        "sequence_name": "orden_compra_item_id_seq"
+      },
+      {
+        "sequence_name": "parametros_reorden_id_seq"
+      },
+      {
+        "sequence_name": "producto_id_seq"
+      },
+      {
+        "sequence_name": "producto_precio_historial_id_seq"
+      },
+      {
+        "sequence_name": "promocion_id_seq"
+      },
+      {
+        "sequence_name": "promocion_producto_id_seq"
+      },
+      {
+        "sequence_name": "proveedor_id_seq"
+      },
+      {
+        "sequence_name": "roles_id_seq"
+      },
+      {
+        "sequence_name": "sesion_caja_id_seq"
+      },
+      {
+        "sequence_name": "unidad_id_seq"
+      },
+      {
+        "sequence_name": "usuario_rol_id_seq"
+      },
+      {
+        "sequence_name": "usuarios_id_seq"
+      },
+      {
+        "sequence_name": "venta_ajuste_id_seq"
+      },
+      {
+        "sequence_name": "venta_id_seq"
+      },
+      {
+        "sequence_name": "venta_item_id_seq"
+      }
+    ],
+    "enums": [
+      {
+        "enum_name": "cuenta_corriente_movimiento_tipo_enum",
+        "enum_value": "DEUDA"
+      },
+      {
+        "enum_name": "cuenta_corriente_movimiento_tipo_enum",
+        "enum_value": "PAGO"
+      },
+      {
+        "enum_name": "cuenta_corriente_movimiento_tipo_enum",
+        "enum_value": "AJUSTE_DEBITO"
+      },
+      {
+        "enum_name": "cuenta_corriente_movimiento_tipo_enum",
+        "enum_value": "AJUSTE_CREDITO"
+      },
+      {
+        "enum_name": "cuenta_corriente_movimiento_tipo_enum",
+        "enum_value": "SALDO_A_FAVOR"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "EFECTIVO"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "TRANSFERENCIA"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "QR"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "DEBITO"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "CREDITO"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "OTRO"
+      },
+      {
+        "enum_name": "cuenta_corriente_pago_medio_pago_enum",
+        "enum_value": "BANCARIZADO"
+      },
+      {
+        "enum_name": "cuenta_corriente_venta_estado_enum",
+        "enum_value": "PENDIENTE"
+      },
+      {
+        "enum_name": "cuenta_corriente_venta_estado_enum",
+        "enum_value": "PARCIAL"
+      },
+      {
+        "enum_name": "cuenta_corriente_venta_estado_enum",
+        "enum_value": "PAGADA"
+      },
+      {
+        "enum_name": "cuenta_corriente_venta_estado_enum",
+        "enum_value": "ANULADA"
+      },
+      {
+        "enum_name": "extraccion_ingreso_origen_enum",
+        "enum_value": "EFECTIVO"
+      },
+      {
+        "enum_name": "extraccion_ingreso_origen_enum",
+        "enum_value": "BANCARIZADO"
+      },
+      {
+        "enum_name": "gasto_origen_enum",
+        "enum_value": "MANUAL"
+      },
+      {
+        "enum_name": "gasto_origen_enum",
+        "enum_value": "ORDEN_COMPRA"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "EFECTIVO"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "TRANSFERENCIA"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "QR"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "DEBITO"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "CREDITO"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "OTRO"
+      },
+      {
+        "enum_name": "ingreso_venta_tipo_enum",
+        "enum_value": "BANCARIZADO"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "EFECTIVO"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "TRANSFERENCIA"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "QR"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "DEBITO"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "CREDITO"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "OTRO"
+      },
+      {
+        "enum_name": "movimiento_caja_medio_pago_enum",
+        "enum_value": "BANCARIZADO"
+      },
+      {
+        "enum_name": "movimiento_caja_origen_enum",
+        "enum_value": "MANUAL"
+      },
+      {
+        "enum_name": "movimiento_caja_origen_enum",
+        "enum_value": "CUENTA_CORRIENTE"
+      },
+      {
+        "enum_name": "movimiento_caja_tipo_enum",
+        "enum_value": "INGRESO"
+      },
+      {
+        "enum_name": "movimiento_caja_tipo_enum",
+        "enum_value": "EGRESO"
+      },
+      {
+        "enum_name": "movimiento_caja_tipo_enum",
+        "enum_value": "RETIRO"
+      },
+      {
+        "enum_name": "orden_compra_estado_enum",
+        "enum_value": "ACTIVA"
+      },
+      {
+        "enum_name": "orden_compra_estado_enum",
+        "enum_value": "ANULADA"
+      },
+      {
+        "enum_name": "sesion_caja_estado_enum",
+        "enum_value": "ABIERTA"
+      },
+      {
+        "enum_name": "sesion_caja_estado_enum",
+        "enum_value": "CERRADA"
+      },
+      {
+        "enum_name": "venta_ajuste_modo_enum",
+        "enum_value": "PORCENTAJE"
+      },
+      {
+        "enum_name": "venta_ajuste_modo_enum",
+        "enum_value": "MONTO"
+      },
+      {
+        "enum_name": "venta_ajuste_origen_enum",
+        "enum_value": "MANUAL"
+      },
+      {
+        "enum_name": "venta_ajuste_origen_enum",
+        "enum_value": "REGLA"
+      },
+      {
+        "enum_name": "venta_ajuste_origen_enum",
+        "enum_value": "MEDIO_PAGO"
+      },
+      {
+        "enum_name": "venta_ajuste_tipo_enum",
+        "enum_value": "DESCUENTO"
+      },
+      {
+        "enum_name": "venta_ajuste_tipo_enum",
+        "enum_value": "RECARGO"
+      }
+    ]
+  },
+  "tables": {
+    "almacen": [],
+    "categoria": [],
+    "cuenta_corriente": [],
+    "cuenta_corriente_movimiento": [],
+    "cuenta_corriente_pago": [],
+    "cuenta_corriente_pago_aplicacion": [],
+    "cuenta_corriente_venta": [],
+    "extraccion_ingreso": [],
+    "factura_venta_item": [],
+    "facturas": [],
+    "gasto": [],
+    "gasto_categoria": [],
+    "ingreso_venta": [],
+    "migrations": [
+      {
+        "id": 298,
+        "timestamp": "1747320849857",
+        "name": "InitSchema1747320849857"
+      },
+      {
+        "id": 299,
+        "timestamp": "1783440000000",
+        "name": "AddVentaAjustes1783440000000"
+      },
+      {
+        "id": 300,
+        "timestamp": "1783441000000",
+        "name": "AddCuentaCorriente1783441000000"
+      },
+      {
+        "id": 301,
+        "timestamp": "1783442000000",
+        "name": "AddMedioPagoMovimientoCaja1783442000000"
+      },
+      {
+        "id": 302,
+        "timestamp": "1783443000000",
+        "name": "AddTipoCobroVenta1783443000000"
+      },
+      {
+        "id": 303,
+        "timestamp": "1783444000000",
+        "name": "AddMetodosPagoDetallados1783444000000"
+      },
+      {
+        "id": 304,
+        "timestamp": "1783445000000",
+        "name": "AddOrdenCompraTrazabilidadGasto1783445000000"
+      },
+      {
+        "id": 305,
+        "timestamp": "1783446000000",
+        "name": "AddUsuarioActivo1783446000000"
+      },
+      {
+        "id": 306,
+        "timestamp": "1783447000000",
+        "name": "AddGastoCategorias1783447000000"
+      },
+      {
+        "id": 307,
+        "timestamp": "1783448000000",
+        "name": "AddAlmacenToGastos1783448000000"
+      },
+      {
+        "id": 308,
+        "timestamp": "1783449000000",
+        "name": "AddAlmacenToPromociones1783449000000"
+      },
+      {
+        "id": 309,
+        "timestamp": "1783450000000",
+        "name": "AddOrigenMovimientoCaja1783450000000"
+      },
+      {
+        "id": 310,
+        "timestamp": "1783451000000",
+        "name": "AddMetodoPagoOtro1783451000000"
+      },
+      {
+        "id": 311,
+        "timestamp": "1783452000000",
+        "name": "AddMetodoPagoQr1783452000000"
+      },
+      {
+        "id": 312,
+        "timestamp": "1783453000000",
+        "name": "CanonicalRoleNames1783453000000"
+      }
+    ],
+    "movimiento_caja": [],
+    "movimiento_stock": [],
+    "orden_compra": [],
+    "orden_compra_item": [],
+    "parametros_reorden": [],
+    "producto": [],
+    "producto_precio_almacen": [],
+    "producto_precio_historial": [],
+    "promocion": [],
+    "promocion_producto": [],
+    "proveedor": [],
+    "roles": [],
+    "sesion_caja": [],
+    "stock_actual": [],
+    "unidad": [],
+    "usuario_rol": [],
+    "usuarios": [],
+    "venta": [],
+    "venta_ajuste": [],
+    "venta_item": []
+  }
+}

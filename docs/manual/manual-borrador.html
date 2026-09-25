@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de usuario — Sistema de Gestión Comercial</title>
+<style>
+  :root {
+    --primario: #1e3a5f;
+    --acento: #c8102e;
+    --texto: #1a1a1a;
+    --suave: #5a6570;
+    --borde: #d8dee5;
+    --fondo-alt: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: var(--texto); line-height: 1.6; margin: 0;
+    font-size: 10.5pt;
+  }
+  .pagina { max-width: 20cm; margin: 0 auto; padding: 2.2cm 2cm; background: #fff; }
+
+  /* ---------- portada ---------- */
+  .portada {
+    min-height: 96vh; display: flex; flex-direction: column;
+    justify-content: center; page-break-after: always;
+    border-top: 10px solid var(--primario);
+  }
+  .portada .kicker { color: var(--acento); font-weight: 700; letter-spacing: .18em;
+    text-transform: uppercase; font-size: 9pt; margin-bottom: 1.2rem; }
+  .portada h1 { font-size: 30pt; line-height: 1.15; margin: 0 0 .4rem; color: var(--primario); }
+  .portada h2 { font-size: 15pt; font-weight: 400; color: var(--suave); margin: 0 0 3rem; border: 0; padding: 0; }
+  .portada .meta { border-top: 1px solid var(--borde); padding-top: 1.2rem; color: var(--suave); font-size: 9.5pt; }
+  .portada .meta strong { color: var(--texto); }
+
+  /* ---------- índice ---------- */
+  .toc { page-break-after: always; }
+  .toc h2 { border: 0; }
+  .toc ul { list-style: none; padding: 0; margin: 0; columns: 1; }
+  .toc li { padding: 2px 0; }
+  .toc li a { text-decoration: none; color: var(--texto); }
+  .toc li.n1 { font-weight: 700; color: var(--primario); margin-top: .9rem; }
+  .toc li.n2 { padding-left: 1.1rem; }
+  .toc li.n3 { padding-left: 2.3rem; color: var(--suave); font-size: 9.5pt; }
+
+  /* ---------- contenido ---------- */
+  h1 { font-size: 20pt; color: var(--primario); }
+  h2 { font-size: 16pt; color: var(--primario); margin-top: 2.2rem;
+       border-bottom: 2px solid var(--primario); padding-bottom: .35rem; }
+  h2.salto { page-break-before: always; }
+  h3 { font-size: 12.5pt; color: var(--primario); margin-top: 1.8rem; }
+  h4 { font-size: 11pt; margin-top: 1.4rem; color: var(--texto);
+       border-left: 3px solid var(--acento); padding-left: .6rem; }
+  p { margin: .6rem 0; }
+  code { background: var(--fondo-alt); border: 1px solid var(--borde);
+         border-radius: 3px; padding: 1px 4px; font-size: .88em;
+         font-family: "Cascadia Mono", Consolas, monospace; }
+
+  .tabla-wrap { overflow-x: auto; margin: .8rem 0 1.2rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.5pt; page-break-inside: avoid; }
+  th { background: var(--primario); color: #fff; text-align: left;
+       padding: .5rem .6rem; font-weight: 600; }
+  td { padding: .45rem .6rem; border-bottom: 1px solid var(--borde); vertical-align: top; }
+  tbody tr:nth-child(even) { background: var(--fondo-alt); }
+
+  .aviso { border-left: 4px solid var(--primario); background: var(--fondo-alt);
+           padding: .7rem .9rem; margin: 1rem 0; page-break-inside: avoid; }
+  .aviso.warn { border-left-color: #d97706; background: #fffbeb; }
+  .aviso.pendiente { border-left-color: #94a3b8; background: #f1f5f9; color: var(--suave); font-style: italic; }
+  .captura-faltante { border: 1px dashed var(--borde); color: var(--suave);
+                      padding: 1.4rem; text-align: center; margin: 1rem 0; border-radius: 6px; }
+
+  figure { margin: 1.2rem 0; page-break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--borde); border-radius: 4px; }
+  figcaption { font-size: 9pt; color: var(--suave); text-align: center; margin-top: .4rem; }
+
+  /* ---------- impresión ---------- */
+  @page { size: A4; margin: 1.8cm 1.6cm; }
+  @media print {
+    .pagina { max-width: none; padding: 0; }
+    .portada { min-height: 24cm; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<div class="pagina">
+
+  <section class="portada">
+    <div class="kicker">Manual de usuario</div>
+    <h1>Sistema de Gestión Comercial</h1>
+    <h2>Rochester</h2>
+    <div class="meta">
+      <div>Versión <strong>1.0</strong> &nbsp;·&nbsp; 14 de septiembre de 2026</div>
+      <div>Elaborado por <strong>Innoview</strong></div>
+    </div>
+  </section>
+
+  <nav class="toc">
+    <h2>Contenido</h2>
+    <ul><li class="n2"><a href="#introduccion">Introducción</a></li>
+<li class="n3"><a href="#a-quien-esta-dirigido">A quién está dirigido</a></li>
+<li class="n3"><a href="#como-usar-este-manual">Cómo usar este manual</a></li>
+<li class="n2"><a href="#1-acceso-al-sistema">1. Acceso al sistema</a></li>
+<li class="n3"><a href="#1-1-para-que-sirve">1.1 Para qué sirve</a></li>
+<li class="n3"><a href="#1-2-como-llegar">1.2 Cómo llegar</a></li>
+<li class="n3"><a href="#1-3-acciones-disponibles">1.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#1-4-estados-y-opciones">1.4 Estados y opciones</a></li>
+<li class="n3"><a href="#1-5-otras-validaciones-del-modulo">1.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#2-ventas">2. Ventas</a></li>
+<li class="n3"><a href="#2-1-para-que-sirve">2.1 Para qué sirve</a></li>
+<li class="n3"><a href="#2-2-como-llegar">2.2 Cómo llegar</a></li>
+<li class="n3"><a href="#2-3-acciones-disponibles">2.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#2-4-estados-y-opciones">2.4 Estados y opciones</a></li>
+<li class="n3"><a href="#2-5-otras-validaciones-del-modulo">2.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#3-caja">3. Caja</a></li>
+<li class="n3"><a href="#3-1-para-que-sirve">3.1 Para qué sirve</a></li>
+<li class="n3"><a href="#3-2-como-llegar">3.2 Cómo llegar</a></li>
+<li class="n3"><a href="#3-3-acciones-disponibles">3.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#3-4-estados-y-opciones">3.4 Estados y opciones</a></li>
+<li class="n3"><a href="#3-5-ciclo-de-vida-de-una-caja">3.5 Ciclo de vida de una caja</a></li>
+<li class="n3"><a href="#3-6-otras-validaciones-del-modulo">3.6 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#4-productos">4. Productos</a></li>
+<li class="n3"><a href="#4-1-para-que-sirve">4.1 Para qué sirve</a></li>
+<li class="n3"><a href="#4-2-como-llegar">4.2 Cómo llegar</a></li>
+<li class="n3"><a href="#4-3-acciones-disponibles">4.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#4-5-otras-validaciones-del-modulo">4.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#5-stock">5. Stock</a></li>
+<li class="n3"><a href="#5-1-para-que-sirve">5.1 Para qué sirve</a></li>
+<li class="n3"><a href="#5-2-como-llegar">5.2 Cómo llegar</a></li>
+<li class="n3"><a href="#5-3-acciones-disponibles">5.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#5-5-otras-validaciones-del-modulo">5.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#6-movimientos-de-stock">6. Movimientos de stock</a></li>
+<li class="n3"><a href="#6-1-para-que-sirve">6.1 Para qué sirve</a></li>
+<li class="n3"><a href="#6-2-como-llegar">6.2 Cómo llegar</a></li>
+<li class="n3"><a href="#6-3-acciones-disponibles">6.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#6-5-otras-validaciones-del-modulo">6.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#7-promociones">7. Promociones</a></li>
+<li class="n3"><a href="#7-1-para-que-sirve">7.1 Para qué sirve</a></li>
+<li class="n3"><a href="#7-2-como-llegar">7.2 Cómo llegar</a></li>
+<li class="n3"><a href="#7-3-acciones-disponibles">7.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#7-5-otras-validaciones-del-modulo">7.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#8-cuentas-corrientes">8. Cuentas corrientes</a></li>
+<li class="n3"><a href="#8-1-para-que-sirve">8.1 Para qué sirve</a></li>
+<li class="n3"><a href="#8-2-como-llegar">8.2 Cómo llegar</a></li>
+<li class="n3"><a href="#8-3-acciones-disponibles">8.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#8-4-estados-y-opciones">8.4 Estados y opciones</a></li>
+<li class="n3"><a href="#8-5-otras-validaciones-del-modulo">8.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#9-gastos">9. Gastos</a></li>
+<li class="n3"><a href="#9-1-para-que-sirve">9.1 Para qué sirve</a></li>
+<li class="n3"><a href="#9-2-como-llegar">9.2 Cómo llegar</a></li>
+<li class="n3"><a href="#9-3-acciones-disponibles">9.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#9-4-estados-y-opciones">9.4 Estados y opciones</a></li>
+<li class="n3"><a href="#9-5-otras-validaciones-del-modulo">9.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#10-ordenes-de-compra">10. Órdenes de compra</a></li>
+<li class="n3"><a href="#10-1-para-que-sirve">10.1 Para qué sirve</a></li>
+<li class="n3"><a href="#10-2-como-llegar">10.2 Cómo llegar</a></li>
+<li class="n3"><a href="#10-3-acciones-disponibles">10.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#10-4-estados-y-opciones">10.4 Estados y opciones</a></li>
+<li class="n3"><a href="#10-5-otras-validaciones-del-modulo">10.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#11-proveedores">11. Proveedores</a></li>
+<li class="n3"><a href="#11-1-para-que-sirve">11.1 Para qué sirve</a></li>
+<li class="n3"><a href="#11-2-como-llegar">11.2 Cómo llegar</a></li>
+<li class="n3"><a href="#11-3-acciones-disponibles">11.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#11-5-otras-validaciones-del-modulo">11.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#12-categorias">12. Categorías</a></li>
+<li class="n3"><a href="#12-1-para-que-sirve">12.1 Para qué sirve</a></li>
+<li class="n3"><a href="#12-2-como-llegar">12.2 Cómo llegar</a></li>
+<li class="n3"><a href="#12-3-acciones-disponibles">12.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#12-5-otras-validaciones-del-modulo">12.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#13-unidades-de-medida">13. Unidades de medida</a></li>
+<li class="n3"><a href="#13-1-para-que-sirve">13.1 Para qué sirve</a></li>
+<li class="n3"><a href="#13-2-como-llegar">13.2 Cómo llegar</a></li>
+<li class="n3"><a href="#13-3-acciones-disponibles">13.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#13-5-otras-validaciones-del-modulo">13.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#14-almacenes">14. Almacenes</a></li>
+<li class="n3"><a href="#14-1-para-que-sirve">14.1 Para qué sirve</a></li>
+<li class="n3"><a href="#14-2-como-llegar">14.2 Cómo llegar</a></li>
+<li class="n3"><a href="#14-3-acciones-disponibles">14.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#14-5-otras-validaciones-del-modulo">14.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#15-parametros-de-reposicion">15. Parámetros de reposición</a></li>
+<li class="n3"><a href="#15-1-para-que-sirve">15.1 Para qué sirve</a></li>
+<li class="n3"><a href="#15-2-como-llegar">15.2 Cómo llegar</a></li>
+<li class="n3"><a href="#15-3-acciones-disponibles">15.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#15-5-otras-validaciones-del-modulo">15.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#16-extracciones-de-caja">16. Extracciones de caja</a></li>
+<li class="n3"><a href="#16-1-para-que-sirve">16.1 Para qué sirve</a></li>
+<li class="n3"><a href="#16-2-como-llegar">16.2 Cómo llegar</a></li>
+<li class="n3"><a href="#16-3-acciones-disponibles">16.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#16-5-otras-validaciones-del-modulo">16.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#17-ingresos">17. Ingresos</a></li>
+<li class="n3"><a href="#17-1-para-que-sirve">17.1 Para qué sirve</a></li>
+<li class="n3"><a href="#17-2-como-llegar">17.2 Cómo llegar</a></li>
+<li class="n3"><a href="#17-3-acciones-disponibles">17.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#17-5-otras-validaciones-del-modulo">17.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#18-facturacion">18. Facturación</a></li>
+<li class="n3"><a href="#18-1-para-que-sirve">18.1 Para qué sirve</a></li>
+<li class="n3"><a href="#18-2-como-llegar">18.2 Cómo llegar</a></li>
+<li class="n3"><a href="#18-3-acciones-disponibles">18.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#18-5-otras-validaciones-del-modulo">18.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#19-usuarios">19. Usuarios</a></li>
+<li class="n3"><a href="#19-1-para-que-sirve">19.1 Para qué sirve</a></li>
+<li class="n3"><a href="#19-2-como-llegar">19.2 Cómo llegar</a></li>
+<li class="n3"><a href="#19-3-acciones-disponibles">19.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#19-5-otras-validaciones-del-modulo">19.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#20-asignacion-de-roles">20. Asignación de roles</a></li>
+<li class="n3"><a href="#20-1-para-que-sirve">20.1 Para qué sirve</a></li>
+<li class="n3"><a href="#20-2-como-llegar">20.2 Cómo llegar</a></li>
+<li class="n3"><a href="#20-3-acciones-disponibles">20.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#20-5-otras-validaciones-del-modulo">20.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#21-roles">21. Roles</a></li>
+<li class="n3"><a href="#21-1-para-que-sirve">21.1 Para qué sirve</a></li>
+<li class="n3"><a href="#21-2-como-llegar">21.2 Cómo llegar</a></li>
+<li class="n3"><a href="#21-3-acciones-disponibles">21.3 Acciones disponibles</a></li>
+<li class="n3"><a href="#21-5-otras-validaciones-del-modulo">21.5 Otras validaciones del módulo</a></li>
+<li class="n2"><a href="#anexo-a-perfiles-y-permisos">Anexo A. Perfiles y permisos</a></li>
+<li class="n2"><a href="#anexo-b-catalogo-completo-de-mensajes-del-sistema">Anexo B. Catálogo completo de mensajes del sistema</a></li>
+<li class="n2"><a href="#anexo-c-glosario">Anexo C. Glosario</a></li></ul>
+  </nav>
+
+  <h2 id="introduccion" class="salto">Introducción</h2>
+<div class="aviso pendiente"><em>Pendiente de redacción — presentar el sistema "Sistema de Gestión Comercial" al usuario final</em></div>
+<h3 id="a-quien-esta-dirigido">A quién está dirigido</h3>
+<ul>
+<li><strong>Admin</strong>: Acceso total. Configura el sistema, gestiona usuarios, ve reportes y cierra cajas.</li>
+<li><strong>Vendedor</strong>: Opera el día a día: registra ventas, cobra, abre y cierra su caja.</li>
+<li><strong>Cocina</strong>: Visualiza los pedidos a preparar y marca su avance.</li>
+</ul>
+<h3 id="como-usar-este-manual">Cómo usar este manual</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — explicar la estructura del documento y las convenciones tipográficas</em></div>
+<h2 id="1-acceso-al-sistema" class="salto">1. Acceso al sistema</h2>
+<h3 id="1-1-para-que-sirve">1.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Acceso al sistema" para el usuario</em></div>
+<h3 id="1-2-como-llegar">1.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="1-3-acciones-disponibles">1.3 Acciones disponibles</h3>
+<h4 id="1-3-1-login">1.3.1 Login</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/auth-login.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>email</code></td><td>Correo electrónico</td><td><strong>Sí</strong></td><td>Máx. 100 caracteres</td></tr><tr><td><code>password</code></td><td>Texto</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="1-3-2-get-profile">1.3.2 Get profile</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/auth-getProfile.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="1-3-3-me">1.3.3 Me</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/auth-me.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="1-4-estados-y-opciones">1.4 Estados y opciones</h3>
+<p><strong>Jwt constants</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td>`process.env.JWT_SECRET \</td><td>\</td><td>'defaultSecret'`</td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>App roles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>Admin</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>Vendedor</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>Cocina</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>Legacy role name map</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>APP_ROLES.ADMIN</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>APP_ROLES.ADMIN</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>APP_ROLES.ADMIN</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>APP_ROLES.VENDEDOR</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>APP_ROLES.VENDEDOR</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>APP_ROLES.COCINA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="1-5-otras-validaciones-del-modulo">1.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Token invalido</td><td>Verify token</td></tr></tbody>
+</table></div>
+<h2 id="2-ventas" class="salto">2. Ventas</h2>
+<h3 id="2-1-para-que-sirve">2.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Ventas" para el usuario</em></div>
+<h3 id="2-2-como-llegar">2.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="2-3-acciones-disponibles">2.3 Acciones disponibles</h3>
+<h4 id="2-3-1-create">2.3.1 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>usuarioId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>almacenId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>pagos</code></td><td>Lista</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>items</code></td><td>Lista</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>promociones</code></td><td>Lista</td><td>No</td><td>—</td></tr><tr><td><code>ajustes</code></td><td>Lista</td><td>No</td><td>—</td></tr><tr><td><code>tipoCobro</code></td><td>Opción de lista</td><td>No</td><td>Valores: <code>CONTADO</code>, <code>CUENTA_CORRIENTE</code></td></tr><tr><td><code>cuentaCorrienteId</code></td><td>Número entero</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Venta pago</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>medio</code></td><td>MedioPagoVenta</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>detalle_pago</code></td><td>Texto</td><td>No</td><td>Mín. 3 caracteres. Máx. DETALLE<em>PAGO</em>MAX_LENGTH caracteres</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Venta item</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>productoId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0.001</td></tr><tr><td><code>precioUnitario</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Venta promo</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>promocionId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Venta ajuste</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>tipo</code></td><td>Opción de lista</td><td><strong>Sí</strong></td><td>Valores: <code>DESCUENTO</code>, <code>RECARGO</code></td></tr><tr><td><code>modo</code></td><td>Opción de lista</td><td><strong>Sí</strong></td><td>Valores: <code>PORCENTAJE</code>, <code>MONTO</code></td></tr><tr><td><code>valor</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>motivo</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 500 caracteres</td></tr><tr><td><code>codigo</code></td><td>Texto</td><td>No</td><td>Máx. 80 caracteres</td></tr><tr><td><code>origen</code></td><td>Opción de lista</td><td>No</td><td>Valores: <code>MANUAL</code>, <code>REGLA</code>, <code>MEDIO_PAGO</code></td></tr></tbody>
+</table></div>
+<div class="aviso warn">⚠️ Este formulario rechaza cualquier dato que no esté en la lista anterior.</div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Almacen {dto.almacenId} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>La venta debe incluir al menos un item o una promocion</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>cuentaCorrienteId es obligatorio para ventas a cuenta corriente</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>cuentaCorrienteId solo puede enviarse con tipoCobro CUENTA_CORRIENTE</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="2-3-2-obtener-ventas">2.3.2 Obtener ventas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-obtenerVentas.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>fechaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>horaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>horaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>usuarioId</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>estado</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>tipo</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>page</code></td><td>string</td><td>No</td><td>Por defecto: <code>1</code></td></tr><tr><td><code>limit</code></td><td>string</td><td>No</td><td>Por defecto: <code>50</code></td></tr><tr><td><code>ordenCampo</code></td><td>string</td><td>No</td><td>Por defecto: <code>fecha</code></td></tr><tr><td><code>ordenDireccion</code></td><td>'ASC' \</td><td>'DESC'</td><td>No</td><td>Por defecto: <code>DESC</code></td></tr></tbody>
+</table></div>
+<h4 id="2-3-3-obtener-estadisticas">2.3.3 Obtener estadisticas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-obtenerEstadisticas.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>EstadisticasVentasDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="2-3-4-obtener-total-por-categoria">2.3.4 Obtener total por categoria</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-obtenerTotalPorCategoria.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>fechaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="2-3-5-find-one">2.3.5 Find one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-findOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>ID inválido</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Venta with ID {id} not found</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="2-3-6-actualizar-estado">2.3.6 Actualizar estado</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-actualizarEstado.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>estado</code></td><td>Texto</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="2-3-7-get-venta-completa">2.3.7 Get venta completa</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/venta-getVentaCompleta.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>ID inválido</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Venta con ID {id} no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="2-4-estados-y-opciones">2.4 Estados y opciones</h3>
+<p><strong>Venta ajuste tipo</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>DESCUENTO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>RECARGO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>Venta ajuste modo</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>PORCENTAJE</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>MONTO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>Venta ajuste origen</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>MANUAL</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>REGLA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>MEDIO_PAGO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>Tipo cobro venta</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>CONTADO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>CUENTA_CORRIENTE</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="2-5-otras-validaciones-del-modulo">2.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Producto {itemDto.productoId} no encontrado</td><td>Armar items venta</td></tr><tr><td>Promocion {promoItem.promocionId} no esta activa</td><td>Armar items venta</td></tr><tr><td>Promocion {promoItem.promocionId} no esta disponible para el almacen {dto.almacenId}</td><td>Armar items venta</td></tr><tr><td>Promocion {promoItem.promocionId} no tiene productos</td><td>Armar items venta</td></tr><tr><td>La cantidad de la promocion debe ser mayor a 0</td><td>Armar items venta</td></tr><tr><td>La promocion {promo.id} tiene gramos invalidos para producto {producto.id}</td><td>Armar items venta</td></tr><tr><td>La promocion {promo.id} tiene cantidad invalida para producto {producto.id}</td><td>Armar items venta</td></tr><tr><td>El ajuste #{index + 1} debe incluir un motivo</td><td>Calcular ajustes</td></tr><tr><td>El ajuste #{index + 1} debe tener un valor mayor a 0</td><td>Calcular ajustes</td></tr><tr><td>El descuento porcentual #{index + 1} no puede superar el 100%</td><td>Calcular ajustes</td></tr><tr><td>Los descuentos no pueden dejar el total de la venta en negativo. Total calculado: {total}</td><td>Calcular ajustes</td></tr><tr><td>Producto {producto.id} se vende por gramos: enviar solo cantidad_gramos</td><td>Validar cantidad segun producto</td></tr><tr><td>Producto {producto.id} se vende por piezas: enviar solo cantidad</td><td>Validar cantidad segun producto</td></tr><tr><td>La venta debe incluir al menos un pago</td><td>Normalizar pagos</td></tr><tr><td>medio debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO</td><td>Normalizar pagos</td></tr><tr><td>detalle_pago es obligatorio para pagos con medio OTRO</td><td>Normalizar pagos</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Normalizar pagos</td></tr><tr><td>Cada pago debe tener un monto mayor a 0</td><td>Normalizar pagos</td></tr><tr><td>La venta debe incluir al menos un pago</td><td>Normalizar pagos</td></tr><tr><td>La suma de pagos ({totalPagos}) debe coincidir con el total de la venta ({total})</td><td>Validar total pagos</td></tr><tr><td>El pago inicial ({totalPagos}) no puede superar el total de la venta ({total}). Para generar saldo a favor, registrar un pago posterior en cuenta corriente.</td><td>Validar pago inicial cuenta corriente</td></tr><tr><td>No existe stock para producto {producto.id} en almacen {almacenId}</td><td>Descontar stock yregistrar movimiento tx</td></tr></tbody>
+</table></div>
+<h2 id="3-caja" class="salto">3. Caja</h2>
+<h3 id="3-1-para-que-sirve">3.1 Para qué sirve</h3>
+<p>La caja representa su sesión de trabajo con dinero. Al comenzar el turno usted <strong>abre la caja</strong> declarando cuánto efectivo hay disponible para dar vuelto; durante la jornada el sistema registra automáticamente todo el dinero que entra y sale; y al terminar usted <strong>cierra la caja</strong> contando el efectivo real.</p>
+<p>En ese momento el sistema compara lo que contó contra lo que debería haber según las operaciones registradas, y calcula la <strong>diferencia</strong>. Ese arqueo es el control principal sobre el manejo de dinero del punto de venta.</p>
+<p>Cada almacén maneja su propia caja de forma independiente: puede haber una caja abierta por almacén al mismo tiempo, pero nunca dos en el mismo almacén.</p>
+<h3 id="3-2-como-llegar">3.2 Cómo llegar</h3>
+<p>Desde el menú principal, ingrese a <strong>Caja</strong>. Si todavía no hay una sesión abierta en su almacén, el sistema le ofrecerá abrirla.</p>
+<h3 id="3-3-acciones-disponibles">3.3 Acciones disponibles</h3>
+<h4 id="3-3-1-abrir-la-caja">3.3.1 Abrir la caja</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-abrir.png</code></div>
+<ol>
+<li>Ingrese a <strong>Caja</strong> desde el menú principal.</li>
+<li>Presione <strong>Abrir caja</strong>.</li>
+<li>Seleccione el <strong>almacén</strong> en el que va a trabajar.</li>
+<li>Cargue el <strong>monto inicial</strong>: el efectivo con el que arranca el turno, contado de forma manual.</li>
+<li>Si corresponde, agregue una <strong>observación</strong> (por ejemplo, "faltaba cambio de $500").</li>
+<li>Confirme. A partir de ese momento todas las ventas y movimientos quedan asociados a esta sesión.</li>
+</ol>
+<div class="aviso">El monto inicial no se puede modificar una vez abierta la caja. Si se equivocó, registre la corrección como un movimiento manual dejando constancia en el motivo.</div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>almacen_id</code></td><td>Número</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto_inicial</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0</td></tr><tr><td><code>observacion</code></td><td>Texto</td><td>No</td><td>Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Ya existe una caja abierta para el almacén {almacen} (sesión #{id})</td><td>Ese almacén tiene una sesión sin cerrar, probablemente del turno anterior. Ciérrela antes de abrir una nueva.</td></tr></tbody>
+</table></div>
+<h4 id="3-3-2-ver-la-caja-activa">3.3.2 Ver la caja activa</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-obtenerActiva.png</code></div>
+<p>Muestra el estado en vivo de la sesión abierta del almacén: monto inicial, total de ingresos y egresos, y el <strong>efectivo esperado</strong> en el cajón hasta el momento. Es la pantalla de consulta rápida durante el turno.</p>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>almacen_id</code></td><td>Número</td><td><strong>Sí</strong></td><td>Almacén cuya caja abierta se quiere consultar</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>No hay caja abierta para el almacén {almacen}</td><td>Nadie abrió la caja en ese almacén todavía. Ábrala para poder operar.</td></tr></tbody>
+</table></div>
+<h4 id="3-3-3-consultar-el-historial-de-cajas">3.3.3 Consultar el historial de cajas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-historial.png</code></div>
+<ol>
+<li>Ingrese a <strong>Caja → Historial</strong>.</li>
+<li>Filtre por almacén y rango de fechas según lo que necesite revisar.</li>
+<li>Haga clic en cualquier sesión para ver su reporte de cierre completo.</li>
+</ol>
+<p>Los resultados se muestran paginados: use los controles del pie de la tabla para avanzar.</p>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>almacen_id</code></td><td>Número</td><td>No</td><td>Si se omite, muestra todos los almacenes</td></tr><tr><td><code>desde</code></td><td>Fecha</td><td>No</td><td>Fecha de apertura mínima</td></tr><tr><td><code>hasta</code></td><td>Fecha</td><td>No</td><td>Fecha de apertura máxima</td></tr><tr><td><code>page</code></td><td>Número</td><td>No</td><td>Por defecto: <code>1</code></td></tr><tr><td><code>limit</code></td><td>Número</td><td>No</td><td>Por defecto: <code>20</code> registros por página</td></tr></tbody>
+</table></div>
+<h4 id="3-3-4-ver-el-reporte-de-una-caja">3.3.4 Ver el reporte de una caja</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-reporte.png</code></div>
+<p>Es el comprobante de la sesión. Incluye el monto inicial, el desglose de ingresos y egresos por medio de pago, el efectivo esperado, el efectivo contado al cierre y la diferencia resultante. Se puede consultar tanto en cajas abiertas (con datos parciales) como cerradas.</p>
+<h4 id="3-3-5-ver-los-movimientos-de-la-caja">3.3.5 Ver los movimientos de la caja</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-listarMovimientos.png</code></div>
+<p>Lista todo lo que entró y salió de la caja durante la sesión: ventas cobradas, retiros, gastos y ajustes manuales. Puede filtrar por tipo, medio de pago y origen para auditar un caso puntual.</p>
+<h4 id="3-3-6-registrar-un-movimiento-manual">3.3.6 Registrar un movimiento manual</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-agregarMovimiento.png</code></div>
+<p>Se usa para el dinero que entra o sale por fuera de una venta: un retiro a la bóveda, el pago de un flete, un ingreso de cambio.</p>
+<ol>
+<li>Dentro de la caja abierta, presione <strong>Nuevo movimiento</strong>.</li>
+<li>Elija el <strong>tipo</strong>: <code>INGRESO</code> (entra dinero), <code>EGRESO</code> (sale por un gasto) o <code>RETIRO</code> (se saca efectivo de la caja).</li>
+<li>Cargue el <strong>monto</strong>, que debe ser mayor a cero.</li>
+<li>Seleccione el <strong>medio de pago</strong>. Si elige <code>OTRO</code>, el campo <strong>detalle de pago</strong> pasa a ser obligatorio.</li>
+<li>Escriba el <strong>motivo</strong>: es obligatorio y queda asentado en el reporte de cierre.</li>
+<li>Confirme.</li>
+</ol>
+<div class="aviso warn">⚠️ Los movimientos no se editan. Si se equivocó, debe anularlo y registrar uno nuevo.</div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>tipo</code></td><td>Opción de lista</td><td><strong>Sí</strong></td><td>Valores: <code>INGRESO</code>, <code>EGRESO</code>, <code>RETIRO</code></td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>medio_pago</code></td><td>Opción de lista</td><td>No</td><td>Valores: <code>EFECTIVO</code>, <code>TRANSFERENCIA</code>, <code>QR</code>, <code>DEBITO</code>, <code>CREDITO</code>, <code>OTRO</code></td></tr><tr><td><code>detalle_pago</code></td><td>Texto</td><td>No</td><td>Obligatorio si el medio de pago es <code>OTRO</code>. Mín. 3 caracteres</td></tr><tr><td><code>motivo</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Mín. 3 caracteres. Máx. 500 caracteres</td></tr><tr><td><code>observacion</code></td><td>Texto</td><td>No</td><td>Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>medio_pago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO, OTRO o BANCARIZADO</td><td>Se envió un medio de pago que no está en la lista. Seleccione uno del desplegable.</td></tr><tr><td>detalle<em>pago es obligatorio para movimientos con medio</em>pago OTRO</td><td>Eligió "Otro" como medio de pago: describa de qué se trata en el campo de detalle.</td></tr><tr><td>tipo debe ser INGRESO, EGRESO o RETIRO</td><td>Seleccione el tipo de movimiento desde la lista.</td></tr></tbody>
+</table></div>
+<h4 id="3-3-7-cerrar-la-caja">3.3.7 Cerrar la caja</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-cerrar.png</code></div>
+<ol>
+<li>Al terminar el turno, cuente físicamente todo el efectivo del cajón.</li>
+<li>Ingrese a la caja abierta y presione <strong>Cerrar caja</strong>.</li>
+<li>Cargue en <strong>efectivo contado</strong> el total que contó, sin descontar el monto inicial.</li>
+<li>Confirme. El sistema calcula la diferencia y emite el reporte de cierre.</li>
+</ol>
+<p>Al confirmar, la sesión pasa a estado <code>CERRADA</code> y ya no admite movimientos nuevos.</p>
+<p><strong>Cómo se calcula la diferencia</strong></p>
+<p>``` efectivo esperado  =  monto inicial                     + cobros en efectivo                     + ingresos manuales en efectivo                     − egresos y retiros en efectivo</p>
+<p>diferencia         =  efectivo contado − efectivo esperado ```</p>
+<p>Una diferencia <strong>positiva</strong> significa sobrante en el cajón; una <strong>negativa</strong>, faltante. El sistema no bloquea el cierre por diferencia: la registra para su revisión posterior.</p>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>efectivo_contado</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<h4 id="3-3-8-anular-un-movimiento">3.3.8 Anular un movimiento</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/caja-anularMovimiento.png</code></div>
+<ol>
+<li>Abra la lista de movimientos de la caja.</li>
+<li>Ubique el movimiento a anular y presione <strong>Anular</strong>.</li>
+<li>Escriba el <strong>motivo de la anulación</strong>. Es obligatorio y queda registrado.</li>
+<li>Confirme.</li>
+</ol>
+<p>El movimiento no se borra: queda marcado como anulado y deja de sumar al total de la caja, conservando la trazabilidad.</p>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>motivo_anulacion</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Mín. 5 caracteres. Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Movimiento #{id} no encontrado</td><td>El movimiento no existe o pertenece a otra caja. Refresque la lista.</td></tr><tr><td>El movimiento #{id} ya está anulado</td><td>Alguien lo anuló antes. No hace falta hacer nada.</td></tr><tr><td>Este movimiento proviene de un pago de cuenta corriente. Debe anularse desde cuenta corriente.</td><td>El movimiento se generó automáticamente al cobrar una cuenta corriente. Anule el pago desde el módulo <strong>Cuentas corrientes</strong> y la caja se corregirá sola.</td></tr><tr><td>La caja ya se encuentra cerrada</td><td>No se pueden anular movimientos de una sesión cerrada.</td></tr></tbody>
+</table></div>
+<h3 id="3-4-estados-y-opciones">3.4 Estados y opciones</h3>
+<p><strong>Estado de la sesión de caja</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>ABIERTA</code></td><td>Sesión en curso. Admite ventas y movimientos. Es la única que puede cerrarse.</td></tr><tr><td><code>CERRADA</code></td><td>Turno finalizado y arqueado. Solo lectura: ya no admite movimientos ni anulaciones.</td></tr></tbody>
+</table></div>
+<p><strong>Origen del movimiento</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>MANUAL</code></td><td>Lo cargó un usuario desde la pantalla de caja. Se puede anular desde aquí.</td></tr><tr><td><code>CUENTA_CORRIENTE</code></td><td>Lo generó el sistema al registrarse el pago de una cuenta corriente. Solo se anula desde ese módulo.</td></tr></tbody>
+</table></div>
+<p><strong>Tipo de movimiento</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>INGRESO</code></td><td>Entra dinero a la caja por un concepto distinto de una venta.</td></tr><tr><td><code>EGRESO</code></td><td>Sale dinero para cubrir un gasto.</td></tr><tr><td><code>RETIRO</code></td><td>Se extrae efectivo de la caja (por ejemplo, hacia la bóveda).</td></tr></tbody>
+</table></div>
+<h3 id="3-5-ciclo-de-vida-de-una-caja">3.5 Ciclo de vida de una caja</h3>
+<p>``<code>   Apertura                Operación del turno              Cierre  ┌──────────┐        ┌───────────────────────┐        ┌──────────┐  │ ABIERTA  │ ─────▶ │ ventas · movimientos  │ ─────▶ │ CERRADA  │  │          │        │ anulaciones           │        │ arqueada │  └──────────┘        └───────────────────────┘        └──────────┘    monto              el sistema acumula el            efectivo contado    inicial            efectivo esperado                − esperado = diferencia </code>``</p>
+<h3 id="3-6-otras-validaciones-del-modulo">3.6 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Cuándo aparece</th></tr></thead>
+<tbody><tr><td>Parametro numerico invalido: {valor}</td><td>Se envió texto donde se esperaba un número (por ejemplo, en un filtro).</td></tr><tr><td>order debe ser ASC o DESC</td><td>El criterio de ordenamiento de la lista no es válido.</td></tr><tr><td>origen debe ser MANUAL o CUENTA_CORRIENTE</td><td>El filtro de origen recibió un valor fuera de la lista.</td></tr></tbody>
+</table></div>
+<h2 id="4-productos" class="salto">4. Productos</h2>
+<h3 id="4-1-para-que-sirve">4.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Productos" para el usuario</em></div>
+<h3 id="4-2-como-llegar">4.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="4-3-acciones-disponibles">4.3 Acciones disponibles</h3>
+<h4 id="4-3-1-importar">4.3.1 Importar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-importar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Debe adjuntarse el archivo Excel en el campo "file" (multipart/form-data).</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>almacenId es obligatorio y debe ser un entero mayor a 0.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="4-3-2-buscar">4.3.2 Buscar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-buscar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>BuscarProductoDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="4-3-3-buscar-fast">4.3.3 Buscar fast</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-buscarFast.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>BuscarProductoFastDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="4-3-4-upsert-precio">4.3.4 Upsert precio</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-upsertPrecio.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>producto_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>almacen_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>precio</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01. Debe ser mayor a cero</td></tr><tr><td><code>moneda</code></td><td>Texto</td><td>No</td><td>—</td></tr><tr><td><code>inOferta</code></td><td>Sí / No</td><td>No</td><td>—</td></tr><tr><td><code>precioOferta</code></td><td>Número</td><td>No</td><td>Mínimo 0.01. Debe ser mayor a cero</td></tr></tbody>
+</table></div>
+<h4 id="4-3-5-remove-precio">4.3.5 Remove precio</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-removePrecio.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="4-3-6-get-precio">4.3.6 Get precio</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-getPrecio.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="4-3-7-historial-precios">4.3.7 Historial precios</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-historialPrecios.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>QueryPrecioHistorialDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="4-3-8-find-by-barcode">4.3.8 Find by barcode</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-findByBarcode.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>No existe producto con barcode {barcode}</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="4-3-9-get-all">4.3.9 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="4-3-10-get-one">4.3.10 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="4-3-11-create">4.3.11 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>sku</code></td><td>Texto</td><td>No</td><td>Máx. 50 caracteres</td></tr><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 255 caracteres</td></tr><tr><td><code>descripcion</code></td><td>Texto</td><td>No</td><td>—</td></tr><tr><td><code>unidad_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>categoria_id</code></td><td>Número entero</td><td>No</td><td>—</td></tr><tr><td><code>precioBase</code></td><td>Número</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>barcode</code></td><td>Texto</td><td>No</td><td>Máx. 100 caracteres</td></tr><tr><td><code>es<em>por</em>gramos</code></td><td>Sí / No</td><td>No</td><td>—</td></tr><tr><td><code>inOferta</code></td><td>Sí / No</td><td>No</td><td>—</td></tr><tr><td><code>almacenId</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>proveedorNombre</code></td><td>Texto</td><td>No</td><td>Máx. 255 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Unidad no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El producto con SKU "{dto.sku}" ya existe.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Ya existe un producto activo con ese código de barras. Nombre: "{existingBarcode.nombre}".</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="4-3-12-update-carga-rapida">4.3.12 Update carga rapida</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-updateCargaRapida.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>string</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>descripcion</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>precioBase</code></td><td>number</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>inOferta</code></td><td>boolean</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>No existe el producto de carga rápida</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="4-3-13-update">4.3.13 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Producto {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Carga rápida: solo se puede editar {allowed.join(', ')}. No permitido: {invalid.join(', ')}</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Unidad no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Producto {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="4-3-14-borrar-logico">4.3.14 Borrar logico</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/producto-borrarLogico.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="4-5-otras-validaciones-del-modulo">4.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>La hoja "Productos" no contiene filas de datos.</td><td>Importar desde excel</td></tr><tr><td>Almacen {almacenId} no encontrado</td><td>Importar desde excel</td></tr><tr><td>El archivo no es un Excel (.xlsx) válido.</td><td>Parsear excel</td></tr><tr><td>El archivo no contiene hojas.</td><td>Parsear excel</td></tr><tr><td>Faltan columnas obligatorias en la hoja "Productos": {faltantes.join(', ')}</td><td>Parsear excel</td></tr><tr><td>{         message: 'El Excel tiene errores de validación. No se importó nada.',         errores,       }</td><td>Parsear excel</td></tr><tr><td>Fila {fila.fila} ({fila.sku}): unidad "{fila.unidad}" no existe en el sistema.</td><td>Resolver unidad</td></tr><tr><td>Fila {fila.fila} ({fila.sku}): no se indicó unidad y no existe una unidad por defecto.</td><td>Resolver unidad</td></tr><tr><td>El producto de carga rápida no permite: {action}</td><td>Assert not quick producto</td></tr><tr><td>Producto {productoId} no encontrado</td><td>Get precio final</td></tr><tr><td>almacenId debe ser un entero mayor a 0</td><td>Validar almacen producto</td></tr><tr><td>Almacen {parsedAlmacenId} no encontrado</td><td>Validar almacen producto</td></tr><tr><td>Producto {id} no encontrado</td><td>Remove</td></tr><tr><td>sortBy invalido. Valores permitidos: precioFinal</td><td>Buscar con filtros</td></tr><tr><td>sortDir invalido. Valores permitidos: asc, desc</td><td>Buscar con filtros</td></tr><tr><td>Para ordenar por precioFinal es obligatorio enviar almacenId</td><td>Buscar con filtros</td></tr><tr><td>Para filtrar por inOferta es obligatorio enviar almacenId</td><td>Buscar con filtros</td></tr><tr><td>page debe ser un entero mayor a 0</td><td>Buscar con filtros</td></tr><tr><td>limit debe ser un entero mayor a 0</td><td>Buscar con filtros</td></tr><tr><td>Producto {id} no encontrado</td><td>Borrar logicamente</td></tr><tr><td>No se puede borrar el producto porque tiene stock en uno o mas almacenes.</td><td>Borrar logicamente</td></tr><tr><td>El precio debe ser &gt; 0</td><td>Upsert precio almacen</td></tr><tr><td>Si inOferta es true, debe enviarse precioOferta &gt; 0</td><td>Upsert precio almacen</td></tr><tr><td>Producto {producto_id} no encontrado</td><td>Upsert precio almacen</td></tr><tr><td>No existe override para producto {producto<em>id} en almacén {almacen</em>id}</td><td>Remove precio almacen</td></tr></tbody>
+</table></div>
+<h2 id="5-stock" class="salto">5. Stock</h2>
+<h3 id="5-1-para-que-sirve">5.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Stock" para el usuario</em></div>
+<h3 id="5-2-como-llegar">5.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="5-3-acciones-disponibles">5.3 Acciones disponibles</h3>
+<h4 id="5-3-1-get-all">5.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>new ValidationPipe({         transform: true,         whitelist: true,         forbidNonWhitelisted: true,       })</code></td><td>QueryStockActualDto</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="5-3-2-get-stock-by-almacen">5.3.2 Get stock by almacen</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-getStockByAlmacen.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="5-3-3-get-one">5.3.3 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="5-3-4-registrar-entrada">5.3.4 Registrar entrada</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-registrarEntrada.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>producto_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>Mínimo 1</td></tr><tr><td><code>almacen_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>Mínimo 1</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>motivo</code></td><td>Texto</td><td>No</td><td>—</td></tr><tr><td><code>proveedor_id</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>precioUnitario</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>precioTotal</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Producto {dto.producto_id} no existe</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="5-3-5-registrar-insumo">5.3.5 Registrar insumo</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-registrarInsumo.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>producto_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>almacen_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Producto {dto.producto_id} no existe</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Stock no encontrado para producto {dto.producto<em>id} en almacén {dto.almacen</em>id}</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="5-3-6-cancelar-insumo">5.3.6 Cancelar insumo</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-cancelarInsumo.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>movimiento_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="5-3-7-create">5.3.7 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>producto_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>Mínimo 1</td></tr><tr><td><code>almacen_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>Mínimo 1</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>motivo</code></td><td>Texto</td><td>No</td><td>—</td></tr><tr><td><code>proveedor_id</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>precioUnitario</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>precioTotal</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<h4 id="5-3-8-update">5.3.8 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="5-3-9-remove">5.3.9 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/stock-actual-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Stock no encontrado para producto {producto<em>id} en almacén {almacen</em>id}</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="5-5-otras-validaciones-del-modulo">5.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>cantidadMin no puede ser mayor que cantidadMax</td><td>Find all</td></tr><tr><td>Stock no encontrado para producto {producto<em>id} en almacén {almacen</em>id}</td><td>Find one</td></tr><tr><td>Producto {productoId} no existe</td><td>Ajustar stock tx</td></tr><tr><td>No existe stock para producto {productoId} en almacén {almacenId}</td><td>Ajustar stock tx</td></tr></tbody>
+</table></div>
+<h2 id="6-movimientos-de-stock" class="salto">6. Movimientos de stock</h2>
+<h3 id="6-1-para-que-sirve">6.1 Para qué sirve</h3>
+<p>Cualquier entrada o salida de mercadería del depósito.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Movimientos de stock" para el usuario</em></div>
+<h3 id="6-2-como-llegar">6.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="6-3-acciones-disponibles">6.3 Acciones disponibles</h3>
+<h4 id="6-3-1-get-all-con-filtros">6.3.1 Get all con filtros</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/movimiento-stock-getAllConFiltros.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>fechaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>usuarioId</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>tipo</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>proveedorId</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>page</code></td><td>string</td><td>No</td><td>Por defecto: <code>1</code></td></tr><tr><td><code>limit</code></td><td>string</td><td>No</td><td>Por defecto: <code>50</code></td></tr><tr><td><code>ordenCampo</code></td><td>string</td><td>No</td><td>Por defecto: <code>fecha</code></td></tr><tr><td><code>ordenDireccion</code></td><td>'ASC' \</td><td>'DESC'</td><td>No</td><td>Por defecto: <code>DESC</code></td></tr></tbody>
+</table></div>
+<h4 id="6-3-2-get-insumos">6.3.2 Get insumos</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/movimiento-stock-getInsumos.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="6-3-3-get-one">6.3.3 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/movimiento-stock-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="6-3-4-create">6.3.4 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/movimiento-stock-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>producto_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>Mínimo 1</td></tr><tr><td><code>origen_almacen</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>destino_almacen</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0.001</td></tr><tr><td><code>tipo</code></td><td>'entrada' \</td><td>'salida' \</td><td>'traspaso' \</td><td>'insumo'</td><td><strong>Sí</strong></td><td>Valores: <code>entrada</code>, <code>salida</code>, <code>traspaso</code>, <code>insumo</code></td></tr><tr><td><code>usuario_id</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>motivo</code></td><td>Texto</td><td>No</td><td>Máx. 500 caracteres</td></tr><tr><td><code>proveedor_id</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>precioUnitario</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr><tr><td><code>precioTotal</code></td><td>Número</td><td>No</td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Para una ENTRADA debe indicarse destino_almacen.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Para una {dto.tipo.toUpperCase()} debe indicarse origen_almacen.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Para un TRASPASO se requieren origen<em>almacen y destino</em>almacen.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>En un TRASPASO, origen<em>almacen y destino</em>almacen deben ser distintos.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="6-3-5-update">6.3.5 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/movimiento-stock-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="6-3-6-remove">6.3.6 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/movimiento-stock-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Movimiento {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="6-5-otras-validaciones-del-modulo">6.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Movimiento {id} no encontrado</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="7-promociones" class="salto">7. Promociones</h2>
+<h3 id="7-1-para-que-sirve">7.1 Para qué sirve</h3>
+<p>Combo o descuento aplicable a una venta.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Promociones" para el usuario</em></div>
+<h3 id="7-2-como-llegar">7.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="7-3-acciones-disponibles">7.3 Acciones disponibles</h3>
+<h4 id="7-3-1-create">7.3.1 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>codigo</code></td><td>Texto</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>precioPromo</code></td><td>Número</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>almacenId</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>productos</code></td><td>Lista</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Producto in promocion</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>productoId</code></td><td>Número</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0.001</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>{           mensaje: <code>Ya existe una promoción ACTIVA con el código "${dto.codigo}"</code>,           productos,         }</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El código "{dto.codigo}" pertenece a una promoción INACTIVA. Por favor use otro código.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Producto {p.productoId} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El producto {prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El producto {prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="7-3-2-get-activas">7.3.2 Get activas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-getActivas.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="7-3-3-get-productos-en-promociones-activas">7.3.3 Get productos en promociones activas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-getProductosEnPromocionesActivas.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>QueryProductosPromocionActivaDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="7-3-4-find-by-codigo">7.3.4 Find by codigo</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-findByCodigo.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>No se encontró ninguna promoción con el código "{codigo}"</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="7-3-5-find-all">7.3.5 Find all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-findAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>QueryPromocionDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="7-3-6-find-one">7.3.6 Find one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-findOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="7-3-7-remove">7.3.7 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="7-3-8-update">7.3.8 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Promoción con id {id} no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Producto {p.productoId} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El producto {prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El producto {prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="7-3-9-activar">7.3.9 Activar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-activar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="7-3-10-desactivar">7.3.10 Desactivar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-desactivar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="7-3-11-borrar-logico">7.3.11 Borrar logico</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/promocion-borrarLogico.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="7-5-otras-validaciones-del-modulo">7.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>No se encontró ninguna promoción con el id "{id}"</td><td>Get promocion by id</td></tr><tr><td>No se encontró ninguna promoción con id {id}</td><td>Set activo</td></tr><tr><td>Almacen {id} no encontrado</td><td>Obtener almacen</td></tr><tr><td>page y limit deben ser enteros mayores a 0</td><td>Normalize positive int</td></tr><tr><td>No se encontro ninguna promocion disponible para el almacen {almacenId}</td><td>Validar promocion disponible en almacen</td></tr></tbody>
+</table></div>
+<h2 id="8-cuentas-corrientes" class="salto">8. Cuentas corrientes</h2>
+<h3 id="8-1-para-que-sirve">8.1 Para qué sirve</h3>
+<p>Crédito otorgado a un cliente para que compre ahora y pague después.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Cuentas corrientes" para el usuario</em></div>
+<h3 id="8-2-como-llegar">8.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="8-3-acciones-disponibles">8.3 Acciones disponibles</h3>
+<h4 id="8-3-1-crear">8.3.1 Crear</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-crear.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 255 caracteres</td></tr><tr><td><code>documento</code></td><td>Texto</td><td>No</td><td>Máx. 50 caracteres</td></tr><tr><td><code>email</code></td><td>Correo electrónico</td><td>No</td><td>Máx. 255 caracteres</td></tr><tr><td><code>telefono</code></td><td>Texto</td><td>No</td><td>Máx. 50 caracteres</td></tr><tr><td><code>observaciones</code></td><td>Texto</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="8-3-2-listar">8.3.2 Listar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-listar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>FiltroCuentaCorrienteDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="8-3-3-obtener-resumen">8.3.3 Obtener resumen</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-obtenerResumen.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="8-3-4-listar-ventas">8.3.4 Listar ventas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-listarVentas.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>FiltroCuentaCorrienteDetalleDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="8-3-5-listar-movimientos">8.3.5 Listar movimientos</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-listarMovimientos.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>FiltroCuentaCorrienteDetalleDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="8-3-6-registrar-pago">8.3.6 Registrar pago</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-registrarPago.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>almacenId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>medioPago</code></td><td>MetodoPago</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>detalle_pago</code></td><td>Texto</td><td>No</td><td>Mín. 3 caracteres. Máx. DETALLE<em>PAGO</em>MAX_LENGTH caracteres</td></tr><tr><td><code>referencia</code></td><td>Texto</td><td>No</td><td>Máx. 120 caracteres</td></tr><tr><td><code>observacion</code></td><td>Texto</td><td>No</td><td>Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>El monto del pago debe ser mayor a 0</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Cuenta corriente {cuentaId} no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>No hay caja abierta para el almacen {dto.almacenId}</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="8-3-7-registrar-ajuste">8.3.7 Registrar ajuste</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-registrarAjuste.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>tipo</code></td><td>Opción de lista</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>descripcion</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Mín. 3 caracteres. Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>El monto del ajuste debe ser mayor a 0</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>La descripcion del ajuste es obligatoria</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Cuenta corriente {cuentaId} no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="8-3-8-obtener">8.3.8 Obtener</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-obtener.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="8-3-9-actualizar">8.3.9 Actualizar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-actualizar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>activa</code></td><td>Sí / No</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="8-3-10-desactivar">8.3.10 Desactivar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/cuenta-corriente-desactivar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="8-4-estados-y-opciones">8.4 Estados y opciones</h3>
+<p><strong>Cuenta corriente movimiento tipo</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>DEUDA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>PAGO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>AJUSTE_DEBITO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>AJUSTE_CREDITO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>SALDO<em>A</em>FAVOR</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>Cuenta corriente medio pago</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>EFECTIVO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>TRANSFERENCIA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>QR</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>DEBITO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>CREDITO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>OTRO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>BANCARIZADO</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<p><strong>Cuenta corriente venta estado</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>PENDIENTE</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>PARCIAL</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>PAGADA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>ANULADA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="8-5-otras-validaciones-del-modulo">8.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Cuenta corriente {id} no encontrada</td><td>Obtener por id</td></tr><tr><td>No hay caja abierta para el almacen {almacenId}</td><td>Registrar venta cuenta corriente tx</td></tr><tr><td>Cuenta corriente {cuentaCorrienteId} no encontrada</td><td>Registrar venta cuenta corriente tx</td></tr><tr><td>La cuenta corriente {cuentaCorrienteId} esta inactiva</td><td>Registrar venta cuenta corriente tx</td></tr><tr><td>Ya existe una cuenta corriente con documento "{documento}"</td><td>Assert documento disponible</td></tr><tr><td>detalle_pago es obligatorio para pagos con medio OTRO</td><td>Validar detalle pago</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Validar detalle pago</td></tr></tbody>
+</table></div>
+<h2 id="9-gastos" class="salto">9. Gastos</h2>
+<h3 id="9-1-para-que-sirve">9.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Gastos" para el usuario</em></div>
+<h3 id="9-2-como-llegar">9.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="9-3-acciones-disponibles">9.3 Acciones disponibles</h3>
+<h4 id="9-3-1-crear">9.3.1 Crear</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-crear.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>fecha</code></td><td>Fecha</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Debe ser mayor a cero</td></tr><tr><td><code>descripcion</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 255 caracteres</td></tr><tr><td><code>notas</code></td><td>Texto</td><td>No</td><td>—</td></tr><tr><td><code>categoriaId</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>almacenId</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr></tbody>
+</table></div>
+<h4 id="9-3-2-actualizar">9.3.2 Actualizar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-actualizar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Gasto no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>monto debe ser &gt; 0</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="9-3-3-listar-categorias">9.3.3 Listar categorias</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-listarCategorias.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>activo</code></td><td>'true' \</td><td>'false' \</td><td>'all'</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="9-3-4-crear-categoria">9.3.4 Crear categoria</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-crearCategoria.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 100 caracteres</td></tr><tr><td><code>descripcion</code></td><td>Texto</td><td>No</td><td>Máx. 255 caracteres</td></tr></tbody>
+</table></div>
+<h4 id="9-3-5-actualizar-categoria">9.3.5 Actualizar categoria</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-actualizarCategoria.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>activo</code></td><td>Sí / No</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="9-3-6-desactivar-categoria">9.3.6 Desactivar categoria</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-desactivarCategoria.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="9-3-7-activar-categoria">9.3.7 Activar categoria</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-activarCategoria.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="9-3-8-obtener">9.3.8 Obtener</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-obtener.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>incluirEliminados</code></td><td>'true' \</td><td>'false'</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="9-3-9-listar">9.3.9 Listar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-listar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>FiltroGastoDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>El rango de fechas es invalido: desde &gt; hasta</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El rango de monto es invalido: minMonto &gt; maxMonto</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="9-3-10-eliminar">9.3.10 Eliminar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-eliminar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Gasto no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="9-3-11-eliminar-def">9.3.11 Eliminar def</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/gastos-eliminarDef.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="9-4-estados-y-opciones">9.4 Estados y opciones</h3>
+<p><strong>Gasto origen</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>MANUAL</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>ORDEN_COMPRA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="9-5-otras-validaciones-del-modulo">9.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Gasto no encontrado</td><td>Obtener por id</td></tr><tr><td>Gasto no encontrado</td><td>Eliminar definitivo</td></tr><tr><td>Categoria de gasto no encontrada</td><td>Obtener categoria</td></tr><tr><td>La categoria de gasto esta inactiva</td><td>Obtener categoria activa</td></tr><tr><td>Almacen no encontrado</td><td>Obtener almacen</td></tr><tr><td>La categoria de gasto "{nombre}" ya existe</td><td>Assert nombre categoria disponible</td></tr><tr><td>{field} es obligatorio</td><td>Clean required</td></tr></tbody>
+</table></div>
+<h2 id="10-ordenes-de-compra" class="salto">10. Órdenes de compra</h2>
+<h3 id="10-1-para-que-sirve">10.1 Para qué sirve</h3>
+<p>Pedido de mercadería a un proveedor.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Órdenes de compra" para el usuario</em></div>
+<h3 id="10-2-como-llegar">10.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="10-3-acciones-disponibles">10.3 Acciones disponibles</h3>
+<h4 id="10-3-1-ingresar-stock">10.3.1 Ingresar stock</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/orden-compra-ingresarStock.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>proveedorId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>almacenId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>usuarioId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>numeroComprobante</code></td><td>Texto</td><td>No</td><td>Máx. 120 caracteres</td></tr><tr><td><code>observacion</code></td><td>Texto</td><td>No</td><td>Máx. 1000 caracteres</td></tr><tr><td><code>items</code></td><td>CreateOrdenCompraItemDto (lista)</td><td><strong>Sí</strong></td><td>Al menos 1 elemento(s)</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Orden compra item</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>productoId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr><tr><td><code>cantidad_gramos</code></td><td>Número</td><td>No</td><td>Mínimo 0.001</td></tr><tr><td><code>precioUnitario</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>fechaVencimiento</code></td><td>Fecha</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="10-3-2-obtener-todas">10.3.2 Obtener todas</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/orden-compra-obtenerTodas.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>(dto)</code></td><td>Ver DTO <code>FiltroOrdenCompraDto</code></td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="10-3-3-obtener">10.3.3 Obtener</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/orden-compra-obtener.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="10-3-4-anular">10.3.4 Anular</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/orden-compra-anular.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>motivoAnulacion</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Mín. 3 caracteres. Máx. 500 caracteres</td></tr><tr><td><code>usuarioId</code></td><td>Número entero</td><td>No</td><td>Mínimo 1</td></tr></tbody>
+</table></div>
+<h4 id="10-3-5-actualizar">10.3.5 Actualizar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/orden-compra-actualizar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="10-4-estados-y-opciones">10.4 Estados y opciones</h3>
+<p><strong>Orden compra estado</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+<tbody><tr><td><code>ACTIVA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td><code>ANULADA</code></td><td>&lt;!-- PROSA:enum --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="10-5-otras-validaciones-del-modulo">10.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Producto {i.productoId} no encontrado</td><td>Crear orden con stock</td></tr><tr><td>El producto {producto.nombre} se maneja por gramos: enviar 'cantidad_gramos' (y NO 'cantidad').</td><td>Crear orden con stock</td></tr><tr><td>El producto {producto.nombre} se maneja por piezas: enviar 'cantidad' (y NO 'cantidad_gramos').</td><td>Crear orden con stock</td></tr><tr><td>Orden de compra {id} no encontrada</td><td>Obtener detalle</td></tr><tr><td>Orden de compra {id} no encontrada</td><td>Actualizar orden</td></tr><tr><td>La orden de compra {id} esta anulada y no puede editarse</td><td>Actualizar orden</td></tr><tr><td>La orden de compra {id} no tiene almacen asociado</td><td>Actualizar orden</td></tr><tr><td>motivoAnulacion es obligatorio</td><td>Anular orden</td></tr><tr><td>Orden de compra {id} no encontrada</td><td>Anular orden</td></tr><tr><td>La orden de compra {id} ya esta anulada</td><td>Anular orden</td></tr><tr><td>La orden de compra {id} no tiene almacen asociado para revertir stock</td><td>Anular orden</td></tr><tr><td>La orden de compra {id} no tiene items para revertir</td><td>Anular orden</td></tr><tr><td>Proveedor {proveedorId} no encontrado</td><td>Get proveedor or fail</td></tr><tr><td>Producto {i.productoId} no encontrado</td><td>Procesar items orden</td></tr><tr><td>El producto {producto.nombre} se maneja por gramos: enviar 'cantidad_gramos' y no 'cantidad'.</td><td>Procesar items orden</td></tr><tr><td>El producto {producto.nombre} se maneja por piezas: enviar 'cantidad' y no 'cantidad_gramos'.</td><td>Procesar items orden</td></tr><tr><td>El producto {producto.nombre} debe tener precioUnitario mayor a 0</td><td>Procesar items orden</td></tr><tr><td>No hay stock actual para revertir el producto {params.producto.id} en almacen {params.almacenId}</td><td>Aplicar delta stock</td></tr><tr><td>Stock insuficiente para editar la orden. Producto {params.producto.nombre}: disponible {actual.toFixed(3)}g, requerido {Math.abs(deltaGramos).toFixed(3)}g</td><td>Aplicar delta stock</td></tr><tr><td>Stock insuficiente para editar la orden. Producto {params.producto.nombre}: disponible {actual}, requerido {Math.abs(deltaPiezas)}</td><td>Aplicar delta stock</td></tr></tbody>
+</table></div>
+<h2 id="11-proveedores" class="salto">11. Proveedores</h2>
+<h3 id="11-1-para-que-sirve">11.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Proveedores" para el usuario</em></div>
+<h3 id="11-2-como-llegar">11.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="11-3-acciones-disponibles">11.3 Acciones disponibles</h3>
+<h4 id="11-3-1-get-all">11.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/proveedor-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="11-3-2-get-one">11.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/proveedor-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="11-3-3-create">11.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/proveedor-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 255 caracteres</td></tr><tr><td><code>contacto</code></td><td>Texto</td><td>No</td><td>Máx. 255 caracteres</td></tr><tr><td><code>telefono</code></td><td>Texto</td><td>No</td><td>Máx. 50 caracteres</td></tr><tr><td><code>email</code></td><td>Correo electrónico</td><td>No</td><td>Máx. 100 caracteres</td></tr></tbody>
+</table></div>
+<h4 id="11-3-4-update">11.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/proveedor-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="11-3-5-remove">11.3.5 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/proveedor-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Proveedor {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="11-5-otras-validaciones-del-modulo">11.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Proveedor {id} no encontrado</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="12-categorias" class="salto">12. Categorías</h2>
+<h3 id="12-1-para-que-sirve">12.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Categorías" para el usuario</em></div>
+<h3 id="12-2-como-llegar">12.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="12-3-acciones-disponibles">12.3 Acciones disponibles</h3>
+<h4 id="12-3-1-get-all">12.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/categoria-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="12-3-2-get-one">12.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/categoria-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="12-3-3-create">12.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/categoria-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 100 caracteres</td></tr><tr><td><code>descripcion</code></td><td>Texto</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="12-3-4-update">12.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/categoria-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="12-3-5-remove">12.3.5 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/categoria-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>No se puede eliminar la categoria {id} porque tiene productos asociados</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>No se puede eliminar la categoria {id} porque tiene productos asociados</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Categoria {id} no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="12-5-otras-validaciones-del-modulo">12.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Categoria {id} no encontrada</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="13-unidades-de-medida" class="salto">13. Unidades de medida</h2>
+<h3 id="13-1-para-que-sirve">13.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Unidades de medida" para el usuario</em></div>
+<h3 id="13-2-como-llegar">13.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="13-3-acciones-disponibles">13.3 Acciones disponibles</h3>
+<h4 id="13-3-1-get-all">13.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/unidad-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="13-3-2-get-one">13.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/unidad-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="13-3-3-create">13.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/unidad-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 50 caracteres</td></tr><tr><td><code>abreviatura</code></td><td>Texto</td><td>No</td><td>Máx. 20 caracteres</td></tr></tbody>
+</table></div>
+<h4 id="13-3-4-update">13.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/unidad-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="13-3-5-remove">13.3.5 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/unidad-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Unidad {id} no encontrada</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="13-5-otras-validaciones-del-modulo">13.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Unidad {id} no encontrada</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="14-almacenes" class="salto">14. Almacenes</h2>
+<h3 id="14-1-para-que-sirve">14.1 Para qué sirve</h3>
+<p>Sucursal o punto de venta. Cada almacén tiene su propio stock, caja y precios.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Almacenes" para el usuario</em></div>
+<h3 id="14-2-como-llegar">14.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="14-3-acciones-disponibles">14.3 Acciones disponibles</h3>
+<h4 id="14-3-1-get-all">14.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/almacen-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="14-3-2-get-one">14.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/almacen-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="14-3-3-create">14.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/almacen-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 100 caracteres</td></tr><tr><td><code>ubicacion</code></td><td>Texto</td><td>No</td><td>Máx. 255 caracteres</td></tr><tr><td><code>capacidad</code></td><td>Número entero</td><td>No</td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<h4 id="14-3-4-update">14.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/almacen-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="14-3-5-remove">14.3.5 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/almacen-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Almacén {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="14-5-otras-validaciones-del-modulo">14.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Almacén {id} no encontrado</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="15-parametros-de-reposicion" class="salto">15. Parámetros de reposición</h2>
+<h3 id="15-1-para-que-sirve">15.1 Para qué sirve</h3>
+<p>Stock mínimo a partir del cual el sistema avisa que hay que reponer.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Parámetros de reposición" para el usuario</em></div>
+<h3 id="15-2-como-llegar">15.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="15-3-acciones-disponibles">15.3 Acciones disponibles</h3>
+<h4 id="15-3-1-get-all">15.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/parametro-reorden-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="15-3-2-get-one">15.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/parametro-reorden-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="15-3-3-create">15.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/parametro-reorden-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>producto_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>nivel_minimo</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0</td></tr><tr><td><code>nivel_optimo</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>nivel<em>optimo debe ser mayor o igual a nivel</em>minimo</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="15-3-4-update">15.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/parametro-reorden-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>nivel<em>optimo debe ser mayor o igual a nivel</em>minimo</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="15-3-5-remove">15.3.5 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/parametro-reorden-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>ParametroReorden {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="15-5-otras-validaciones-del-modulo">15.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>ParametroReorden {id} no encontrado</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="16-extracciones-de-caja" class="salto">16. Extracciones de caja</h2>
+<h3 id="16-1-para-que-sirve">16.1 Para qué sirve</h3>
+<p>Retiro de dinero de la caja.</p>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Extracciones de caja" para el usuario</em></div>
+<h3 id="16-2-como-llegar">16.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="16-3-acciones-disponibles">16.3 Acciones disponibles</h3>
+<h4 id="16-3-1-crear">16.3.1 Crear</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/extraccion-crear.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>origen</code></td><td>Opción de lista</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0.01</td></tr><tr><td><code>motivo</code></td><td>string</td><td><strong>Sí</strong></td><td>Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Fondos insuficientes en {dto.origen}. Total disponible: ${totalDisponible.toFixed(2)}</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="16-3-2-get-extracciones-con-filtros">16.3.2 Get extracciones con filtros</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/extraccion-getExtraccionesConFiltros.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>origen</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>page</code></td><td>string</td><td>No</td><td>Por defecto: <code>1</code></td></tr><tr><td><code>limit</code></td><td>string</td><td>No</td><td>Por defecto: <code>50</code></td></tr><tr><td><code>ordenCampo</code></td><td>string</td><td>No</td><td>Por defecto: <code>fecha</code></td></tr><tr><td><code>ordenDireccion</code></td><td>'ASC' \</td><td>'DESC'</td><td>No</td><td>Por defecto: <code>DESC</code></td></tr></tbody>
+</table></div>
+<h4 id="16-3-3-obtener-totales">16.3.3 Obtener totales</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/extraccion-obtenerTotales.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="16-3-4-editar">16.3.4 Editar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/extraccion-editar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>origen</code></td><td>Opción de lista</td><td>No</td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td>No</td><td>Mínimo 0.01</td></tr><tr><td><code>motivo</code></td><td>string</td><td>No</td><td>Máx. 500 caracteres</td></tr></tbody>
+</table></div>
+<h4 id="16-3-5-borrar">16.3.5 Borrar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/extraccion-borrar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="16-5-otras-validaciones-del-modulo">16.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Extracción {id} no encontrada</td><td>Borrar extraccion</td></tr><tr><td>Extracción {id} no encontrada</td><td>Editar extraccion</td></tr><tr><td>Fondos insuficientes en {nuevoOrigen}. Disponible: ${disponible.toFixed(2)}</td><td>Editar extraccion</td></tr></tbody>
+</table></div>
+<h2 id="17-ingresos" class="salto">17. Ingresos</h2>
+<h3 id="17-1-para-que-sirve">17.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Ingresos" para el usuario</em></div>
+<h3 id="17-2-como-llegar">17.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="17-3-acciones-disponibles">17.3 Acciones disponibles</h3>
+<h4 id="17-3-1-crear">17.3.1 Crear</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/ingreso-crear.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>ventaId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>tipo</code></td><td>MetodoPago</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>monto</code></td><td>Número</td><td><strong>Sí</strong></td><td>Debe ser mayor a cero</td></tr><tr><td><code>detalle_pago</code></td><td>Texto</td><td>No</td><td>Mín. 3 caracteres. Máx. DETALLE<em>PAGO</em>MAX_LENGTH caracteres</td></tr></tbody>
+</table></div>
+<h4 id="17-3-2-obtener-ingresos-con-filtros">17.3.2 Obtener ingresos con filtros</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/ingreso-obtenerIngresosConFiltros.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>tipo</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>ventaId</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>montoMin</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>montoMax</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>page</code></td><td>string</td><td>No</td><td>Por defecto: <code>1</code></td></tr><tr><td><code>limit</code></td><td>string</td><td>No</td><td>Por defecto: <code>50</code></td></tr><tr><td><code>ordenCampo</code></td><td>string</td><td>No</td><td>Por defecto: <code>fecha</code></td></tr><tr><td><code>ordenDireccion</code></td><td>'ASC' \</td><td>'DESC'</td><td>No</td><td>Por defecto: <code>DESC</code></td></tr></tbody>
+</table></div>
+<h4 id="17-3-3-resumen">17.3.3 Resumen</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/ingreso-resumen.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>fechaDesde</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>fechaHasta</code></td><td>string</td><td>No</td><td>—</td></tr><tr><td><code>almacenId</code></td><td>string</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h3 id="17-5-otras-validaciones-del-modulo">17.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Venta con id {dto.ventaId} no encontrada</td><td>Registrar ingreso</td></tr><tr><td>detalle_pago es obligatorio para ingresos con tipo OTRO</td><td>Validar detalle pago</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Validar detalle pago</td></tr></tbody>
+</table></div>
+<h2 id="18-facturacion" class="salto">18. Facturación</h2>
+<h3 id="18-1-para-que-sirve">18.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Facturación" para el usuario</em></div>
+<h3 id="18-2-como-llegar">18.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="18-3-acciones-disponibles">18.3 Acciones disponibles</h3>
+<h4 id="18-3-1-crear-factura">18.3.1 Crear factura</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/factura-crearFactura.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>cuit_emisor</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>punto_venta</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>factura_tipo</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>metodo_pago</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>test</code></td><td>Sí / No</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>usuario_id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>items</code></td><td>Lista</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<p><em>Detalle de <code>Factura item</code></em></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>venta<em>item</em>id</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>cantidad</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>Mínimo 1</td></tr><tr><td><code>subtotal</code></td><td>Número</td><td><strong>Sí</strong></td><td>Mínimo 0</td></tr></tbody>
+</table></div>
+<h3 id="18-5-otras-validaciones-del-modulo">18.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Usuario no encontrado</td><td>Create</td></tr><tr><td>Ítem de venta {itemDto.venta<em>item</em>id} no encontrado</td><td>Create</td></tr><tr><td>Cantidad solicitada ({itemDto.cantidad}) mayor a la vendida ({ventaItem.cantidad})</td><td>Create</td></tr><tr><td>La API de ARCA no devolvió un CAE válido</td><td>Create</td></tr><tr><td>Error al conectar con la API de ARCA</td><td>Enviar afacturador arca</td></tr></tbody>
+</table></div>
+<h2 id="19-usuarios" class="salto">19. Usuarios</h2>
+<h3 id="19-1-para-que-sirve">19.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Usuarios" para el usuario</em></div>
+<h3 id="19-2-como-llegar">19.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="19-3-acciones-disponibles">19.3 Acciones disponibles</h3>
+<h4 id="19-3-1-get-all">19.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Filtros disponibles</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Filtro</th><th>Tipo</th><th>Obligatorio</th><th>Observación</th></tr></thead>
+<tbody><tr><td><code>activo</code></td><td>'true' \</td><td>'false' \</td><td>'all'</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="19-3-2-get-one">19.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="19-3-3-create">19.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 255 caracteres</td></tr><tr><td><code>usuario</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 100 caracteres</td></tr><tr><td><code>password</code></td><td>Texto</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>email</code></td><td>Correo electrónico</td><td><strong>Sí</strong></td><td>Máx. 255 caracteres</td></tr><tr><td><code>roles</code></td><td>Número entero</td><td>No</td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="19-3-4-update">19.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>El nombre de usuario '{dto.usuario}' ya está en uso.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>El rol con id {rolId} no existe.</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="19-3-5-desactivar">19.3.5 Desactivar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-desactivar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="19-3-6-activar">19.3.6 Activar</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-activar.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="19-3-7-remove">19.3.7 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h3 id="19-5-otras-validaciones-del-modulo">19.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>Usuario {id} no encontrado</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="20-asignacion-de-roles" class="salto">20. Asignación de roles</h2>
+<h3 id="20-1-para-que-sirve">20.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Asignación de roles" para el usuario</em></div>
+<h3 id="20-2-como-llegar">20.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="20-3-acciones-disponibles">20.3 Acciones disponibles</h3>
+<h4 id="20-3-1-get-all">20.3.1 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-rol-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="20-3-2-get-one">20.3.2 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-rol-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="20-3-3-create">20.3.3 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-rol-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>usuarioId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr><tr><td><code>rolId</code></td><td>Número entero</td><td><strong>Sí</strong></td><td>—</td></tr></tbody>
+</table></div>
+<h4 id="20-3-4-update">20.3.4 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-rol-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="20-3-5-remove">20.3.5 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/usuario-rol-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>UsuarioRol {id} no encontrado</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="20-5-otras-validaciones-del-modulo">20.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>UsuarioRol {id} no encontrado</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="21-roles" class="salto">21. Roles</h2>
+<h3 id="21-1-para-que-sirve">21.1 Para qué sirve</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — describir en 2-4 frases qué resuelve "Roles" para el usuario</em></div>
+<h3 id="21-2-como-llegar">21.2 Cómo llegar</h3>
+<div class="aviso pendiente"><em>Pendiente de redacción — completar con la ruta de menú real de la aplicación</em></div>
+<h3 id="21-3-acciones-disponibles">21.3 Acciones disponibles</h3>
+<h4 id="21-3-1-sync">21.3.1 Sync</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/role-sync.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Invalid role sync secret</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="21-3-2-get-all">21.3.2 Get all</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/role-getAll.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="21-3-3-get-one">21.3.3 Get one</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/role-getOne.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<h4 id="21-3-4-create">21.3.4 Create</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/role-create.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Datos a completar</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Reglas</th></tr></thead>
+<tbody><tr><td><code>nombre</code></td><td>Texto</td><td><strong>Sí</strong></td><td>Máx. 100 caracteres</td></tr></tbody>
+</table></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Role name is required</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="21-3-5-update">21.3.5 Update</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/role-update.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Role name is required</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h4 id="21-3-6-remove">21.3.6 Remove</h4>
+<div class="captura-faltante">📷 Captura pendiente: <code>../capturas/role-remove.png</code></div>
+<div class="aviso pendiente"><em>Pendiente de redacción — redactar el paso a paso numerado desde la interfaz</em></div>
+<p><strong>Mensajes que puede mostrar el sistema</strong></p>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Motivo / Cómo resolverlo</th></tr></thead>
+<tbody><tr><td>Admin role cannot be deleted</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr><tr><td>Role {id} not found</td><td>&lt;!-- PROSA:err --&gt;<em>completar</em>&lt;!-- /PROSA --&gt;</td></tr></tbody>
+</table></div>
+<h3 id="21-5-otras-validaciones-del-modulo">21.5 Otras validaciones del módulo</h3>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Se produce en</th></tr></thead>
+<tbody><tr><td>{         message: 'Role sync failed',         peerStatus: res.status,         peerBody: body.slice(0, 500),       }</td><td>Sync role name</td></tr><tr><td>Role {id} not found</td><td>Find one</td></tr></tbody>
+</table></div>
+<h2 id="anexo-a-perfiles-y-permisos" class="salto">Anexo A. Perfiles y permisos</h2>
+<p><strong>Admin</strong> — Acceso total. Configura el sistema, gestiona usuarios, ve reportes y cierra cajas.</p>
+<p><strong>Vendedor</strong> — Opera el día a día: registra ventas, cobra, abre y cierra su caja.</p>
+<p><strong>Cocina</strong> — Visualiza los pedidos a preparar y marca su avance.</p>
+<div class="aviso warn">⚠️ <strong>Nota técnica para el equipo (quitar del entregable al cliente):</strong> el backend exige inicio de sesión en todos los endpoints, pero <strong>no restringe por rol</strong>: no hay ningún <code>@Roles()</code> aplicado. La tabla siguiente describe el comportamiento <em>previsto</em>, no el que el sistema aplica hoy.</div>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Módulo</th><th>Acciones</th><th>Admin</th><th>Vendedor</th><th>Cocina</th></tr></thead>
+<tbody><tr><td>Almacenes</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Acceso al sistema</td><td>3</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Caja</td><td>8</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Categorías</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Cuentas corrientes</td><td>10</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Extracciones de caja</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Facturación</td><td>1</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Gastos</td><td>11</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Ingresos</td><td>3</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Movimientos de stock</td><td>6</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Órdenes de compra</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Parámetros de reposición</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Productos</td><td>14</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Promociones</td><td>11</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Proveedores</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Roles</td><td>6</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Stock</td><td>9</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Unidades de medida</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Usuarios</td><td>7</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Asignación de roles</td><td>5</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Ventas</td><td>7</td><td>—</td><td>—</td><td>—</td></tr></tbody>
+</table></div>
+<div class="aviso">Completar la matriz con ✔ / ✖ según la política de acceso definida con el cliente.</div>
+<h2 id="anexo-b-catalogo-completo-de-mensajes-del-sistema" class="salto">Anexo B. Catálogo completo de mensajes del sistema</h2>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Mensaje</th><th>Módulo</th></tr></thead>
+<tbody><tr><td>{           mensaje: <code>Ya existe una promoción ACTIVA con el código "${dto.codigo}"</code>,           productos,         }</td><td>Promociones</td></tr><tr><td>{         message: 'Role sync failed',         peerStatus: res.status,         peerBody: body.slice(0, 500),       }</td><td>Roles</td></tr><tr><td>{         message: 'El Excel tiene errores de validación. No se importó nada.',         errores,       }</td><td>Productos</td></tr><tr><td>{field} es obligatorio</td><td>Gastos</td></tr><tr><td>Admin role cannot be deleted</td><td>Roles</td></tr><tr><td>Almacen {almacenId} no encontrado</td><td>Productos</td></tr><tr><td>Almacen {dto.almacenId} no encontrado</td><td>Ventas</td></tr><tr><td>Almacen {id} no encontrado</td><td>Promociones</td></tr><tr><td>Almacén {id} no encontrado</td><td>Almacenes</td></tr><tr><td>Almacén {id} no encontrado</td><td>Almacenes</td></tr><tr><td>Almacen {parsedAlmacenId} no encontrado</td><td>Productos</td></tr><tr><td>Almacen no encontrado</td><td>Gastos</td></tr><tr><td>almacenId debe ser un entero mayor a 0</td><td>Productos</td></tr><tr><td>almacenId es obligatorio y debe ser un entero mayor a 0.</td><td>Productos</td></tr><tr><td>Cada pago debe tener un monto mayor a 0</td><td>Ventas</td></tr><tr><td>Cantidad solicitada ({itemDto.cantidad}) mayor a la vendida ({ventaItem.cantidad})</td><td>Facturación</td></tr><tr><td>cantidadMin no puede ser mayor que cantidadMax</td><td>Stock</td></tr><tr><td>Carga rápida: solo se puede editar {allowed.join(', ')}. No permitido: {invalid.join(', ')}</td><td>Productos</td></tr><tr><td>Categoria {id} no encontrada</td><td>Categorías</td></tr><tr><td>Categoria {id} no encontrada</td><td>Categorías</td></tr><tr><td>Categoria de gasto no encontrada</td><td>Gastos</td></tr><tr><td>Cuenta corriente {cuentaCorrienteId} no encontrada</td><td>Cuentas corrientes</td></tr><tr><td>Cuenta corriente {cuentaId} no encontrada</td><td>Cuentas corrientes</td></tr><tr><td>Cuenta corriente {cuentaId} no encontrada</td><td>Cuentas corrientes</td></tr><tr><td>Cuenta corriente {id} no encontrada</td><td>Cuentas corrientes</td></tr><tr><td>cuentaCorrienteId es obligatorio para ventas a cuenta corriente</td><td>Ventas</td></tr><tr><td>cuentaCorrienteId solo puede enviarse con tipoCobro CUENTA_CORRIENTE</td><td>Ventas</td></tr><tr><td>Debe adjuntarse el archivo Excel en el campo "file" (multipart/form-data).</td><td>Productos</td></tr><tr><td>detalle_pago es obligatorio para ingresos con tipo OTRO</td><td>Ingresos</td></tr><tr><td>detalle<em>pago es obligatorio para movimientos con medio</em>pago OTRO</td><td>Caja</td></tr><tr><td>detalle_pago es obligatorio para pagos con medio OTRO</td><td>Cuentas corrientes</td></tr><tr><td>detalle_pago es obligatorio para pagos con medio OTRO</td><td>Ventas</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Caja</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Cuentas corrientes</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Ingresos</td></tr><tr><td>detalle<em>pago no puede superar {DETALLE</em>PAGO<em>MAX</em>LENGTH} caracteres</td><td>Ventas</td></tr><tr><td>El ajuste #{index + 1} debe incluir un motivo</td><td>Ventas</td></tr><tr><td>El ajuste #{index + 1} debe tener un valor mayor a 0</td><td>Ventas</td></tr><tr><td>El archivo no contiene hojas.</td><td>Productos</td></tr><tr><td>El archivo no es un Excel (.xlsx) válido.</td><td>Productos</td></tr><tr><td>El código "{dto.codigo}" pertenece a una promoción INACTIVA. Por favor use otro código.</td><td>Promociones</td></tr><tr><td>El descuento porcentual #{index + 1} no puede superar el 100%</td><td>Ventas</td></tr><tr><td>El monto del ajuste debe ser mayor a 0</td><td>Cuentas corrientes</td></tr><tr><td>El monto del pago debe ser mayor a 0</td><td>Cuentas corrientes</td></tr><tr><td>El movimiento #{movimientoId} ya está anulado</td><td>Caja</td></tr><tr><td>El nombre de usuario '{dto.usuario}' ya está en uso.</td><td>Usuarios</td></tr><tr><td>El pago inicial ({totalPagos}) no puede superar el total de la venta ({total}). Para generar saldo a favor, registrar un pago posterior en cuenta corriente.</td><td>Ventas</td></tr><tr><td>El precio debe ser &gt; 0</td><td>Productos</td></tr><tr><td>El producto {prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').</td><td>Promociones</td></tr><tr><td>El producto {prod.nombre} se maneja por gramos: usar 'cantidad_gramos' (y no 'cantidad').</td><td>Promociones</td></tr><tr><td>El producto {prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').</td><td>Promociones</td></tr><tr><td>El producto {prod.nombre} se maneja por piezas: usar 'cantidad' (y no 'cantidad_gramos').</td><td>Promociones</td></tr><tr><td>El producto {producto.nombre} debe tener precioUnitario mayor a 0</td><td>Órdenes de compra</td></tr><tr><td>El producto {producto.nombre} se maneja por gramos: enviar 'cantidad_gramos' (y NO 'cantidad').</td><td>Órdenes de compra</td></tr><tr><td>El producto {producto.nombre} se maneja por gramos: enviar 'cantidad_gramos' y no 'cantidad'.</td><td>Órdenes de compra</td></tr><tr><td>El producto {producto.nombre} se maneja por piezas: enviar 'cantidad' (y NO 'cantidad_gramos').</td><td>Órdenes de compra</td></tr><tr><td>El producto {producto.nombre} se maneja por piezas: enviar 'cantidad' y no 'cantidad_gramos'.</td><td>Órdenes de compra</td></tr><tr><td>El producto con SKU "{dto.sku}" ya existe.</td><td>Productos</td></tr><tr><td>El producto de carga rápida no permite: {action}</td><td>Productos</td></tr><tr><td>El rango de fechas es invalido: desde &gt; hasta</td><td>Gastos</td></tr><tr><td>El rango de monto es invalido: minMonto &gt; maxMonto</td><td>Gastos</td></tr><tr><td>El rol con id {rolId} no existe.</td><td>Usuarios</td></tr><tr><td>En un TRASPASO, origen<em>almacen y destino</em>almacen deben ser distintos.</td><td>Movimientos de stock</td></tr><tr><td>Error al conectar con la API de ARCA</td><td>Facturación</td></tr><tr><td>Este movimiento proviene de un pago de cuenta corriente. Debe anularse desde cuenta corriente.</td><td>Caja</td></tr><tr><td>Extracción {id} no encontrada</td><td>Extracciones de caja</td></tr><tr><td>Extracción {id} no encontrada</td><td>Extracciones de caja</td></tr><tr><td>Faltan columnas obligatorias en la hoja "Productos": {faltantes.join(', ')}</td><td>Productos</td></tr><tr><td>Fila {fila.fila} ({fila.sku}): no se indicó unidad y no existe una unidad por defecto.</td><td>Productos</td></tr><tr><td>Fila {fila.fila} ({fila.sku}): unidad "{fila.unidad}" no existe en el sistema.</td><td>Productos</td></tr><tr><td>Fondos insuficientes en {dto.origen}. Total disponible: ${totalDisponible.toFixed(2)}</td><td>Extracciones de caja</td></tr><tr><td>Fondos insuficientes en {nuevoOrigen}. Disponible: ${disponible.toFixed(2)}</td><td>Extracciones de caja</td></tr><tr><td>Gasto no encontrado</td><td>Gastos</td></tr><tr><td>Gasto no encontrado</td><td>Gastos</td></tr><tr><td>Gasto no encontrado</td><td>Gastos</td></tr><tr><td>Gasto no encontrado</td><td>Gastos</td></tr><tr><td>ID inválido</td><td>Ventas</td></tr><tr><td>ID inválido</td><td>Ventas</td></tr><tr><td>Invalid role sync secret</td><td>Roles</td></tr><tr><td>Ítem de venta {itemDto.venta<em>item</em>id} no encontrado</td><td>Facturación</td></tr><tr><td>La API de ARCA no devolvió un CAE válido</td><td>Facturación</td></tr><tr><td>La cantidad de la promocion debe ser mayor a 0</td><td>Ventas</td></tr><tr><td>La categoria de gasto "{nombre}" ya existe</td><td>Gastos</td></tr><tr><td>La categoria de gasto esta inactiva</td><td>Gastos</td></tr><tr><td>La cuenta corriente {cuentaCorrienteId} esta inactiva</td><td>Cuentas corrientes</td></tr><tr><td>La descripcion del ajuste es obligatoria</td><td>Cuentas corrientes</td></tr><tr><td>La hoja "Productos" no contiene filas de datos.</td><td>Productos</td></tr><tr><td>La orden de compra {id} esta anulada y no puede editarse</td><td>Órdenes de compra</td></tr><tr><td>La orden de compra {id} no tiene almacen asociado</td><td>Órdenes de compra</td></tr><tr><td>La orden de compra {id} no tiene almacen asociado para revertir stock</td><td>Órdenes de compra</td></tr><tr><td>La orden de compra {id} no tiene items para revertir</td><td>Órdenes de compra</td></tr><tr><td>La orden de compra {id} ya esta anulada</td><td>Órdenes de compra</td></tr><tr><td>La promocion {promo.id} tiene cantidad invalida para producto {producto.id}</td><td>Ventas</td></tr><tr><td>La promocion {promo.id} tiene gramos invalidos para producto {producto.id}</td><td>Ventas</td></tr><tr><td>La sesión de caja #{sesion.id} está cerrada. No se pueden registrar movimientos.</td><td>Caja</td></tr><tr><td>La suma de pagos ({totalPagos}) debe coincidir con el total de la venta ({total})</td><td>Ventas</td></tr><tr><td>La venta debe incluir al menos un item o una promocion</td><td>Ventas</td></tr><tr><td>La venta debe incluir al menos un pago</td><td>Ventas</td></tr><tr><td>La venta debe incluir al menos un pago</td><td>Ventas</td></tr><tr><td>limit debe ser un entero mayor a 0</td><td>Productos</td></tr><tr><td>Los descuentos no pueden dejar el total de la venta en negativo. Total calculado: {total}</td><td>Ventas</td></tr><tr><td>medio debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO u OTRO</td><td>Ventas</td></tr><tr><td>medio_pago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO, OTRO o BANCARIZADO</td><td>Caja</td></tr><tr><td>medio_pago debe ser EFECTIVO, TRANSFERENCIA, QR, DEBITO, CREDITO, OTRO o BANCARIZADO</td><td>Caja</td></tr><tr><td>monto debe ser &gt; 0</td><td>Gastos</td></tr><tr><td>motivoAnulacion es obligatorio</td><td>Órdenes de compra</td></tr><tr><td>Movimiento {id} no encontrado</td><td>Movimientos de stock</td></tr><tr><td>Movimiento {id} no encontrado</td><td>Movimientos de stock</td></tr><tr><td>Movimiento #{movimientoId} no encontrado</td><td>Caja</td></tr><tr><td>nivel<em>optimo debe ser mayor o igual a nivel</em>minimo</td><td>Parámetros de reposición</td></tr><tr><td>nivel<em>optimo debe ser mayor o igual a nivel</em>minimo</td><td>Parámetros de reposición</td></tr><tr><td>No existe el producto de carga rápida</td><td>Productos</td></tr><tr><td>No existe override para producto {producto<em>id} en almacén {almacen</em>id}</td><td>Productos</td></tr><tr><td>No existe producto con barcode {barcode}</td><td>Productos</td></tr><tr><td>No existe stock para producto {producto.id} en almacen {almacenId}</td><td>Ventas</td></tr><tr><td>No existe stock para producto {productoId} en almacén {almacenId}</td><td>Stock</td></tr><tr><td>No hay caja abierta para el almacen {almacenId}</td><td>Cuentas corrientes</td></tr><tr><td>No hay caja abierta para el almacén {almacenId}</td><td>Caja</td></tr><tr><td>No hay caja abierta para el almacen {dto.almacenId}</td><td>Cuentas corrientes</td></tr><tr><td>No hay stock actual para revertir el producto {params.producto.id} en almacen {params.almacenId}</td><td>Órdenes de compra</td></tr><tr><td>No se encontró ninguna promoción con el código "{codigo}"</td><td>Promociones</td></tr><tr><td>No se encontró ninguna promoción con el id "{id}"</td><td>Promociones</td></tr><tr><td>No se encontró ninguna promoción con id {id}</td><td>Promociones</td></tr><tr><td>No se encontro ninguna promocion disponible para el almacen {almacenId}</td><td>Promociones</td></tr><tr><td>No se puede borrar el producto porque tiene stock en uno o mas almacenes.</td><td>Productos</td></tr><tr><td>No se puede eliminar la categoria {id} porque tiene productos asociados</td><td>Categorías</td></tr><tr><td>No se puede eliminar la categoria {id} porque tiene productos asociados</td><td>Categorías</td></tr><tr><td>Orden de compra {id} no encontrada</td><td>Órdenes de compra</td></tr><tr><td>Orden de compra {id} no encontrada</td><td>Órdenes de compra</td></tr><tr><td>Orden de compra {id} no encontrada</td><td>Órdenes de compra</td></tr><tr><td>order debe ser ASC o DESC</td><td>Caja</td></tr><tr><td>origen debe ser MANUAL o CUENTA_CORRIENTE</td><td>Caja</td></tr><tr><td>page debe ser un entero mayor a 0</td><td>Productos</td></tr><tr><td>page y limit deben ser enteros mayores a 0</td><td>Promociones</td></tr><tr><td>Para filtrar por inOferta es obligatorio enviar almacenId</td><td>Productos</td></tr><tr><td>Para ordenar por precioFinal es obligatorio enviar almacenId</td><td>Productos</td></tr><tr><td>Para un TRASPASO se requieren origen<em>almacen y destino</em>almacen.</td><td>Movimientos de stock</td></tr><tr><td>Para una {dto.tipo.toUpperCase()} debe indicarse origen_almacen.</td><td>Movimientos de stock</td></tr><tr><td>Para una ENTRADA debe indicarse destino_almacen.</td><td>Movimientos de stock</td></tr><tr><td>Parametro numerico invalido: {value}</td><td>Caja</td></tr><tr><td>ParametroReorden {id} no encontrado</td><td>Parámetros de reposición</td></tr><tr><td>ParametroReorden {id} no encontrado</td><td>Parámetros de reposición</td></tr><tr><td>Producto {dto.producto_id} no existe</td><td>Stock</td></tr><tr><td>Producto {dto.producto_id} no existe</td><td>Stock</td></tr><tr><td>Producto {i.productoId} no encontrado</td><td>Órdenes de compra</td></tr><tr><td>Producto {i.productoId} no encontrado</td><td>Órdenes de compra</td></tr><tr><td>Producto {id} no encontrado</td><td>Productos</td></tr><tr><td>Producto {id} no encontrado</td><td>Productos</td></tr><tr><td>Producto {id} no encontrado</td><td>Productos</td></tr><tr><td>Producto {id} no encontrado</td><td>Productos</td></tr><tr><td>Producto {itemDto.productoId} no encontrado</td><td>Ventas</td></tr><tr><td>Producto {p.productoId} no encontrado</td><td>Promociones</td></tr><tr><td>Producto {p.productoId} no encontrado</td><td>Promociones</td></tr><tr><td>Producto {producto_id} no encontrado</td><td>Productos</td></tr><tr><td>Producto {producto.id} se vende por gramos: enviar solo cantidad_gramos</td><td>Ventas</td></tr><tr><td>Producto {producto.id} se vende por piezas: enviar solo cantidad</td><td>Ventas</td></tr><tr><td>Producto {productoId} no encontrado</td><td>Productos</td></tr><tr><td>Producto {productoId} no existe</td><td>Stock</td></tr><tr><td>Promocion {promoItem.promocionId} no esta activa</td><td>Ventas</td></tr><tr><td>Promocion {promoItem.promocionId} no esta disponible para el almacen {dto.almacenId}</td><td>Ventas</td></tr><tr><td>Promocion {promoItem.promocionId} no tiene productos</td><td>Ventas</td></tr><tr><td>Promoción con id {id} no encontrada</td><td>Promociones</td></tr><tr><td>Proveedor {id} no encontrado</td><td>Proveedores</td></tr><tr><td>Proveedor {id} no encontrado</td><td>Proveedores</td></tr><tr><td>Proveedor {proveedorId} no encontrado</td><td>Órdenes de compra</td></tr><tr><td>Role {id} not found</td><td>Roles</td></tr><tr><td>Role {id} not found</td><td>Roles</td></tr><tr><td>Role name is required</td><td>Roles</td></tr><tr><td>Role name is required</td><td>Roles</td></tr><tr><td>Sesión de caja #{cajaId} no encontrada</td><td>Caja</td></tr><tr><td>Si inOferta es true, debe enviarse precioOferta &gt; 0</td><td>Productos</td></tr><tr><td>sortBy invalido. Valores permitidos: precioFinal</td><td>Productos</td></tr><tr><td>sortDir invalido. Valores permitidos: asc, desc</td><td>Productos</td></tr><tr><td>Stock insuficiente para editar la orden. Producto {params.producto.nombre}: disponible {actual.toFixed(3)}g, requerido {Math.abs(deltaGramos).toFixed(3)}g</td><td>Órdenes de compra</td></tr><tr><td>Stock insuficiente para editar la orden. Producto {params.producto.nombre}: disponible {actual}, requerido {Math.abs(deltaPiezas)}</td><td>Órdenes de compra</td></tr><tr><td>Stock no encontrado para producto {dto.producto<em>id} en almacén {dto.almacen</em>id}</td><td>Stock</td></tr><tr><td>Stock no encontrado para producto {producto<em>id} en almacén {almacen</em>id}</td><td>Stock</td></tr><tr><td>Stock no encontrado para producto {producto<em>id} en almacén {almacen</em>id}</td><td>Stock</td></tr><tr><td>tipo debe ser INGRESO, EGRESO o RETIRO</td><td>Caja</td></tr><tr><td>Token invalido</td><td>Acceso al sistema</td></tr><tr><td>Unidad {id} no encontrada</td><td>Unidades de medida</td></tr><tr><td>Unidad {id} no encontrada</td><td>Unidades de medida</td></tr><tr><td>Unidad no encontrada</td><td>Productos</td></tr><tr><td>Unidad no encontrada</td><td>Productos</td></tr><tr><td>Usuario {id} no encontrado</td><td>Usuarios</td></tr><tr><td>Usuario no encontrado</td><td>Facturación</td></tr><tr><td>UsuarioRol {id} no encontrado</td><td>Asignación de roles</td></tr><tr><td>UsuarioRol {id} no encontrado</td><td>Asignación de roles</td></tr><tr><td>Venta con id {dto.ventaId} no encontrada</td><td>Ingresos</td></tr><tr><td>Venta con ID {id} no encontrada</td><td>Ventas</td></tr><tr><td>Venta with ID {id} not found</td><td>Ventas</td></tr><tr><td>Ya existe un producto activo con ese código de barras. Nombre: "{existingBarcode.nombre}".</td><td>Productos</td></tr><tr><td>Ya existe una caja abierta para el almacén {dto.almacen_id} (sesión #{cajaAbierta.id})</td><td>Caja</td></tr><tr><td>Ya existe una cuenta corriente con documento "{documento}"</td><td>Cuentas corrientes</td></tr></tbody>
+</table></div>
+<h2 id="anexo-c-glosario" class="salto">Anexo C. Glosario</h2>
+<div class="tabla-wrap"><table>
+<thead><tr><th>Término</th><th>Significado</th></tr></thead>
+<tbody><tr><td>Almacen</td><td>Sucursal o punto de venta. Cada almacén tiene su propio stock, caja y precios.</td></tr><tr><td>Caja</td><td>Sesión de trabajo con dinero. Se abre al empezar el turno y se cierra al terminar, con arqueo.</td></tr><tr><td>Movimiento stock</td><td>Cualquier entrada o salida de mercadería del depósito.</td></tr><tr><td>Cuenta corriente</td><td>Crédito otorgado a un cliente para que compre ahora y pague después.</td></tr><tr><td>Parametro reorden</td><td>Stock mínimo a partir del cual el sistema avisa que hay que reponer.</td></tr><tr><td>Orden compra</td><td>Pedido de mercadería a un proveedor.</td></tr><tr><td>Extraccion</td><td>Retiro de dinero de la caja.</td></tr><tr><td>Promocion</td><td>Combo o descuento aplicable a una venta.</td></tr></tbody>
+</table></div>
+
+</div>
+</body>
+</html>

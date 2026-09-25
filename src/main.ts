@@ -27,6 +27,7 @@ async function bootstrap() {
       'https://frontend-gestioncomercios-production.up.railway.app',
       'https://frontend-sanesquina-production.up.railway.app',
       'https://main.d36q81g1sp706c.amplifyapp.com', //San esquina
+      'https://gestionkiosco-production.up.railway.app',
     ], // o true para permitir todos los orígenes (no recomendado en producción)
     credentials: true, // si usas cookies o autenticación con tokens en headers
   });
